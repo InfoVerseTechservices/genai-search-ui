@@ -70,7 +70,7 @@ const Focus = ({
   setFocusMode: (mode: string) => void;
 }) => {
   return (
-    <Popover className="fixed w-full max-w-[15rem] md:max-w-md lg:max-w-lg">
+    <Popover className="w-full max-w-[15rem] md:max-w-md lg:max-w-lg">
       <Popover.Button
         type="button"
         className="p-2 text-black/50 dark:text-white/50 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary active:scale-95 transition duration-200 hover:text-black dark:hover:text-white"

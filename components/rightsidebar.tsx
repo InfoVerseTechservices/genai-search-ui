@@ -28,87 +28,77 @@ const Rightsidebar: React.FC = () => {
     };
 
     return (
-        <div className="w-[100%] mt-[60px]  overflow-hidden">
-            <div className="mb-[46px] mt-[20px] relative">
+        <div className="w-[100%] mt-[20px] overflow-hidden">
+            <div className="mb-[46px] mt-[5px] relative">
                 <div
                     className="flex z-50 justify-center items-center rounded-full hover:text-brandprimary cursor-pointer mx-auto"
                 >
                     <ProfilePicture image={profilePic} />
                 </div>
-                {/* <ul className="min-w-[160px] rounded-lg bg-white shadow-md">
-                    <Link href="/profile">
-                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer font-sans text-brandprimary">
-                            {name}
-                        </li>
-                    </Link>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer font-sans" onClick={handleSignOut}>
-                        Log out
-                    </li>
-                </ul> */}
             </div>
-            <div className="h-[75vh] overflow-hidden">
+            <div className="h-[75vh] overflow-hidden text-black"> {/* Ensures text is black */}
                 <Link href="/gen-search">
-                    <div className="mb-[34px]">
+                    <div className="mb-[20px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             <FeedIcon w="30" h="30" fill={pathname === '/gen-search' ? "#1E71F2" : "#8E8E93"} />
                         </div>
-                        <p className={`${pathname === '/gen-search' ? "text-brandprimary" : "text-sidebaricon"} text-center text-[14px] mt-[7px] font-sans`}>
+                        <p className={`${pathname === '/gen-search' ? "text-black" : "text-black"} text-center text-[14px] mt-[7px] font-sans`}>
                             Gen AI
                         </p>
                     </div>
                 </Link>
 
                 <Link href="/task-bot">
-                    <div className="mb-[34px]">
+                    <div className="mb-[20px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             <FeedIcon w="30" h="30" fill={pathname === '/task-bot' ? "#1E71F2" : "#8E8E93"} />
                         </div>
-                        <p className={`${pathname === '/task-bot' ? "text-brandprimary" : "text-sidebaricon"} text-center text-[14px] mt-[7px] font-sans`}>
-                           Vibes
+                        <p className={`${pathname === '/task-bot' ? "text-black" : "text-black"} text-center text-[14px] mt-[7px] font-sans`}>
+                            Vibes
                         </p>
                     </div>
                 </Link>
 
                 <Link href="/feed">
-                    <div className="mb-[34px]">
+                    <div className="mb-[20px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             <FeedIcon w="30" h="30" fill={feedSections.includes(pathname) ? "#1E71F2" : "#8E8E93"} />
                         </div>
-                        <p className={`${feedSections.includes(pathname) ? "text-brandprimary" : "text-sidebaricon"} text-center text-[14px] mt-[7px] font-sans`}>
+                        <p className={`${feedSections.includes(pathname) ? "text-black" : "text-black"} text-center text-[14px] mt-[7px] font-sans`}>
                             Feed
                         </p>
                     </div>
                 </Link>
 
                 <Link href="/shop">
-                    <div className="mb-[34px]">
+                    <div className="mb-[20px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             <FeedIcon w="30" h="30" fill={pathname === '/shop' ? "#1E71F2" : "#8E8E93"} />
                         </div>
-                        <p className={`${pathname === '/shop' ? "text-brandprimary" : "text-sidebaricon"} text-center text-[14px] mt-[7px] font-sans`}>
+                        <p className={`${pathname === '/shop' ? "text-black" : "text-black"} text-center text-[14px] mt-[7px] font-sans`}>
                             Shopping
                         </p>
                     </div>
                 </Link>
 
                 <Link href="/news">
-                    <div className="mb-[34px]">
+                    <div className="mb-[20px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             <FeedIcon w="30" h="30" fill={pathname === '/news' ? "#1E71F2" : "#8E8E93"} />
                         </div>
-                        <p className={`${pathname === '/news' ? "text-brandprimary" : "text-sidebaricon"} text-center text-[14px] mt-[7px] font-sans`}>
+                        <p className={`${pathname === '/news' ? "text-black" : "text-black"} text-center text-[14px] mt-[7px] font-sans`}>
                             News
                         </p>
                     </div>
                 </Link>
 
-                <div className="mb-[34px]">
+                <div className="mb-[20px]"> {/* Reduced margin-bottom */}
                     <div className="w-[29px] mx-auto">
                         <FeedIcon w="30" h="30" fill={pathname === '/star' ? "#1E71F2" : "#8E8E93"} />
                     </div>
-                    <p className={`${pathname === '/news' ? "text-brandprimary" : "text-sidebaricon"} text-center text-[14px] mt-[7px] font-sans`}>
-                            Star Icon
-                        </p>
+                    <p className={`${pathname === '/star' ? "text-black" : "text-black"} text-center text-[14px] mt-[7px] font-sans`}>
+                        Star Icon
+                    </p>
                 </div>
             </div>
         </div>

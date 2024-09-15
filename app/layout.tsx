@@ -29,10 +29,10 @@ export default function RootLayout({
       <body className={cn('h-full', montserrat.className)}>
         <ThemeProvider>
           <div className="flex h-full">
-            <aside className="fixed left-0 top-0 h-full w-[9%] bg-gray-100 dark:bg-gray-800">
+            <aside className="fixed left-0 top-0 h-full w-[4%] bg-gray-100 dark:bg-white">
               <Rightsidebar />
             </aside>
-            <main className="flex-1 ml-[10%] flex flex-col ">
+            <main className="flex-1 ml-[4%] flex flex-col ">
               <Sidebar>{children}</Sidebar>
             </main>
           </div>

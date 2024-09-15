@@ -3,6 +3,7 @@ import { Montserrat } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import Sidebar from '@/components/Sidebar';
+import Rightsidebar from '@/components/rightsidebar'; // Ensure this path is correct
 import { Toaster } from 'sonner';
 import ThemeProvider from '@/components/theme/Provider';
 
@@ -15,8 +16,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: 'Perplexica - Chat with the internet',
-  description:
-    'Perplexica is an AI powered chatbot that is connected to the internet.',
+  description: 'Perplexica is an AI-powered chatbot that is connected to the internet.',
 };
 
 export default function RootLayout({
@@ -28,7 +28,14 @@ export default function RootLayout({
     <html className="h-full" lang="en" suppressHydrationWarning>
       <body className={cn('h-full', montserrat.className)}>
         <ThemeProvider>
-          <Sidebar>{children}</Sidebar>
+          <div className="flex h-full">
+            <aside className="fixed left-0 top-0 h-full w-[9%] bg-gray-100 dark:bg-gray-800">
+              <Rightsidebar />
+            </aside>
+            <main className="flex-1 ml-[10%] flex flex-col ">
+              <Sidebar>{children}</Sidebar>
+            </main>
+          </div>
           <Toaster
             toastOptions={{
               unstyled: true,

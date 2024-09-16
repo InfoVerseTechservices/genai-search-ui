@@ -69,7 +69,7 @@ const MessageBox = ({
     <div>
       {message.role === 'user' && (
         <div className={cn('', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-          <h2 className="text-black bg-[#D2E3FD] self-start font-medium text-3xl max-w-max inline rounded-md whitespace-normal">
+          <h2 className="text-[#000080] bg-[#D2E3FD] self-start font-medium text-3xl max-w-max inline rounded-md whitespace-normal">
             {message.content}
           </h2>
         </div>
@@ -119,10 +119,10 @@ const MessageBox = ({
                     {/*  <button className="p-2 text-black/70 dark:text-white/70 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black text-black dark:hover:text-white">
                       <Share size={18} />
                     </button> */}
-                    <Rewrite rewrite={rewrite} messageId={message.messageId} />
+                    {/* <Rewrite rewrite={rewrite} messageId={message.messageId} /> */}
                   </div>
                   <div className="flex flex-row items-center space-x-1">
-                    <Copy initialMessage={message.content} message={message} />
+                    <Copy initialMessage={message.content} message={message}/>
                     <button
                       onClick={() => {
                         if (speechStatus === 'started') {
@@ -134,7 +134,7 @@ const MessageBox = ({
                       className="p-2 text-black rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black dark:hover:text-white"
                     >
                       {speechStatus === 'started' ? (
-                        <StopCircle size={18} />
+                        <StopCircle size={18}/>
                       ) : (
                         <Volume2 size={18} />
                       )}
@@ -142,7 +142,7 @@ const MessageBox = ({
                   </div>
                 </div>
               )}
-              {isLast &&
+              {/* {isLast &&
                 message.suggestions &&
                 message.suggestions.length > 0 &&
                 message.role === 'assistant' &&
@@ -180,7 +180,7 @@ const MessageBox = ({
                       </div>
                     </div>
                   </>
-                )}
+                )} */}
             </div>
           </div>
           <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3 w-full lg:w-3/12 z-30 h-full pb-4">

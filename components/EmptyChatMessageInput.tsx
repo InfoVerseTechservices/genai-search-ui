@@ -72,7 +72,7 @@ const EmptyChatMessageInput = ({
           onChange={(e) => setMessage(e.target.value)}
           minRows={6}
           className="bg-transparent p-1 placeholder:text-[#ACACAC] text-sm self-start text-black resize-none focus:outline-none w-full max-h-24 lg:max-h-36 xl:max-h-48"
-          placeholder="Ask anything..."
+          placeholder="Ask Coco..."
         />
         <Image src={uploadIcon} alt='colombo' className="absolute top-2 right-2 cursor-pointer" />
 

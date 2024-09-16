@@ -1,5 +1,5 @@
 import { setCookie as set, getCookie as get, deleteCookie, getCookies, hasCookie } from 'cookies-next'
-import { COOKIE_OPTIONS } from './rootURL'
+import { COOKIE_OPTIONS } from './constant'
 
 // Define the type for the key and value parameters
 export const setCookie = (key: string, value?: string) => {

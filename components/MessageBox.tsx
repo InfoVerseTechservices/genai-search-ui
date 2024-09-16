@@ -54,7 +54,7 @@ const MessageBox = ({
         message.content.replace(
           regex,
           (_, number) =>
-            `<a href="${message.sources?.[number - 1]?.metadata?.url}" target="_blank" className="bg-light-secondary dark:bg-dark-secondary px-1 rounded ml-1 no-underline text-xs text-black/70 dark:text-white/70 relative">${number}</a>`,
+            `<a href="${message.sources?.[number - 1]?.metadata?.url}" target="_blank" className="bg-light-secondary dark:bg-dark-secondary px-1 rounded ml-1 no-underline text-xs text-black relative">${number}</a>`,
         ),
       );
     }
@@ -68,8 +68,8 @@ const MessageBox = ({
   return (
     <div>
       {message.role === 'user' && (
-        <div className={cn('w-full', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-          <h2 className="text-black dark:text-white font-medium text-3xl lg:w-9/12">
+        <div className={cn('', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
+          <h2 className="text-[#000080] bg-[#D2E3FD] self-start font-medium text-3xl max-w-max inline rounded-md whitespace-normal">
             {message.content}
           </h2>
         </div>
@@ -84,8 +84,8 @@ const MessageBox = ({
             {message.sources && message.sources.length > 0 && (
               <div className="flex flex-col space-y-2">
                 <div className="flex flex-row items-center space-x-2">
-                  <BookCopy className="text-black dark:text-white" size={20} />
-                  <h3 className="text-black dark:text-white font-medium text-xl">
+                  <BookCopy className="text-black" size={20} />
+                  <h3 className="text-black  font-medium text-xl">
                     Sources
                   </h3>
                 </div>
@@ -96,33 +96,33 @@ const MessageBox = ({
               <div className="flex flex-row items-center space-x-2">
                 <Disc3
                   className={cn(
-                    'text-black dark:text-white',
+                    'text-black',
                     isLast && loading ? 'animate-spin' : 'animate-none',
                   )}
                   size={20}
                 />
-                <h3 className="text-black dark:text-white font-medium text-xl">
+                <h3 className="text-black font-medium text-xl">
                   Answer
                 </h3>
               </div>
               <Markdown
                 className={cn(
-                  'prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0',
-                  'max-w-none break-words text-black dark:text-white text-sm md:text-base font-medium',
+                  'prose prose-p:leading-relaxed prose-pre:p-0',
+                  'max-w-none break-words text-black text-sm md:text-base font-medium',
                 )}
               >
                 {parsedMessage}
               </Markdown>
               {loading && isLast ? null : (
-                <div className="flex flex-row items-center justify-between w-full text-black dark:text-white py-4 -mx-2">
+                <div className="flex flex-row items-center justify-between w-full text-black py-4 -mx-2">
                   <div className="flex flex-row items-center space-x-1">
                     {/*  <button className="p-2 text-black/70 dark:text-white/70 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black text-black dark:hover:text-white">
                       <Share size={18} />
                     </button> */}
-                    <Rewrite rewrite={rewrite} messageId={message.messageId} />
+                    {/* <Rewrite rewrite={rewrite} messageId={message.messageId} /> */}
                   </div>
                   <div className="flex flex-row items-center space-x-1">
-                    <Copy initialMessage={message.content} message={message} />
+                    <Copy initialMessage={message.content} message={message}/>
                     <button
                       onClick={() => {
                         if (speechStatus === 'started') {
@@ -131,10 +131,10 @@ const MessageBox = ({
                           start();
                         }
                       }}
-                      className="p-2 text-black/70 dark:text-white/70 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black dark:hover:text-white"
+                      className="p-2 text-black rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black dark:hover:text-white"
                     >
                       {speechStatus === 'started' ? (
-                        <StopCircle size={18} />
+                        <StopCircle size={18}/>
                       ) : (
                         <Volume2 size={18} />
                       )}
@@ -142,14 +142,14 @@ const MessageBox = ({
                   </div>
                 </div>
               )}
-              {isLast &&
+              {/* {isLast &&
                 message.suggestions &&
                 message.suggestions.length > 0 &&
                 message.role === 'assistant' &&
                 !loading && (
                   <>
                     <div className="h-px w-full bg-light-secondary dark:bg-dark-secondary" />
-                    <div className="flex flex-col space-y-3 text-black dark:text-white">
+                    <div className="flex flex-col space-y-3 text-black">
                       <div className="flex flex-row items-center space-x-2 mt-4">
                         <Layers3 />
                         <h3 className="text-xl font-medium">Related</h3>
@@ -167,7 +167,7 @@ const MessageBox = ({
                               }}
                               className="cursor-pointer flex flex-row justify-between font-medium space-x-2 items-center"
                             >
-                              <p className="transition duration-200 hover:text-[#24A0ED]">
+                              <p className="transition duration-200 text-[#24A0ED]">
                                 {suggestion}
                               </p>
                               <Plus
@@ -180,7 +180,7 @@ const MessageBox = ({
                       </div>
                     </div>
                   </>
-                )}
+                )} */}
             </div>
           </div>
           <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3 w-full lg:w-3/12 z-30 h-full pb-4">

@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { BookOpenText, Home, Search, SquarePen, Settings } from 'lucide-react';
+import { History, Home, Search, SquarePen, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useSelectedLayoutSegments } from 'next/navigation';
 import React, { useState, type ReactNode } from 'react';
@@ -28,12 +28,12 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
     },
     {
       icon: Search,
-      href: '/discover',
+      href: '/',
       active: segments.includes('discover'),
       label: 'Discover',
     },
     {
-      icon: BookOpenText,
+      icon: History,
       href: '/library',
       active: segments.includes('library'),
       label: 'Library',
@@ -43,23 +43,24 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-20 lg:flex-col">
-        <div className="flex grow flex-col items-center justify-between gap-y-5 overflow-y-auto bg-light-secondary dark:bg-dark-secondary px-2 py-8">
-          <a href="/">
-            <SquarePen className="cursor-pointer" />
+        <div className="flex grow flex-col items-center justify-between gap-y-5 overflow-y-auto bg-[#D2E3FD] border-x-[#1E71F2] border px-2 py-8">
+          <a>
+            <SquarePen className="" color='transparent'/>
           </a>
           <VerticalIconContainer>
             {navLinks.map((link, i) => (
               <Link
                 key={i}
                 href={link.href}
+                color='black'
                 className={cn(
-                  'relative flex flex-row items-center justify-center cursor-pointer hover:bg-black/10 dark:hover:bg-white/10 duration-150 transition w-full py-2 rounded-lg',
+                  'relative flex flex-row items-center justify-center cursor-pointer text-black duration-150 transition w-full py-2 rounded-lg',
                   link.active
                     ? 'text-black dark:text-white'
                     : 'text-black/70 dark:text-white/70',
                 )}
               >
-                <link.icon />
+                <link.icon color='#646464'/>
                 {link.active && (
                   <div className="absolute right-0 -mr-2 h-full w-1 rounded-l-lg bg-black dark:bg-white" />
                 )}
@@ -70,6 +71,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
           <Settings
             onClick={() => setIsSettingsOpen(!isSettingsOpen)}
             className="cursor-pointer"
+            color='#646464'
           />
 
           <SettingsDialog

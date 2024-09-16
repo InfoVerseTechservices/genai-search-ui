@@ -58,7 +58,7 @@ const Page = () => {
     </div>
   ) : (
     <div>
-      <div className="fixed z-40 top-0 left-0 right-0 lg:pl-[104px] lg:pr-6 lg:px-8 px-4 py-4 lg:py-6 border-b border-light-200 dark:border-dark-200">
+      <div className="fixed z-40 top-0 left-0 right-0 lg:pl-[104px] lg:pr-6 lg:px-8 px-4 py-4 lg:py-6 ">
         <div className="flex flex-row items-center space-x-2 max-w-screen-lg lg:mx-auto">
           <BookOpenText />
           <h2 className="text-black dark:text-white lg:text-3xl lg:font-medium">
@@ -82,12 +82,12 @@ const Page = () => {
             >
               <Link
                 href={`/c/${chat.id}`}
-                className="text-black dark:text-white lg:text-xl font-medium truncate transition duration-200 hover:text-[#24A0ED] dark:hover:text-[#24A0ED] cursor-pointer"
+                className=" lg:text-xl font-medium truncate transition duration-200 text-[#24A0ED] dark:hover:text-[#24A0ED] cursor-pointer"
               >
                 {chat.title}
               </Link>
               <div className="flex flex-row items-center justify-between w-full">
-                <div className="flex flex-row items-center space-x-1 lg:space-x-1.5 text-black/70 dark:text-white/70">
+                <div className="flex flex-row items-center space-x-1 lg:space-x-1.5 text-black/70">
                   <ClockIcon size={15} />
                   <p className="text-xs">
                     {formatTimeDifference(new Date(), chat.createdAt)} Ago

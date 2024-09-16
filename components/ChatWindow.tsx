@@ -480,7 +480,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
   if (hasError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <p className="dark:text-white/70 text-black/70 text-sm">
+        <p className="text-black/70 text-sm">
           Failed to connect to the server. Please try again later.
         </p>
       </div>

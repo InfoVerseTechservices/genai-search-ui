@@ -35,7 +35,7 @@ const SideBottomAdComponent: React.FC<SideBottomAdComponentProps> = ({ divid }) 
                   '/23102803892/genai_desktop_300v_sidebar',
                   [[300, 250], [250, 250], [125, 125], [300, 600], [320, 480], [200, 200], [336, 280], [300, 100]],
                   divid
-                ).addService(window.googletag.pubads());
+                )?.addService(window.googletag.pubads());
 
                 console.log('Collapsing empty divs...');
                 window.googletag.pubads().collapseEmptyDivs();

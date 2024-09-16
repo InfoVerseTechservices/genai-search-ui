@@ -42,10 +42,10 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div>
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-20 lg:flex-col">
-        <div className="flex grow flex-col items-center justify-between gap-y-5 overflow-y-auto bg-[#D2E3FD] border-x-[#1E71F2] border px-2 py-8">
-          <a>
-            <SquarePen className="" color='transparent'/>
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-18 lg:flex-col">
+        <div className="flex grow flex-col items-center justify-between gap-y-5 overflow-y-auto bg-light-secondary dark:bg-dark-secondary px-2 py-8">
+          <a href="/">
+            <SquarePen className="cursor-pointer" />
           </a>
           <VerticalIconContainer>
             {navLinks.map((link, i) => (

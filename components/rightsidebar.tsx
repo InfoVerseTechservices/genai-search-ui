@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Image from 'next/image';
 
 // Import the image
-import feedIconImage from "@/components/Rightsidebar/feediconimage/image.png";  // Adjust the relative path as needed
+import feedIconImage from "@/components/Rightsidebar/feediconimage/feed.png";  // Adjust the relative path as needed
 import vibeImage from "@/components/Rightsidebar/feediconimage/vibes.png";
 import StarImage from "@/components/Rightsidebar/feediconimage/star.png";
 
@@ -46,8 +46,8 @@ const Rightsidebar: React.FC = () => {
                 </div>
             </div>
             <div className="h-[75vh] overflow-hidden text-black"> {/* Ensures text is black */}
-                <Link href="/gen-search">
-                    <div className="mb-[20px]"> {/* Reduced margin-bottom */}
+                <Link href="https://colomboai.com/gen-search">
+                    <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             {/* Use imported image here */}
                             <Image src={genaiImage} alt="Gen AI Icon" width={40} height={40} />
@@ -58,8 +58,8 @@ const Rightsidebar: React.FC = () => {
                     </div>
                 </Link>
 
-                <Link href="/task-bot">
-                    <div className="mb-[20px]"> {/* Reduced margin-bottom */}
+                <Link href="https://colomboai.com/vibes">
+                    <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             {/* Use imported image here */}
                             <Image src={vibeImage} alt="Vibes Icon" width={30} height={30} />
@@ -70,8 +70,8 @@ const Rightsidebar: React.FC = () => {
                     </div>
                 </Link>
 
-                <Link href="/feed">
-                    <div className="mb-[20px]"> {/* Reduced margin-bottom */}
+                <Link href="https://colomboai.com/feed">
+                    <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                         <div className="w-[40px] mx-auto">
                             {/* Use imported image here */}
                             <Image src={feedIconImage} alt="Feed Icon" width={40} height={40} />
@@ -82,8 +82,8 @@ const Rightsidebar: React.FC = () => {
                     </div>
                 </Link>
 
-                <Link href="/shop">
-                    <div className="mb-[20px]"> {/* Reduced margin-bottom */}
+                <Link href="https://colomboai.com/shop">
+                    <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             {/* Use imported image here */}
                             <Image src={shopImage} alt="Shopping Icon" width={30} height={30} />
@@ -94,8 +94,8 @@ const Rightsidebar: React.FC = () => {
                     </div>
                 </Link>
 
-                <Link href="/news">
-                    <div className="mb-[20px]"> {/* Reduced margin-bottom */}
+                <Link href="https://colomboai.com/news">
+                    <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             {/* Use imported image here */}
                             <Image src={newsImage} alt="News Icon" width={30} height={30} />
@@ -106,7 +106,7 @@ const Rightsidebar: React.FC = () => {
                     </div>
                 </Link>
 
-                <div className="mb-[20px]"> {/* Reduced margin-bottom */}
+                <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                   <div className="w-[50px] mx-auto"> {/* Adjusted the size to 40px */}
                      {/* Use imported image here */}
                     <Image src={StarImage} alt="Star Icon" width={50} height={50} /> {/* Increased size to 40px */}

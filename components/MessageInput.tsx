@@ -49,8 +49,15 @@ const MessageInput = ({
     };
   }, []);
 
+  const borderStyle = {
+    border: '0.5px solid transparent',
+    backgroundClip: 'padding-box',
+    background: 'linear-gradient(white, white) padding-box, linear-gradient(180deg, #FF0049 0%, #FFBE3B 25%, #00BB5C 50%, #187DC4 75%, #58268B 100%) border-box',
+    borderImageSlice: 1,
+  };
+
   return (
-    <form
+    <form style={borderStyle}
       onSubmit={(e) => {
         if (loading) return;
         e.preventDefault();
@@ -65,7 +72,7 @@ const MessageInput = ({
         }
       }}
       className={cn(
-        'bg-light-secondary dark:bg-dark-secondary p-4 flex items-center overflow-hidden border border-light-200 dark:border-dark-200',
+        'bg-white p-4 flex items-center overflow-hidden border ',
         mode === 'multi' ? 'flex-col rounded-lg' : 'flex-row rounded-full',
       )}
     >
@@ -77,10 +84,12 @@ const MessageInput = ({
         onHeightChange={(height, props) => {
           setTextareaRows(Math.ceil(height / props.rowHeight));
         }}
-        className="transition bg-transparent dark:placeholder:text-white/50 placeholder:text-sm text-sm dark:text-white resize-none focus:outline-none w-full px-2 max-h-24 lg:max-h-36 xl:max-h-48 flex-grow flex-shrink"
+        className="transition bg-transparent placeholder:text-[#ACACAC] placeholder:text-sm text-black text-sm  resize-none focus:outline-none w-full px-2 max-h-24 lg:max-h-36 xl:max-h-48 flex-grow flex-shrink"
         placeholder="Ask a follow-up"
       />
-      {mode === 'single' && (
+      {/* Co-pilot */}
+
+      {/* {mode === 'single' && (
         <div className="flex flex-row items-center space-x-4">
           <CopilotToggle
             copilotEnabled={copilotEnabled}
@@ -93,8 +102,8 @@ const MessageInput = ({
             <ArrowUp className="bg-background" size={17} />
           </button>
         </div>
-      )}
-      {mode === 'multi' && (
+      )} */}
+      {/* {mode === 'multi' && (
         <div className="flex flex-row items-center justify-between w-full pt-2">
           <Attach />
           <div className="flex flex-row items-center space-x-4">
@@ -110,7 +119,7 @@ const MessageInput = ({
             </button>
           </div>
         </div>
-      )}
+      )} */}
     </form>
   );
 };

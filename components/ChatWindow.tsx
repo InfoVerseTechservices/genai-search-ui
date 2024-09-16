@@ -504,11 +504,14 @@ const ChatWindow = ({ id }: { id?: string }) => {
             />
           </>
         ) : (
+          <>
           <EmptyChat
             sendMessage={sendMessage}
             focusMode={focusMode}
             setFocusMode={setFocusMode}
           />
+        
+          </>
         )}
       </div>
     )

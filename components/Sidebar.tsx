@@ -41,9 +41,9 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
   ];
 
   return (
-    <div>
+    <div className=''>
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-18 lg:flex-col">
-        <div className="flex grow flex-col items-center justify-between gap-y-5 overflow-y-auto bg-light-secondary dark:bg-dark-secondary px-2 py-8">
+        <div className="flex grow w-[60px] flex-col items-center justify-between gap-y-5 overflow-y-auto bg-[#D2E3FD]  border-[0.5px] border-[#1E71F2] dark:bg-dark-secondary px-2 py-8">
           <a href="/">
             <SquarePen className="cursor-pointer" />
           </a>
@@ -60,10 +60,18 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                     : 'text-black/70 dark:text-white/70',
                 )}
               >
-                <link.icon color='#646464'/>
-                {link.active && (
-                  <div className="absolute right-0 -mr-2 h-full w-1 rounded-l-lg bg-black dark:bg-white" />
+                
+                {link.active ?
+                ( 
+                  <link.icon color='black'/> 
+                )
+                : 
+                (
+                  <link.icon color='#646464'/> 
                 )}
+                {/* {link.active && (
+                  <div className="absolute right-0 -mr-2 h-full w-1 rounded-l-lg bg-black dark:bg-white" />
+                )} */}
               </Link>
             ))}
           </VerticalIconContainer>

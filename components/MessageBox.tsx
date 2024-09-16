@@ -19,6 +19,8 @@ import MessageSources from './MessageSources';
 import SearchImages from './SearchImages';
 import SearchVideos from './SearchVideos';
 import { useSpeech } from 'react-text-to-speech';
+import SideTopAdComponent from './Ads/SideAdTop';
+import SideBottomAdComponent from './Ads/SideAdBottom';
 
 const MessageBox = ({
   message,
@@ -192,6 +194,14 @@ const MessageBox = ({
               chat_history={history.slice(0, messageIndex - 1)}
               query={history[messageIndex - 1].content}
             />
+            <div className='w-[300px] border border-red-600 h-[1140px]'>
+            <div className="w-[300px]  h-[250px] cursor-pointer">
+          <SideTopAdComponent divid='top1'/>
+        </div>
+        <div className="w-[300px] h-[600px] cursor-pointer">
+          <SideBottomAdComponent divid='bottom1'/>
+        </div>
+              </div>
           </div>
         </div>
       )}

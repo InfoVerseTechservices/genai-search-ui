@@ -282,7 +282,6 @@ const ChatWindow = ({ id }: { id?: string }) => {
   const [isMessagesLoaded, setIsMessagesLoaded] = useState(false);
 
   const [notFound, setNotFound] = useState(false);
-
   useEffect(() => {
     if (
       chatId &&
@@ -486,7 +485,13 @@ const ChatWindow = ({ id }: { id?: string }) => {
       </div>
     );
   }
-
+  const editMessage = (messageId: string, newContent: string) => {
+    setMessages((prevMessages) =>
+      prevMessages.map((msg) =>
+        msg.messageId === messageId ? { ...msg, content: newContent } : msg,
+      ),
+    );
+  };
   return isReady ? (
     notFound ? (
       <Error statusCode={404} />
@@ -501,16 +506,17 @@ const ChatWindow = ({ id }: { id?: string }) => {
               sendMessage={sendMessage}
               messageAppeared={messageAppeared}
               rewrite={rewrite}
+              editMessage={editMessage}
+              setMessages={setMessages}
             />
           </>
         ) : (
           <>
-          <EmptyChat
-            sendMessage={sendMessage}
-            focusMode={focusMode}
-            setFocusMode={setFocusMode}
-          />
-        
+            <EmptyChat
+              sendMessage={sendMessage}
+              focusMode={focusMode}
+              setFocusMode={setFocusMode}
+            />
           </>
         )}
       </div>

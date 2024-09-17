@@ -2,7 +2,7 @@ import { Delete, Trash } from 'lucide-react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, useState } from 'react';
 import { toast } from 'sonner';
-import { Chat } from '@/app/library/page';
+import { Chat } from '@/app/genai-search/library/page';
 
 const DeleteChat = ({
   chatId,

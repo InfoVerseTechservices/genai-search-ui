@@ -39,13 +39,13 @@ const Chat = ({
     };
   });
 
-  useEffect(() => {
-    messageEnd.current?.scrollIntoView({ behavior: 'smooth' });
+  // useEffect(() => {
+  //   messageEnd.current?.scrollIntoView({ behavior: 'smooth' });
 
-    if (messages.length === 1) {
-      document.title = `${messages[0].content.substring(0, 30)} - Perplexica`;
-    }
-  }, [messages]);
+  //   if (messages.length === 1) {
+  //     document.title = `${messages[0].content.substring(0, 30)} - Perplexica`;
+  //   }
+  // }, [messages]);
 
   return (
     <div className="flex flex-col space-y-6 pt-8 pb-44 lg:pb-32 sm:mx-4 md:mx-8">

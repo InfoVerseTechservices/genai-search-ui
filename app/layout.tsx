@@ -28,7 +28,7 @@ export default function RootLayout({
     <html className="h-full" lang="en" suppressHydrationWarning>
       <body className={cn('h-full', montserrat.className)}>
         <ThemeProvider>
-          <div className="flex h-full">
+          <div className="flex h-full overflow-auto">
             <aside className="fixed left-0 top-0 h-full w-[4%] bg-white dark:bg-white">
               <Rightsidebar />
             </aside>

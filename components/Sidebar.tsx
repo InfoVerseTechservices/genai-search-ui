@@ -36,7 +36,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
       icon: History,
       href: '/library',
       active: segments.includes('library'),
-      label: 'Library',
+      label: 'History',
     },
   ];
 

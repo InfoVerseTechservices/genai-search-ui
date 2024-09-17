@@ -12,12 +12,16 @@ const Chat = ({
   sendMessage,
   messageAppeared,
   rewrite,
+  editMessage,
+  setMessages,
 }: {
   messages: Message[];
   sendMessage: (message: string) => void;
   loading: boolean;
   messageAppeared: boolean;
   rewrite: (messageId: string) => void;
+  editMessage: (messageId: string, newContent: string) => void;
+  setMessages: (messages: Message[]) => void;
 }) => {
   const [dividerWidth, setDividerWidth] = useState(0);
   const dividerRef = useRef<HTMLDivElement | null>(null);
@@ -64,6 +68,8 @@ const Chat = ({
               isLast={isLast}
               rewrite={rewrite}
               sendMessage={sendMessage}
+              editMessage={editMessage}
+              setMessages={setMessages}
             />
             {!isLast && msg.role === 'assistant' && (
               <div className="h-px w-full bg-light-secondary dark:bg-dark-secondary" />

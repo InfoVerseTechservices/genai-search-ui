@@ -1156,7 +1156,7 @@ const MessageBox = ({
   };
 
   return (
-    <div>
+    <div >
       {message.role === 'user' && (
         <div className={cn('', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
           {isEditing ? (
@@ -1249,7 +1249,7 @@ const MessageBox = ({
               )}
             </div>
           </div>
-          <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3 w-full lg:w-3/12 z-30 h-full pb-4">
+          <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3  w-[300px]  z-30 h-full pb-4">
             <SearchImages
               query={history[messageIndex - 1].content}
               chat_history={history.slice(0, messageIndex - 1)}
@@ -1258,11 +1258,11 @@ const MessageBox = ({
               chat_history={history.slice(0, messageIndex - 1)}
               query={history[messageIndex - 1].content}
             />
-            <div className="w-[300px] border border-red-600 h-[1140px]">
-              <div className="w-[300px] h-[250px] cursor-pointer">
+            <div className="w-[300px]  gap-2.5  overflow-x-hidden">
+              <div className="w-[300px]  h-[250px]  cursor-pointer">
                 <SideTopAdComponent divid="top1" />
               </div>
-              <div className="w-[300px] h-[600px] cursor-pointer">
+              <div className="w-[300px] h-[600px]  cursor-pointer">
                 <SideBottomAdComponent divid="bottom1" />
               </div>
             </div>

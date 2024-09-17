@@ -18,7 +18,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
   const segments = useSelectedLayoutSegments();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
+  
   const navLinks = [
     // {
     //   icon: Home,
@@ -51,6 +51,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
             {navLinks.map((link, i) => (
               <Link
                 key={i}
+
                 href={link.href}
                 color='black'
                 className={cn(
@@ -95,6 +96,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
           <Link
             href={link.href}
             key={i}
+
             className={cn(
               'relative flex flex-col items-center space-y-1 text-center w-full',
               link.active

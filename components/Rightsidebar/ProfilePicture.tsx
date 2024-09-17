@@ -1,4 +1,5 @@
-import React from 'react';
+import React from 'react'
+import Image from 'next/image'
 
 // Define the prop types
 interface ProfilePictureProps {
@@ -7,13 +8,16 @@ interface ProfilePictureProps {
   className?: string; // Optional additional class names
 }
 
+
+
 const ProfilePicture: React.FC<ProfilePictureProps> = ({ image = '/images/profile/defalut_user.svg', size = 42, className }) => {
   return (
-    <img
+    <Image
       src={image}
       alt="avatar"
       className={`rounded-full${className ? ` ${className}` : ''}`}
-      style={{ height: size, width: size }}
+      width={size}
+      height={size}
     />
   );
 };

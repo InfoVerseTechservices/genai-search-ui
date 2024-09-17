@@ -5,13 +5,16 @@ import Logo from "../public/ColomboAI-logo.svg"
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'Chat - Perplexica',
+  title: 'ColomboAI',
   description: 'Chat with the internet, chat with Perplexica.',
 };
 
 const Home = () => {
   return (
     <div className='flex flex-col items-center'>
+      {/* <head>
+        <link rel="icon" href="/images/favicon.svg" />
+      </head> */}
       <Suspense>
         <ChatWindow />
       </Suspense>

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+// import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Document } from '@langchain/core/documents';
 import Navbar from './Navbar';
 import Chat from './Chat';
@@ -306,15 +307,25 @@ const ChatWindow = ({ id }: { id?: string }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    return () => {
-      if (ws?.readyState === 1) {
-        ws.close();
-        console.log('[DEBUG] closed');
-      }
-    };
-  }, []);
+  const closeWebSocket = useCallback(() => {
+    if (ws?.readyState === 1) {
+      ws.close();
+      console.log('[DEBUG] closed');
+    }
+  }, [ws]);
 
+  // useEffect(() => {
+  //   return () => {
+  //     if (ws?.readyState === 1) {
+  //       ws.close();
+  //       console.log('[DEBUG] closed');
+  //     }
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    return closeWebSocket;
+  }, [closeWebSocket]);
   const messagesRef = useRef<Message[]>([]);
 
   useEffect(() => {

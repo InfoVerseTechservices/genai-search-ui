@@ -5,16 +5,6 @@ import ProfilePicture from "@/components/Rightsidebar/ProfilePicture";
 import { useEffect, useState } from "react";
 import Image from 'next/image';
 
-// Import the image
-import feedIconImage from "@/components/Rightsidebar/feediconimage/feed.png";  // Adjust the relative path as needed
-import vibeImage from "@/components/Rightsidebar/feediconimage/vibes.png";
-import StarImage from "@/components/Rightsidebar/feediconimage/star.png";
-
-import genaiImage from "@/components/Rightsidebar/feediconimage/genai.png";
-import shopImage from "@/components/Rightsidebar/feediconimage/shop.png";
-import newsImage from "@/components/Rightsidebar/feediconimage/news.png";
-
-
 
 /* eslint-disable @next/next/no-img-element */
 
@@ -50,7 +40,7 @@ const Rightsidebar: React.FC = () => {
                     <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             {/* Use imported image here */}
-                            <Image src={genaiImage} alt="Gen AI Icon" width={40} height={40} />
+                            <Image src="/feediconimage/genai.png" alt="Gen AI Icon" width={40} height={40} />
                         </div>
                         {/* <p className="text-black text-center text-[14px] mt-[7px] font-sans">
                             Gen AI
@@ -62,7 +52,7 @@ const Rightsidebar: React.FC = () => {
                     <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             {/* Use imported image here */}
-                            <Image src={vibeImage} alt="Vibes Icon" width={30} height={30} />
+                            <Image src="/feediconimage/vibes.png" alt="Vibes Icon" width={30} height={30} />
                         </div>
                         {/* <p className="text-black text-center text-[14px] mt-[7px] font-sans">
                             Vibes
@@ -74,7 +64,7 @@ const Rightsidebar: React.FC = () => {
                     <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                         <div className="w-[40px] mx-auto">
                             {/* Use imported image here */}
-                            <Image src={feedIconImage} alt="Feed Icon" width={40} height={40} />
+                            <Image src="/feediconimage/feed.png" alt="Feed Icon" width={40} height={40} />
                         </div>
                         {/* <p className="text-black text-center text-[14px] mt-[7px] font-sans">
                             Feed
@@ -86,7 +76,7 @@ const Rightsidebar: React.FC = () => {
                     <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             {/* Use imported image here */}
-                            <Image src={shopImage} alt="Shopping Icon" width={30} height={30} />
+                            <Image src="/feediconimage/shop.png" alt="Shopping Icon" width={30} height={30} />
                         </div>
                         {/* <p className="text-black text-center text-[14px] mt-[7px] font-sans">
                             Shop
@@ -98,7 +88,7 @@ const Rightsidebar: React.FC = () => {
                     <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             {/* Use imported image here */}
-                            <Image src={newsImage} alt="News Icon" width={30} height={30} />
+                            <Image src="/feediconimage/news.png" alt="News Icon" width={30} height={30} />
                         </div>
                         {/* <p className="text-black text-center text-[14px] mt-[7px] font-sans">
                             News
@@ -109,7 +99,7 @@ const Rightsidebar: React.FC = () => {
                 <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                   <div className="w-[50px] mx-auto"> {/* Adjusted the size to 40px */}
                      {/* Use imported image here */}
-                    <Image src={StarImage} alt="Star Icon" width={50} height={50} /> {/* Increased size to 40px */}
+                    <Image src="/feediconimage/star.png" alt="Star Icon" width={50} height={50} /> {/* Increased size to 40px */}
                   </div>
                      {/* <p className="text-black text-center text-[14px] mt-[7px] font-sans">
                           Star Icon

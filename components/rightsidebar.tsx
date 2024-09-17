@@ -6,14 +6,15 @@ import { useEffect, useState } from "react";
 import Image from 'next/image';
 
 // Import the image
+const URL = "https://colomboai.com/genai-search/feediconimage"
 
-import feedIconImage from "@/public/feediconimage/feed.png";  // Adjust the relative path as needed
-import vibeImage from "@/public/feediconimage/vibes.png";
-import StarImage from "@/public/feediconimage/star.png";
+const feedIconImage = `${URL}/feed.png`;  // Adjust the relative path as needed
+const vibeImage = `${URL}/vibes.png`;
+const StarImage = `${URL}/star.png`;
 
-import genaiImage from "@/public/feediconimage/genai.png";
-import shopImage from "@/public/feediconimage/shop.png";
-import newsImage from "@/public/feediconimage/news.png";
+const genaiImage = `${URL}/genai.png`;
+const shopImage = `${URL}/shop.png`;
+const newsImage = `${URL}/news.png`;
 
 /* eslint-disable @next/next/no-img-element */
 

@@ -1,8 +1,5 @@
 {
   "name": "colomboai-gensearch",
-  "version": "1.9.0-rc2",
-  "license": "MIT",
-  "author": "ItzCrazyKns",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

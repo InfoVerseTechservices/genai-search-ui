@@ -46,7 +46,7 @@ const Rightsidebar: React.FC = () => {
                 </div>
             </div>
             <div className="h-[75vh] overflow-hidden text-black"> {/* Ensures text is black */}
-                <Link href="https://colomboai.com/gen-search">
+                <Link href="https://colomboai.com/genai-search">
                     <div className="mb-[30px]"> {/* Reduced margin-bottom */}
                         <div className="w-[29px] mx-auto">
                             {/* Use imported image here */}

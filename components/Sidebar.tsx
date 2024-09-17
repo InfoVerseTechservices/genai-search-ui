@@ -20,18 +20,18 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const navLinks = [
-    {
-      icon: Home,
-      href: '/',
-      active: segments.length === 0 || segments.includes('c'),
-      label: 'Home',
-    },
-    {
-      icon: Search,
-      href: '/',
-      active: segments.includes('discover'),
-      label: 'Discover',
-    },
+    // {
+    //   icon: Home,
+    //   href: '/',
+    //   active: segments.length === 0 || segments.includes('c'),
+    //   label: 'Home',
+    // },
+    // {
+    //   icon: Search,
+    //   href: '/',
+    //   active: segments.includes('discover'),
+    //   label: 'Discover',
+    // },
     {
       icon: History,
       href: '/library',
@@ -79,7 +79,8 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
           <Settings
             onClick={() => setIsSettingsOpen(!isSettingsOpen)}
             className="cursor-pointer"
-            color='#646464'
+            // color='#646464'
+            color='transparent'
           />
 
           <SettingsDialog

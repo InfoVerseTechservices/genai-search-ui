@@ -43,7 +43,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className=''>
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-18 lg:flex-col">
-        <div className="flex grow w-[60px] flex-col items-center justify-between gap-y-5 overflow-y-auto bg-[#D2E3FD]  border-[0.5px] border-[#1E71F2] dark:bg-dark-secondary px-2 py-8">
+        <div className="flex grow w-[40px] flex-col items-center justify-between gap-y-5 overflow-y-auto bg-[#D2E3FD]  border-[0.5px] border-[#1E71F2] dark:bg-dark-secondary px-2 py-8">
           <a href="/">
             <SquarePen className="cursor-pointer" />
           </a>

@@ -32,9 +32,10 @@ const SideTopAdComponent: React.FC<SideTopAdComponentProps> = ({ divid }) => {
               if (!isSlotDefined(divid)) {
                 console.log('Defining ad slot...');
                 window.googletag.defineSlot(
-                  '/23102803892/genai_mobile_300v_ad1',
-                  [[320, 50], [336, 280], [88, 31], [300, 100], [120, 30], [216, 36], [120, 20], [168, 28], [300, 50], [300, 250], [168, 42]],
-                  divid
+                  '/23102803892/Genai_Desktop_300v_sidebar_top',
+                  [[300, 250], [336, 280]]
+                  ,
+                       divid
                 )?.addService(window.googletag.pubads());
 
                 console.log('Collapsing empty divs...');
@@ -66,7 +67,7 @@ const SideTopAdComponent: React.FC<SideTopAdComponentProps> = ({ divid }) => {
       <Head>
         <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
       </Head>
-      <div id={divid} style={{ minWidth: '88px', minHeight: '20px', border:'1px solid blue' }}></div>
+      <div id={divid} style={{ minHeight:'250px',minWidth:'300px' }}></div>
     </>
   );
 };

@@ -1,8 +1,5 @@
 {
   "name": "colomboai-gensearch",
-  "version": "1.9.0-rc2",
-  "license": "MIT",
-  "author": "ItzCrazyKns",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -16,6 +13,7 @@
     "@langchain/openai": "^0.0.25",
     "@popperjs/core": "^2.11.8",
     "@tailwindcss/typography": "^0.5.12",
+    "@types/google-publisher-tag": "^1.20240902.0",
     "clsx": "^2.1.0",
     "cookies-next": "^4.2.1",
     "langchain": "^0.1.30",

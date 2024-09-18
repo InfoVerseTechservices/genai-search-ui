@@ -3,7 +3,7 @@ import { Montserrat } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import Sidebar from '@/components/Sidebar';
-import Rightsidebar from '@/components/rightsidebar'; // Ensure this path is correct
+import LeftSidebar from '@/components/LeftSidebar'; // Ensure this path is correct
 import { Toaster } from 'sonner';
 import ThemeProvider from '@/components/theme/Provider';
 
@@ -30,9 +30,9 @@ export default function RootLayout({
         <ThemeProvider>
           <div className="flex h-full">
             <aside className="fixed left-0 top-0 h-full w-[4%] bg-gray-100 dark:bg-white">
-              <Rightsidebar />
+              <LeftSidebar />
             </aside>
-            <main className="flex-1 ml-[4%] flex flex-col ">
+            <main className="flex-1 ml-[4%] w-[4%] flex flex-col ">
               <Sidebar>{children}</Sidebar>
             </main>
           </div>

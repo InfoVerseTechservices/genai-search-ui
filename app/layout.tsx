@@ -32,7 +32,7 @@ export default function RootLayout({
             <aside className="fixed left-0 top-0 h-full w-[4%] bg-gray-100 dark:bg-white">
               <LeftSidebar />
             </aside>
-            <main className="flex-1 ml-[4%] flex flex-col ">
+            <main className="flex-1 ml-[4%] w-[4%] flex flex-col ">
               <Sidebar>{children}</Sidebar>
             </main>
           </div>

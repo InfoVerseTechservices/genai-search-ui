@@ -1,10 +1,9 @@
-// rootURL.ts
-export const COOKIE_OPTIONS = {
-    // Define your cookie options here
-    // For example:
-    path: '/',
-    maxAge: 30 * 24 * 60 * 60,
-    sameSite: 'strict' as const,
-    // Add any other options you need
-  };
-  export default COOKIE_OPTIONS;
+import { OptionsType } from "cookies-next/lib/types";
+
+export const COOKIE_OPTIONS: OptionsType = {
+    path: "/",
+    expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000 * 365),
+    sameSite: 'strict',
+    secure: true,
+    domain: '.colomboai.com'
+  }

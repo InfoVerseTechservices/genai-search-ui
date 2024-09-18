@@ -12,12 +12,16 @@ const Chat = ({
   sendMessage,
   messageAppeared,
   rewrite,
+  editMessage,
+  setMessages,
 }: {
   messages: Message[];
   sendMessage: (message: string) => void;
   loading: boolean;
   messageAppeared: boolean;
   rewrite: (messageId: string) => void;
+  editMessage: (messageId: string, newContent: string) => void;
+  setMessages: (messages: Message[]) => void;
 }) => {
   const [dividerWidth, setDividerWidth] = useState(0);
   const dividerRef = useRef<HTMLDivElement | null>(null);
@@ -39,13 +43,13 @@ const Chat = ({
     };
   });
 
-  useEffect(() => {
-    messageEnd.current?.scrollIntoView({ behavior: 'smooth' });
+  // useEffect(() => {
+  //   messageEnd.current?.scrollIntoView({ behavior: 'smooth' });
 
-    if (messages.length === 1) {
-      document.title = `${messages[0].content.substring(0, 30)} - Perplexica`;
-    }
-  }, [messages]);
+  //   if (messages.length === 1) {
+  //     document.title = `${messages[0].content.substring(0, 30)} - Perplexica`;
+  //   }
+  // }, [messages]);
 
   return (
     <div className="flex flex-col space-y-6 pt-8 pb-44 lg:pb-32 sm:mx-4 md:mx-8">
@@ -64,6 +68,8 @@ const Chat = ({
               isLast={isLast}
               rewrite={rewrite}
               sendMessage={sendMessage}
+              editMessage={editMessage}
+              setMessages={setMessages}
             />
             {!isLast && msg.role === 'assistant' && (
               <div className="h-px w-full bg-light-secondary dark:bg-dark-secondary" />

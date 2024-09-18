@@ -28,13 +28,13 @@ const EmptyChat = ({
        </div>
      </div>
    </div>
-   <div className='fixed top-[110px] right-5 w-[300px] flex flex-col items-center gap-2.5  h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden'>
+   <div className='fixed top-[110px] right-5 min-w-[88px] border border-red-500 max-w-[300px] flex flex-col items-center gap-2.5  h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden'>
        <div className="min-h-[20px] min-w-[88px] cursor-pointer">
        <SideTopAdComponent divid='top2'/>
        </div>
-       <div className="w-[300px] h-[600px] cursor-pointer">
+       {/* <div className="w-[300px] h-[600px] cursor-pointer">
         <SideBottomAdComponent divid='bottom2'/>
-       </div>
+       </div> */}
    </div>
  </div>
   );

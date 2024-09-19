@@ -45,6 +45,7 @@ const IconLink: FC<IconLinkProps> = ({ href, Icon, label }) => {
 }
 
 const LeftSidebar: FC = () => {
+  const LeftSidebar: FC = () => {
     const [profilePic, setProfilePic] = useState<string | undefined>(undefined)
     const router = useRouter()
 

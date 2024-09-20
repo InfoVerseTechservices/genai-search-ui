@@ -534,7 +534,7 @@ const EmptyChatMessageInput = ({
       <div className="flex flex-col gap-[2rem] items-center w-full text-center">
         <div
           style={borderStyle}
-          className="relative flex flex-col bg-white px-5 pt-5 pb-2 rounded-lg items-center w-[48rem] border"
+          className="relative flex flex-col bg-white px-5 pt-5 pb-2 rounded-lg items-center w-[20rem] sm:w-[30rem] md:w-[35rem] lg:w-[38rem]   xl:w-[48rem] border"
         >
           <TextareaAutosize
             ref={inputRef}
@@ -555,7 +555,7 @@ const EmptyChatMessageInput = ({
             <ArrowRight className="bg-background" size={17} />
           </button>
         </div>
-        <p className="text-[#ACACAC] text-sm w-[44rem]">
+        <p className="text-[#ACACAC] text-sm w-[20rem] sm:w-[28rem] md:w-[35rem] lg:w-[40rem]  xl:w-[44rem]">
           Welcome to GenAI Search, your go-to tool for instant answers and web
           exploration! <br />
           Simply type your question or topic of interest, and GenAI will provide

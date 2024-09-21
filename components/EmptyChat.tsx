@@ -30,10 +30,10 @@ const EmptyChat = ({
    </div>
    <div className=' w-[300px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-2.5  h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden'>
        <div className="w-[300px] h-[250px]  cursor-pointer">
-       {/* <SideTopAdComponent divid='top2'/> */}
+       <SideTopAdComponent divid='top2'/>
        </div>
        <div className="w-[300px] h-[600px] cursor-pointer">
-        {/* <SideBottomAdComponent divid='bottom2'/> */}
+        <SideBottomAdComponent divid='bottom2'/>
        </div>
    </div>
  </div>

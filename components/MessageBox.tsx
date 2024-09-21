@@ -1472,10 +1472,10 @@ const MessageBox = ({
             />
             <div className="w-[300px] gap-2.5 overflow-x-hidden  hidden xl:flex lg:flex">
               <div className="w-[300px] h-[250px] cursor-pointer">
-                {/* <SideTopAdComponent divid="top1" /> */}
+                <SideTopAdComponent divid="top1" />
               </div>
               <div className="w-[300px] h-[600px] cursor-pointer">
-                {/* <SideBottomAdComponent divid="bottom1" /> */}
+                <SideBottomAdComponent divid="bottom1" />
               </div>
             </div>
           </div>

@@ -1370,27 +1370,20 @@ const MessageBox = ({
   };
   const [isImage,setImage] = useState(false)
   const [isVideo,setVideo] = useState(false)
-  let img = false
-  let vid = false
+
   const handleComplete = async(success:boolean) =>{
-    console.log("video here ",success)
+ 
     setVideo(!success)
     setImage(success)
-    vid = !success
-    img = success
-    console.log("video here ",isVideo , isImage)
+
   }
   const handleImg = async(success:boolean)=>{
-    console.log("img here ",success)
+
     setImage(!success)
     setVideo(success)
-    img = !success
-    vid = success
-    console.log(" image here ",isVideo, isImage)
+   
   }
-  useEffect(() => {
-    console.log("use effect here ", isVideo, isImage);
-  }, [isVideo, isImage]);
+
 
   return (
     <>

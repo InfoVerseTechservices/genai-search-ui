@@ -5,7 +5,16 @@ interface IconProps {
   h?: number;
   fill?: string;
 }
+export const NewGenSearchIcon: React.FC<IconProps> = ({w,h,fill}) =>{
+    return (
+        <svg width="24" height="24" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="17" cy="17" r="15" stroke="black
+" stroke-width="3"/>
+<path d="M9 15.4004H15.1379V9H17.8293V15.4004H24V17.9934H17.8293V24.4595H15.1379V17.9934H9V15.4004Z" fill="black"/>
+</svg>
 
+    )
+}
 export const MessengerIcon:React.FC<IconProps> = ({w,h,fill})=>{
     return(
         <svg width={w} height={w} viewBox="0 0 44 43" fill="none" xmlns="http://www.w3.org/2000/svg">

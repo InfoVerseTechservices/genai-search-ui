@@ -27,22 +27,29 @@ declare module 'yet-another-react-lightbox' {
 const Searchvideos = ({
   query,
   chat_history,
+  complete,
+  visible
 }: {
   query: string;
   chat_history: Message[];
+  complete? : (success: boolean) => void;
+  visible: boolean
 }) => {
   const [videos, setVideos] = useState<Video[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [slides, setSlides] = useState<VideoSlide[]>([]);
-
+  const [isVisible,setVisible] = useState(true)
   return (
     <>
       {!loading && videos === null && (
         <button
           onClick={async () => {
             setLoading(true);
-
+            if (complete){
+              complete(true)
+            }
+            setVisible(true)
             const chatModelProvider = localStorage.getItem('chatModelProvider');
             const chatModel = localStorage.getItem('chatModel');
 
@@ -86,7 +93,7 @@ const Searchvideos = ({
           <PlusIcon className="text-[#24A0ED]" size={17} />
         </button>
       )}
-      {loading && (
+      {loading && isVisible &&(
         <div className="grid grid-cols-2 gap-2">
           {[...Array(4)].map((_, i) => (
             <div
@@ -96,7 +103,7 @@ const Searchvideos = ({
           ))}
         </div>
       )}
-      {videos !== null && videos.length > 0 && (
+      {videos !== null && videos.length > 0 && isVisible && (
         <>
           <div className="grid grid-cols-2 gap-2">
             {videos.length > 4

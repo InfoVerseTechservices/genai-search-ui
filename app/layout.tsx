@@ -6,6 +6,7 @@ import Sidebar from '@/components/Sidebar';
 import LeftSidebar from '@/components/LeftSidebar'; // Ensure this path is correct
 import { Toaster } from 'sonner';
 import ThemeProvider from '@/components/theme/Provider';
+import NewSidebar from '@/components/NewSidebar';
 
 const montserrat = Montserrat({
   weight: ['300', '400', '500', '700'],
@@ -32,8 +33,10 @@ export default function RootLayout({
             <aside className="fixed left-0 top-0 h-full w-[4%] bg-gray-100 dark:bg-white">
               <LeftSidebar />
             </aside>
-            <main className="flex-1 ml-[5%] w-[4%] flex flex-col ">
-              <Sidebar>{children}</Sidebar>
+            <main className="flex-1 w-[4%] flex flex-col ">
+              {/* <Sidebar>{children}</Sidebar> */}
+
+              <NewSidebar>{children} </NewSidebar>
             </main>
           </div>
           <Toaster

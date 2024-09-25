@@ -1292,6 +1292,7 @@ import { useSpeech } from 'react-text-to-speech';
 import SideTopAdComponent from './Ads/SideAdTop';
 import SideBottomAdComponent from './Ads/SideAdBottom';
 import Share from './MessageActions/Share';
+import RelatedImages from './GetOneImage';
 
 const MessageBox = ({
   message,
@@ -1304,6 +1305,7 @@ const MessageBox = ({
   sendMessage,
   editMessage,
   setMessages,
+  callAd
 }: {
   message: Message;
   messageIndex: number;
@@ -1315,6 +1317,7 @@ const MessageBox = ({
   sendMessage: (message: string) => void;
   editMessage: (messageId: string, newContent: string) => void;
   setMessages: (messages: Message[]) => void;
+  callAd : boolean
 }) => {
   const [parsedMessage, setParsedMessage] = useState(message.content);
   const [speechMessage, setSpeechMessage] = useState(message.content);
@@ -1365,9 +1368,33 @@ const MessageBox = ({
     }
     setIsEditing(false);
   };
+  const [isImage,setImage] = useState(false)
+  const [isVideo,setVideo] = useState(false)
+  let img = false
+  let vid = false
+  const handleComplete = async(success:boolean) =>{
+    console.log("video here ",success)
+    setVideo(!success)
+    setImage(success)
+    vid = !success
+    img = success
+    console.log("video here ",isVideo , isImage)
+  }
+  const handleImg = async(success:boolean)=>{
+    console.log("img here ",success)
+    setImage(!success)
+    setVideo(success)
+    img = !success
+    vid = success
+    console.log(" image here ",isVideo, isImage)
+  }
+  useEffect(() => {
+    console.log("use effect here ", isVideo, isImage);
+  }, [isVideo, isImage]);
 
   return (
-    <div>
+    <>
+    <div className=''>
       {message.role === 'user' && (
         <div
           className={cn(
@@ -1399,10 +1426,11 @@ const MessageBox = ({
       )}
 
       {message.role === 'assistant' && (
-        <div className="flex flex-col space-y-9 lg:space-y-0 lg:flex-row lg:justify-between lg:space-x-9">
+        <div className="flex  flex-col space-y-9 lg:space-y-0 lg:flex-row lg:justify-between lg:space-x-9">
           <div
             ref={dividerRef}
-            className="flex flex-col space-y-6 w-full lg:w-9/12"
+            className="flex flex-col space-y-6 w-full lg:w-9/12 h-full"
+
           >
             {message.sources && message.sources.length > 0 && (
               <div className="flex flex-col space-y-2">
@@ -1461,27 +1489,68 @@ const MessageBox = ({
               )}
             </div>
           </div>
-          <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3 w-[300px] z-30 h-full pb-4">
-            <SearchImages
-              query={history[messageIndex - 1].content}
-              chat_history={history.slice(0, messageIndex - 1)}
+          <div className="lg:sticky lg:top-20  flex flex-col items-center space-y-3 w-[300px] z-30 h-full pb-4">
+          <div className=' w-[300px] h-[207.36px]'>
+          <div className="h-full w-full">
+
+            {/* add the images code here */}
+            <RelatedImages 
+            chat_history={history.slice(0, messageIndex - 1)} 
+            query={history[messageIndex - 1].content}
             />
-            <SearchVideos
-              chat_history={history.slice(0, messageIndex - 1)}
-              query={history[messageIndex - 1].content}
-            />
-            <div className="w-[300px] gap-2.5 overflow-x-hidden  hidden xl:flex lg:flex">
-              <div className="w-[300px] h-[250px] cursor-pointer">
-                <SideTopAdComponent divid="top1" />
-              </div>
-              <div className="w-[300px] h-[600px] cursor-pointer">
-                <SideBottomAdComponent divid="bottom1" />
-              </div>
+        </div>
             </div>
+            {isImage ?
+            <>
+            <SearchImages key="image-true" query={history[messageIndex - 1].content} chat_history={history.slice(0, messageIndex - 1)} complete={handleImg} visible={false}/>
+          
+            </>
+            :
+            <>
+            <SearchImages
+              key="image-false"
+              query={history[messageIndex - 1].content}
+              chat_history={history.slice(0, messageIndex - 1)}
+              complete={handleImg}
+              visible = {true}
+            />
+        
+            </>
+}
+{isVideo?
+<SearchVideos
+            key={`video-${isVideo}`}
+              chat_history={history.slice(0, messageIndex - 1)}
+              query={history[messageIndex - 1].content}
+              complete={handleComplete}
+              visible = {false}
+            /> 
+            :
+            <SearchVideos
+            key={`video-${isVideo}`}
+              chat_history={history.slice(0, messageIndex - 1)}
+              query={history[messageIndex - 1].content}
+              complete={handleComplete}
+              visible = {true}
+            /> 
+}
+{callAd && 
+      <div className=" w-[300px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-2.5  h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden">
+               <div className="w-[300px]  h-[250px] cursor-pointer">
+                 <SideTopAdComponent divid="top1" />
+               </div>
+               <div className="w-[300px] h-[600px] cursor-pointer">
+                 <SideBottomAdComponent divid="bottom1" />
+               </div>
+             </div> 
+     }
           </div>
         </div>
       )}
+   
     </div>
+  
+  </>
   );
 };
 

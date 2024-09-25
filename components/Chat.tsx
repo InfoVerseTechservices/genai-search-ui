@@ -61,6 +61,7 @@ const Chat = ({
             <MessageBox
               key={i}
               message={msg}
+              callAd = {i==messages.length-1}
               messageIndex={i}
               history={messages}
               loading={loading}
@@ -74,6 +75,7 @@ const Chat = ({
             {!isLast && msg.role === 'assistant' && (
               <div className="h-px w-full bg-light-secondary dark:bg-dark-secondary" />
             )}
+            
           </Fragment>
         );
       })}

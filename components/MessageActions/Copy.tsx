@@ -19,9 +19,11 @@ const Copy = ({
         setCopied(true);
         setTimeout(() => setCopied(false), 1000);
       }}
-      className="p-2 text-black/70 rounded-xl hover:bg-black hover:text-white transition duration-200 "
+       className="py-2 px-3 rounded-xl hover:bg-light-secondary hover:text-black dark:hover:bg-dark-secondary transition duration-200 text-black flex flex-row items-center space-x-1"
+      // className="p-2 text-black/70 rounded-xl hover:bg-light-secondary hover:text-black transition duration-200 "
     >
       {copied ? <Check size={18} /> : <ClipboardList size={18} />}
+      <p className="text-sm font-medium">{copied ? 'Copied' : 'Copy'}</p>
     </button>
   );
 };

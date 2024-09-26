@@ -307,7 +307,7 @@ const RelatedImages: React.FC<RelatedImagesProps> = ({ chat_history, query }) =>
   const [images, setImages] = useState<Image[]>([]);
 
   useEffect(() => {
-    console.log("in here for image ")
+
     // Function to fetch chat messages and images
     const fetchChatAndImages = async () => {
       try {

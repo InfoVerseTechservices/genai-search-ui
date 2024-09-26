@@ -22,7 +22,7 @@ const NewSidebar = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
               <Layout>{children}</Layout>
-    <div className="fixed top-[70px] left-[160px]">
+    <div className="fixed top-[70px] left-[110px]">
         <div className="  flex gap-8   px-2 py-8">
           <a href="/">
                 <NewGenSearchIcon />

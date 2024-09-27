@@ -551,7 +551,7 @@ const EmptyChatMessageInput = ({
             type="button"
             onClick={handleSendMessage}
             disabled={message.trim().length === 0}
-            className="bg-[#24A0ED] text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc] dark:disabled:bg-[#ececec21] hover:bg-opacity-85 transition duration-100 rounded-full p-2 cursor-pointer absolute bottom-2 right-2"
+            className="bg-[#D2E3FD] text-[#000080] disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc] dark:disabled:bg-[#ececec21] hover:bg-opacity-85 transition duration-100 rounded-full p-2 cursor-pointer absolute bottom-2 right-2"
           >
             <ArrowRight className="bg-background" size={17} />
           </button>

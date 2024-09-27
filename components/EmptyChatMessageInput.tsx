@@ -535,13 +535,13 @@ const EmptyChatMessageInput = ({
     setFile(selectedFile);
     setUploadedFile(selectedFile);
     setIsUploading(false);
-    if (selectedFile) {
-      sendMessage(message,selectedFile);
-      console.log("here is the file ",selectedFile)
-      setMessage('');
-      setFile(null)
-      setUploadedFile(null)
-    }
+    // if (selectedFile) {
+    //   sendMessage(message,selectedFile);
+    //   console.log("here is the file ",selectedFile)
+    //   setMessage('');
+    //   setFile(null)
+    //   setUploadedFile(null)
+    // }
   };
   const handleUploadFile = () =>{
     console.log("here in upload file ",uploadFile)

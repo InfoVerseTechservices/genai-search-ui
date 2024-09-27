@@ -1528,12 +1528,12 @@ const MessageBox = ({
             /> 
 }
 {callAd && 
-      <div className=" w-[300px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-2.5  h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden">
+      <div className=" w-[300px] mt-10 flex-col items-center gap-2.5  h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden">
                <div className="w-[300px]  h-[250px] cursor-pointer">
-                 <SideTopAdComponent divid={`top-${messageIndex-1}`} />
+                 <SideTopAdComponent divid={`top-message-${messageIndex-1}`} />
                </div>
                <div className="w-[300px] h-[600px] cursor-pointer">
-                 <SideBottomAdComponent divid={`bottom-${messageIndex-1}`} />
+                 <SideBottomAdComponent divid={`bottom-message-${messageIndex-1}`} />
                </div>
              </div> 
      }

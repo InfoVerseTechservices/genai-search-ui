@@ -459,27 +459,32 @@
 // export default EmptyChatMessageInput;
 
 import { ArrowRight, Share } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, ChangeEvent } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import CopilotToggle from './MessageInputActions/Copilot';
 import Focus from './MessageInputActions/Focus';
 import uploadIcon from '../public/uploadIcon.svg';
 import Image from 'next/image';
+import InputBar from './UploadFile';
+import { UploadIcon } from './Icons';
 
 const EmptyChatMessageInput = ({
   sendMessage,
   focusMode,
   setFocusMode,
 }: {
-  sendMessage: (message: string) => void;
+  sendMessage: (message: string , file: File | null) => void;
   focusMode: string;
   setFocusMode: (mode: string) => void;
 }) => {
-  const [copilotEnabled, setCopilotEnabled] = useState(false);
+  const [copilotEnabled, setCopilotEnabled] = useState(false); 
   const [message, setMessage] = useState('');
-
+  const [uploadFile,setUploadFile] = useState(false)
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
-
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeElement = document.activeElement;
@@ -509,15 +514,100 @@ const EmptyChatMessageInput = ({
       'linear-gradient(white, white) padding-box, linear-gradient(180deg, #FF0049 0%, #FFBE3B 25%, #00BB5C 50%, #187DC4 75%, #58268B 100%) border-box',
     borderImageSlice: 1,
   };
+  
+  const onUploadChange = (bool: boolean) => {
+    setIsUploading(bool);
+  };
 
   const handleSendMessage = () => {
-    if (message.trim().length > 0) {
-      sendMessage(message);
+    console.log("heree ", file, uploadedFile)
+    if (file || message.trim().length > 0 ) {
+      sendMessage(message,file);
+      console.log("here is the file ",file)
       setMessage('');
+      setFile(null)
+      setUploadedFile(null)
     }
   };
 
+  const handleFileChange = async(e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile =  e.target.files?.[0] || null;
+    setFile(selectedFile);
+    setUploadedFile(selectedFile);
+    setIsUploading(false);
+    // if (selectedFile) {
+    //   sendMessage(message,selectedFile);
+    //   console.log("here is the file ",selectedFile)
+    //   setMessage('');
+    //   setFile(null)
+    //   setUploadedFile(null)
+    // }
+  };
+  const handleUploadFile = () =>{
+    console.log("here in upload file ",uploadFile)
+    setUploadFile(!uploadFile)
+    setIsUploading(true)
+  }
   return (
+    <>
+    {uploadFile? (
+ <div className='relative'>
+      
+ <div className='flex flex-col items-center md:w-[28rem] md:h-[10.52rem] lg:w-[30rem] lg:h-[11.32rem] xl:w-[45rem] xl:h-[17rem] mt-[1.2rem] ml-[6rem] rounded-[1.5rem]' style={borderStyle}>
+ 
+   <p className='lg:p-1 xl:p-5 font-[700] md:text-base lg:text-lg xl:text-xl'>Drag and Drop or upload your file here
+
+      <button 
+      type='button'
+      onClick={() => handleUploadFile()}
+      className='absolute right-4 font-normal text-[#E3E3E3] cursor-pointer'
+      >
+     <span  >x </span>
+     </button>
+   </p>
+ 
+
+   <hr className='border-[0.1px] md:w-[28rem] lg:w-[30rem] xl:w-[45rem] border-[#FF0049]' />
+   <button
+     type="button"
+     onClick={() => fileInputRef.current?.click()}
+     className='lg:mt-[0.3rem] xl:mt-[1rem]'
+   >
+
+     <UploadIcon w={80} h={80} />
+   </button>
+   <button
+     style={{
+       background: 'linear-gradient(180deg, #6237FF, #258EFF)',
+       color: 'white',
+       border: 'none',
+       borderRadius: '15px',
+       cursor: 'pointer',
+       fontWeight: 'normal',
+     }}
+     className='mt-[0.3rem] xl:mt-[0.5rem] md:text-[0.8rem] lg:text-[0.8rem] xl:text-[1rem] md:px-[1.25rem] md:py-[0.3rem] lg:px-[1.25rem] lg:py-[0.3rem] xl:px-[1.75rem] xl:py-[0.4rem]'
+     onClick={() => fileInputRef.current?.click()}
+   >
+     UPLOAD
+   </button>
+   <p className='text-[#8B8B8B] md:mt-[0.75rem] lg:mt-[0.5rem] xl:mt-[1.75rem] md:text-xs lg:text-sm'>Max ??mb only</p>
+   <input
+     type="file"
+     ref={fileInputRef}
+     onChange={handleFileChange}
+     className="hidden"
+   />
+ </div>
+
+</div>
+
+    )
+    : 
+    (
+      <>
+      <h2 className="text-[#000080] text-xl sm:text-xl md:text-xl  lg:text-2xl xl:text-3xl font-medium -mt-8">
+           Discover and Do More with AI
+         </h2>
     <form
       onSubmit={(e) => {
         e.preventDefault();
@@ -545,7 +635,12 @@ const EmptyChatMessageInput = ({
             className="bg-transparent p-1 placeholder:text-[#ACACAC] text-sm self-start text-black resize-none focus:outline-none w-full max-h-24 lg:max-h-36 xl:max-h-48"
             placeholder="Ask Coco..."
           />
-          {/* <Image src={uploadIcon} alt='colombo' className="absolute top-8 right-8 cursor-pointer" /> */}
+          <button 
+          type='button'
+          onClick={handleUploadFile}
+          >
+          <Image src={uploadIcon} alt='colombo' className="absolute bottom-3 right-16 cursor-pointer" />
+          </button>
           {/* Enter button at the bottom, keeping the box size unchanged */}
           <button
             type="button"
@@ -566,6 +661,9 @@ const EmptyChatMessageInput = ({
         </p>
       </div>
     </form>
+    </>
+    )}
+    </>
   );
 };
 

@@ -13,10 +13,10 @@ const EmptyChat = ({
 }) => {
    return (
     
-    <div className=" lg:flex ">
+    <div className="flex">
    <div className="flex-grow mr-[20px]  xl:mr-[30px] ">
      <div className="relative">
-       <div className="flex flex-col items-center justify-center mt-24 lg:mt-0 lg:min-h-screen w-full mx-auto p-2 space-y-8">
+       <div className="flex flex-col items-center justify-center min-h-screen w-full mx-auto p-2 space-y-8">
          
          <EmptyChatMessageInput
            sendMessage={sendMessage}
@@ -26,7 +26,7 @@ const EmptyChat = ({
        </div>
      </div>
    </div>
-   <div className=' w-[300px] lg:mt-10 justify-center mx-auto mt-0  flex-col  items-center gap-2.5  h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden'>
+   <div className=' w-[300px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-2.5  h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden'>
        <div className="w-[300px] h-[250px]  cursor-pointer">
        <SideTopAdComponent divid='top-emptychat'/>
        </div>

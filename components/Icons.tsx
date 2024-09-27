@@ -5,6 +5,36 @@ interface IconProps {
   h?: number;
   fill?: string;
 }
+
+export const UploadIcon : React.FC<IconProps> = ({w,h,fill}) =>{
+    return (
+        <svg
+          width={w}
+          height={h}
+          viewBox="0 0 20 17"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M0.832275 9.99577H2.66561V14.5791H17.3323V9.99577H19.1656V14.5791C19.1656 15.5966 18.3498 16.4124 17.3323 16.4124H2.66561C1.65728 16.4124 0.832275 15.5966 0.832275 14.5791V9.99577ZM9.99894 0.829102L4.92061 5.8341L6.22228 7.13577L9.08228 4.2666V12.7458H10.9156V4.2666L13.7848 7.13577L15.0864 5.82493L9.99894 0.829102Z"
+            fill="url(#paint0_linear_7887_21018)"
+          />
+          <defs>
+            <linearGradient
+              id="paint0_linear_7887_21018"
+              x1="9.99894"
+              y1="0.829102"
+              x2="9.99894"
+              y2="16.4124"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0.305" stop-color="#6237FF" />
+              <stop offset="1" stop-color="#258EFF" />
+            </linearGradient>
+          </defs>
+        </svg>
+      );
+}
 export const NewGenSearchIcon: React.FC<IconProps> = ({w,h,fill}) =>{
     return (
         <svg width="24" height="24" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">

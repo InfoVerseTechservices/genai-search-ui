@@ -639,7 +639,7 @@ const EmptyChatMessageInput = ({
           type='button'
           onClick={handleUploadFile}
           >
-          <Image src={uploadIcon} alt='colombo' className="absolute bottom-3 right-16 cursor-pointer" />
+          {/* <Image src={uploadIcon} alt='colombo' className="absolute bottom-3 right-16 cursor-pointer" /> */}
           </button>
           {/* Enter button at the bottom, keeping the box size unchanged */}
           <button

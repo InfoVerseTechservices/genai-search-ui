@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation"
 import ProfilePicture from "@/components/LeftSidebar/ProfilePicture"
 import { FeedIcon, VibesIcon, GenAiIcon, ShopIcon, NewsIcon, StarIcon, NewGenSearchIcon, HistoryIcon } from "./Icons"
 
-
 interface IconProps {
   w: number;
   h: number;
@@ -59,142 +58,299 @@ const LeftSidebar: FC = () => {
     };
 
     return (
-        <div className="w-16 bg-white h-screen  flex flex-col items-center py-4 border-r border-gray-200">
+        <div className="w-16 bg-white h-screen flex flex-col items-center py-4 border-r border-gray-200">
             <div className="mt-0 mb-6">
                 <ProfilePicture image={profilePic} />
             </div>
             <div className="flex flex-col items-center space-y-6 flex-grow">
-            {/* <IconLink 
-                  href="https://colomboai.com/genai-search"
-                  Icon={GenAiIcon as IconComponent}
-                  label="Gen AI"
-                /> */}
-   <div className="flex flex-col items-center">
-        <div className="w-6 h-6 mb-1">
-          <GenAiIcon 
-            w={24} 
-            h={24} 
-            fill={"#8E8E93"}
-          />
-        </div>
-        <p className={`
-          ${"text-[#8E8E93]"}
-          text-center text-[10px]
-        `}>
-          Gen AI
-        </p> 
-      </div>
-
-      <div className="flex flex-col items-center">
-        <div className="w-6 h-6 mb-1">
-          <VibesIcon 
-            w={24} 
-            h={24} 
-            fill={"#8E8E93"}
-          />
-        </div>
-        <p className={`
-          ${"text-[#8E8E93]"}
-          text-center text-[10px]
-        `}>
-          Vibes
-        </p> 
-      </div>
-      <div className="flex flex-col items-center">
-        <div className="w-6 h-6 mb-1">
-          <FeedIcon 
-            w={24} 
-            h={24} 
-            fill={"#8E8E93"}
-          />
-        </div>
-        <p className={`
-          ${"text-[#8E8E93]"}
-          text-center text-[10px]
-        `}>
-          Feed
-        </p> 
-      </div>
-      <div className="flex flex-col items-center">
-        <div className="w-6 h-6 mb-1">
-          <ShopIcon 
-            w={24} 
-            h={24} 
-            fill={"#8E8E93"}
-          />
-        </div>
-        <p className={`
-          ${"text-[#8E8E93]"}
-          text-center text-[10px]
-        `}>
-          Shop
-        </p> 
-      </div>
-      <div className="flex flex-col items-center">
-        <div className="w-6 h-6 mb-1">
-          <NewsIcon 
-            w={24} 
-            h={24} 
-            fill={"#8E8E93"}
-          />
-        </div>
-        <p className={`
-          ${"text-[#8E8E93]"}
-          text-center text-[10px]
-        `}>
-          News
-        </p> 
-      </div>
-      
-                {/* <IconLink 
-                  href="https://colomboai.com/vibes"
-                  Icon={VibesIcon as IconComponent}
-                  label="Vibes"
-                /> */}
-                {/* <IconLink 
-                  href="https://colomboai.com/feed"
-                  Icon={FeedIcon as IconComponent}
-                  label="Feed"
-                /> */}
-                {/* <IconLink 
-                  href="https://colomboai.com/shop"
-                  Icon={ShopIcon as IconComponent}
-                  label="Shop"
-                /> */}
-                {/* <IconLink 
-                  href="https://colomboai.com/news"
-                  Icon={NewsIcon as IconComponent}
-                  label="News"
-                /> */}
                 <div className="flex flex-col items-center">
-                    <StarIcon 
-                      w={24} 
-                      h={24} 
-                      fill="#8E8E93"
-                    />
+                    <div className="w-6 h-6 mb-1">
+                        <GenAiIcon 
+                            w={24} 
+                            h={24} 
+                            fill={"#8E8E93"}
+                        />
+                    </div>
+                    <p className="text-[#8E8E93] text-center text-[10px]">
+                        Gen AI
+                    </p> 
                 </div>
 
-            <IconLink 
-            href='https://colomboai.com/genai-search'
-            Icon={NewGenSearchIcon as IconComponent}
-            label='New Chat'
-            />
-            <IconLink 
-            href='https://colomboai.com/genai-search/library/'
-            Icon={HistoryIcon as IconComponent}
-            label='History'
-            />
+                <div className="flex flex-col items-center">
+                    <div className="w-6 h-6 mb-1">
+                        <VibesIcon 
+                            w={24} 
+                            h={24} 
+                            fill={"#8E8E93"}
+                        />
+                    </div>
+                    <p className="text-[#8E8E93] text-center text-[10px]">
+                        Vibes
+                    </p> 
+                </div>
+                <div className="flex flex-col items-center">
+                    <div className="w-6 h-6 mb-1">
+                        <FeedIcon 
+                            w={24} 
+                            h={24} 
+                            fill={"#8E8E93"}
+                        />
+                    </div>
+                    <p className="text-[#8E8E93] text-center text-[10px]">
+                        Feed
+                    </p> 
+                </div>
+                <div className="flex flex-col items-center">
+                    <div className="w-6 h-6 mb-1">
+                        <ShopIcon 
+                            w={24} 
+                            h={24} 
+                            fill={"#8E8E93"}
+                        />
+                    </div>
+                    <p className="text-[#8E8E93] text-center text-[10px]">
+                        Shop
+                    </p> 
+                </div>
+                <div className="flex flex-col items-center">
+                    <div className="w-6 h-6 mb-1">
+                        <NewsIcon 
+                            w={24} 
+                            h={24} 
+                            fill={"#8E8E93"}
+                        />
+                    </div>
+                    <p className="text-[#8E8E93] text-center text-[10px]">
+                        News
+                    </p> 
+                </div>
+                <div className="flex flex-col items-center">
+                    <StarIcon 
+                        w={24} 
+                        h={24} 
+                        fill="#8E8E93"
+                    />
+                </div>
             </div>
-            <div className="mt-auto">
-                <button onClick={handleSignOut} className=" text-xs text-gray-400" disabled>
-                    Sign Out
-                </button>
+            <div className="mt-auto mb-4 flex flex-col items-center space-y-8">
+                <IconLink 
+                    href='https://colomboai.com/genai-search'
+                    Icon={NewGenSearchIcon as IconComponent}
+                    label='New Chat'
+                />
+                <IconLink 
+                    href='https://colomboai.com/genai-search/library/'
+                    Icon={HistoryIcon as IconComponent}
+                    label='History'
+                />
             </div>
         </div>
     )
 }
 
 export default LeftSidebar
+
+
+
+// 'use client'
+// import React, { useEffect, useState, FunctionComponent as FC } from 'react'
+// import Link from "next/link"
+// import { usePathname, useRouter } from "next/navigation"
+// import ProfilePicture from "@/components/LeftSidebar/ProfilePicture"
+// import { FeedIcon, VibesIcon, GenAiIcon, ShopIcon, NewsIcon, StarIcon, NewGenSearchIcon, HistoryIcon } from "./Icons"
+
+
+// interface IconProps {
+//   w: number;
+//   h: number;
+//   fill: string;
+// }
+
+// type IconComponent = FC<IconProps>;
+
+// interface IconLinkProps {
+//   href: string;
+//   Icon: IconComponent;
+//   label: string;
+// }
+
+// const IconLink: FC<IconLinkProps> = ({ href, Icon, label }) => {
+//   const pathname = usePathname()
+//   const isActive = pathname === href
+
+//   return (
+//     <Link href={href}>
+//       <div className="flex flex-col items-center">
+//         <div className="w-6 h-6 mb-1">
+//           <Icon 
+//             w={24} 
+//             h={24} 
+//             fill={isActive ? "#1E71F2" : "#8E8E93"}
+//           />
+//         </div>
+//         <p className={`
+//           ${isActive ? "text-[#1E71F2]" : "text-[#8E8E93]"}
+//           text-center text-[10px]
+//         `}>
+//           {label}
+//         </p> 
+//       </div>
+//     </Link>
+//   )
+// }
+
+// const LeftSidebar: FC = () => {
+//     const [profilePic, setProfilePic] = useState<string | undefined>(undefined)
+//     const router = useRouter()
+
+//     useEffect(() => {
+//         setProfilePic(localStorage.getItem('profilePic') || undefined)
+//     }, [])
+
+//     const handleSignOut = () => {
+//         localStorage.removeItem('profilePic')
+//         router.push("/sign-up")
+//     };
+
+//     return (
+//         <div className="w-16 bg-white h-screen  flex flex-col items-center py-4 border-r border-gray-200">
+//             <div className="mt-0 mb-6">
+//                 <ProfilePicture image={profilePic} />
+//             </div>
+//             <div className="flex flex-col items-center space-y-6 flex-grow">
+//             {/* <IconLink 
+//                   href="https://colomboai.com/genai-search"
+//                   Icon={GenAiIcon as IconComponent}
+//                   label="Gen AI"
+//                 /> */}
+//    <div className="flex flex-col items-center">
+//         <div className="w-6 h-6 mb-1">
+//           <GenAiIcon 
+//             w={24} 
+//             h={24} 
+//             fill={"#8E8E93"}
+//           />
+//         </div>
+//         <p className={`
+//           ${"text-[#8E8E93]"}
+//           text-center text-[10px]
+//         `}>
+//           Gen AI
+//         </p> 
+//       </div>
+
+//       <div className="flex flex-col items-center">
+//         <div className="w-6 h-6 mb-1">
+//           <VibesIcon 
+//             w={24} 
+//             h={24} 
+//             fill={"#8E8E93"}
+//           />
+//         </div>
+//         <p className={`
+//           ${"text-[#8E8E93]"}
+//           text-center text-[10px]
+//         `}>
+//           Vibes
+//         </p> 
+//       </div>
+//       <div className="flex flex-col items-center">
+//         <div className="w-6 h-6 mb-1">
+//           <FeedIcon 
+//             w={24} 
+//             h={24} 
+//             fill={"#8E8E93"}
+//           />
+//         </div>
+//         <p className={`
+//           ${"text-[#8E8E93]"}
+//           text-center text-[10px]
+//         `}>
+//           Feed
+//         </p> 
+//       </div>
+//       <div className="flex flex-col items-center">
+//         <div className="w-6 h-6 mb-1">
+//           <ShopIcon 
+//             w={24} 
+//             h={24} 
+//             fill={"#8E8E93"}
+//           />
+//         </div>
+//         <p className={`
+//           ${"text-[#8E8E93]"}
+//           text-center text-[10px]
+//         `}>
+//           Shop
+//         </p> 
+//       </div>
+//       <div className="flex flex-col items-center">
+//         <div className="w-6 h-6 mb-1">
+//           <NewsIcon 
+//             w={24} 
+//             h={24} 
+//             fill={"#8E8E93"}
+//           />
+//         </div>
+//         <p className={`
+//           ${"text-[#8E8E93]"}
+//           text-center text-[10px]
+//         `}>
+//           News
+//         </p> 
+//       </div>
+      
+//                 {/* <IconLink 
+//                   href="https://colomboai.com/vibes"
+//                   Icon={VibesIcon as IconComponent}
+//                   label="Vibes"
+//                 /> */}
+//                 {/* <IconLink 
+//                   href="https://colomboai.com/feed"
+//                   Icon={FeedIcon as IconComponent}
+//                   label="Feed"
+//                 /> */}
+//                 {/* <IconLink 
+//                   href="https://colomboai.com/shop"
+//                   Icon={ShopIcon as IconComponent}
+//                   label="Shop"
+//                 /> */}
+//                 {/* <IconLink 
+//                   href="https://colomboai.com/news"
+//                   Icon={NewsIcon as IconComponent}
+//                   label="News"
+//                 /> */}
+//                 <div className="flex flex-col items-center">
+//                     <StarIcon 
+//                       w={24} 
+//                       h={24} 
+//                       fill="#8E8E93"
+//                     />
+//                 </div>
+
+//             <IconLink 
+//             href='https://colomboai.com/genai-search'
+//             Icon={NewGenSearchIcon as IconComponent}
+//             label='New Chat'
+//             />
+//             <IconLink 
+//             href='https://colomboai.com/genai-search/library/'
+//             Icon={HistoryIcon as IconComponent}
+//             label='History'
+//             />
+//             </div>
+//             {/* <div className="mt-auto">
+//                 <button onClick={handleSignOut} className=" text-xs text-gray-400" disabled>
+//                     Sign Out
+//                 </button>
+//             </div> */}
+//         </div>
+//     )
+// }
+
+// export default LeftSidebar
+
+
 
 // 'use client'
 // import React from 'react'

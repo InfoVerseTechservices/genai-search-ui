@@ -5,6 +5,17 @@ interface IconProps {
   h?: number;
   fill?: string;
 }
+export const ShareIcon : React.FC<IconProps> = ({w,h,fill})=>{
+    return (
+        <svg width="16" height="16" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.5001 5.65679C14.8809 5.65679 16.0002 4.64931 16.0002 3.40652C16.0002 2.16373 14.8809 1.15625 13.5001 1.15625C12.1193 1.15625 11 2.16373 11 3.40652C11 4.64931 12.1193 5.65679 13.5001 5.65679Z" fill="black" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M3.50011 10.9068C4.88088 10.9068 6.00021 9.89931 6.00021 8.65652C6.00021 7.41373 4.88088 6.40625 3.50011 6.40625C2.11934 6.40625 1 7.41373 1 8.65652C1 9.89931 2.11934 10.9068 3.50011 10.9068Z" fill="black" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.5001 16.1568C14.8809 16.1568 16.0002 15.1493 16.0002 13.9065C16.0002 12.6637 14.8809 11.6562 13.5001 11.6562C12.1193 11.6562 11 12.6637 11 13.9065C11 15.1493 12.1193 16.1568 13.5001 16.1568Z" fill="black" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M5.65625 9.78906L11.3482 12.7744" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M11.3398 4.53906L5.65625 7.52442" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+    )
+}
 export const HistoryIcon : React.FC<IconProps> = ({w,h,fill}) =>{
     return(
         <svg width={w} height={h} viewBox="0 0 29 27" fill={fill} xmlns="http://www.w3.org/2000/svg">

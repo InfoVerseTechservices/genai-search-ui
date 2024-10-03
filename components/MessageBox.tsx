@@ -1456,11 +1456,12 @@ const MessageBox = ({
               {loading && isLast ? null : (
                 <div className="flex flex-row items-center justify-between w-full text-black py-4 -mx-2">
                   <div className="flex flex-row items-center space-x-1">
+                  <Share message={message.content} />
                     <Rewrite rewrite={rewrite} messageId={message.messageId} />
                   </div>
                   <div className="flex flex-row items-center space-x-1">
                     <Copy initialMessage={message.content} message={message} />
-                    <Share message={message.content} />
+                    
                     <button
                       onClick={() => {
                         if (speechStatus === 'started') {

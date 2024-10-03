@@ -624,7 +624,7 @@ const EmptyChatMessageInput = ({
       <div className="flex flex-col gap-[2rem] items-center w-full text-center">
         <div
           style={borderStyle}
-          className="relative flex flex-col bg-white px-5 pt-5 pb-2 rounded-lg items-center w-[20rem] sm:w-[30rem] md:w-[35rem] lg:w-[38rem]   xl:w-[48rem] border"
+          className="relative flex flex-col bg-white px-5 pt-5 pb-2 rounded-lg items-center w-[22rem] sm:w-[30rem] md:w-[35rem] lg:w-[38rem]   xl:w-[48rem] border"
         >
           <TextareaAutosize
             ref={inputRef}
@@ -651,12 +651,12 @@ const EmptyChatMessageInput = ({
             <ArrowRight className="bg-background" size={17} />
           </button>
         </div>
-        <p className="text-[#ACACAC] text-sm w-[20rem] sm:w-[28rem] md:w-[35rem] lg:w-[40rem]  xl:w-[44rem]">
+        <p className="text-[#ACACAC] text-[14px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] w-[375px] sm:w-[600px] md:w-[600px] lg:w-[600px]   xl:w-[700px]">
           Welcome to GenAI Search, your go-to tool for instant answers and web
-          exploration! <br />
+          exploration! 
           Simply type your question or topic of interest, and GenAI will provide
           you with accurate answers along with related links from the web.
-          Whether you&apos;re seeking quick information or <br /> diving deeper
+          Whether you&apos;re seeking quick information or diving deeper
           into a topic, GenAI Search has you covered.
         </p>
       </div>

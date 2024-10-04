@@ -229,7 +229,7 @@ const Page = () => {
       {chats.length=== 0 && (
         <div className="flex  items-center justify-center h-[70vh] ">
         <div className='text-center   text-[#515151]  text-[18px] font-[450]   w-[477px]'>
-        Looks like your GenAI search history is as clean as a whistle! Keep browsing and let us know if you need any help finding what you're looking for.
+        Looks like your GenAI search history is as clean as a whistle! Keep browsing and let us know if you need any help finding what you&apos;re looking for.
         </div>
         </div>
       )}

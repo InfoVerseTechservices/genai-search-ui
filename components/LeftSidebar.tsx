@@ -1,9 +1,22 @@
-'use client'
-import React, { useEffect, useState, FunctionComponent as FC } from 'react'
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import ProfilePicture from "@/components/LeftSidebar/ProfilePicture"
-import { FeedIcon, VibesIcon, GenAiIcon, ShopIcon, NewsIcon, StarIcon, NewGenSearchIcon, HistoryIcon } from "./Icons"
+'use client';
+import React, { useEffect, useState, FunctionComponent as FC } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import ProfilePicture from '@/components/LeftSidebar/ProfilePicture';
+import {
+  FeedIcon,
+  VibesIcon,
+  GenAiIcon,
+  ShopIcon,
+  NewsIcon,
+  StarIcon,
+  NewGenSearchIcon,
+  HistoryIcon,
+} from './Icons';
+
+// USER PROFILE Context
+import { useUserProfile } from '@/app/context/user';
+// import { useRouter } from 'next/router';
 
 interface IconProps {
   w: number;
@@ -20,137 +33,111 @@ interface IconLinkProps {
 }
 
 const IconLink: FC<IconLinkProps> = ({ href, Icon, label }) => {
-  const pathname = usePathname()
-  const isActive = pathname === href
+  const pathname = usePathname();
+  const isActive = pathname === href;
 
   return (
     <Link href={href}>
       <div className="flex flex-col items-center">
         <div className="w-6 h-6 mb-1">
-          <Icon 
-            w={24} 
-            h={24} 
-            fill={isActive ? "#1E71F2" : "#8E8E93"}
-          />
+          <Icon w={24} h={24} fill={isActive ? '#1E71F2' : '#8E8E93'} />
         </div>
-        <p className={`
-          ${isActive ? "text-[#1E71F2]" : "text-[#8E8E93]"}
+        <p
+          className={`
+          ${isActive ? 'text-[#1E71F2]' : 'text-[#8E8E93]'}
           text-center text-[10px]
-        `}>
+        `}
+        >
           {label}
-        </p> 
+        </p>
       </div>
     </Link>
-  )
-}
+  );
+};
 
 const LeftSidebar: FC = () => {
-    const [profilePic, setProfilePic] = useState<string | undefined>(undefined)
-    const router = useRouter()
+  const [profilePic, setProfilePic] = useState<string | undefined>(undefined);
+  const router = useRouter();
 
-    useEffect(() => {
-        setProfilePic(localStorage.getItem('profilePic') || undefined)
-    }, [])
+  const { userDetails, isLoggedIn } = useUserProfile();
 
-    const handleSignOut = () => {
-        localStorage.removeItem('profilePic')
-        router.push("/sign-up")
-    };
+  useEffect(() => {
+    // Don't use it on the sidebar - since the sidebar is present on login as well - infinite loop
+    // if (!isLoggedIn) {
+    //   router.push('/login');
+    //   return;
+    // }
 
-    return (
-        <div className="w-16 bg-white h-screen flex flex-col items-center py-4 border-r border-gray-200">
-            <div className="mt-0 mb-6">
-                <ProfilePicture image={profilePic} />
-            </div>
-            <div className="flex flex-col items-center space-y-6 flex-grow">
-                <div className="flex flex-col items-center">
-                    <div className="w-6 h-6 mb-1">
-                        <GenAiIcon 
-                            w={24} 
-                            h={24} 
-                            fill={"#8E8E93"}
-                        />
-                    </div>
-                    <p className="text-[#8E8E93] text-center text-[10px]">
-                        Gen AI
-                    </p> 
-                </div>
+    if (isLoggedIn) {
+      setProfilePic(userDetails.profile_picture || undefined);
+    }
 
-                <div className="flex flex-col items-center">
-                    <div className="w-6 h-6 mb-1">
-                        <VibesIcon 
-                            w={24} 
-                            h={24} 
-                            fill={"#8E8E93"}
-                        />
-                    </div>
-                    <p className="text-[#8E8E93] text-center text-[10px]">
-                        Vibes
-                    </p> 
-                </div>
-                <div className="flex flex-col items-center">
-                    <div className="w-6 h-6 mb-1">
-                        <FeedIcon 
-                            w={24} 
-                            h={24} 
-                            fill={"#8E8E93"}
-                        />
-                    </div>
-                    <p className="text-[#8E8E93] text-center text-[10px]">
-                        Feed
-                    </p> 
-                </div>
-                <div className="flex flex-col items-center">
-                    <div className="w-6 h-6 mb-1">
-                        <ShopIcon 
-                            w={24} 
-                            h={24} 
-                            fill={"#8E8E93"}
-                        />
-                    </div>
-                    <p className="text-[#8E8E93] text-center text-[10px]">
-                        Shop
-                    </p> 
-                </div>
-                <div className="flex flex-col items-center">
-                    <div className="w-6 h-6 mb-1">
-                        <NewsIcon 
-                            w={24} 
-                            h={24} 
-                            fill={"#8E8E93"}
-                        />
-                    </div>
-                    <p className="text-[#8E8E93] text-center text-[10px]">
-                        News
-                    </p> 
-                </div>
-                <div className="flex flex-col items-center">
-                    <StarIcon 
-                        w={24} 
-                        h={24} 
-                        fill="#8E8E93"
-                    />
-                </div>
-            </div>
-            <div className="mt-auto mb-4 flex flex-col items-center space-y-8">
-                <IconLink 
-                    href='https://colomboai.com/genai-search'
-                    Icon={NewGenSearchIcon as IconComponent}
-                    label='New Chat'
-                />
-                <IconLink 
-                    href='https://colomboai.com/genai-search/library/'
-                    Icon={HistoryIcon as IconComponent}
-                    label='History'
-                />
-            </div>
+    // setProfilePic(localStorage.getItem('profilePic') || undefined);
+  }, []);
+
+  const handleSignOut = () => {
+    localStorage.removeItem('profilePic');
+    router.push('/sign-up');
+  };
+
+  return (
+    <div className="w-16 bg-white h-screen flex flex-col items-center py-4 border-r border-gray-200">
+      <div className="mt-0 mb-6">
+        <ProfilePicture image={profilePic} />
+      </div>
+      <div className="flex flex-col items-center space-y-6 flex-grow">
+        <div className="flex flex-col items-center">
+          <div className="w-6 h-6 mb-1">
+            <GenAiIcon w={24} h={24} fill={'#8E8E93'} />
+          </div>
+          <p className="text-[#8E8E93] text-center text-[10px]">Gen AI</p>
         </div>
-    )
-}
 
-export default LeftSidebar
+        <div className="flex flex-col items-center">
+          <div className="w-6 h-6 mb-1">
+            <VibesIcon w={24} h={24} fill={'#8E8E93'} />
+          </div>
+          <p className="text-[#8E8E93] text-center text-[10px]">Vibes</p>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="w-6 h-6 mb-1">
+            <FeedIcon w={24} h={24} fill={'#8E8E93'} />
+          </div>
+          <p className="text-[#8E8E93] text-center text-[10px]">Feed</p>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="w-6 h-6 mb-1">
+            <ShopIcon w={24} h={24} fill={'#8E8E93'} />
+          </div>
+          <p className="text-[#8E8E93] text-center text-[10px]">Shop</p>
+        </div>
+        <div className="flex flex-col items-center">
+          <div className="w-6 h-6 mb-1">
+            <NewsIcon w={24} h={24} fill={'#8E8E93'} />
+          </div>
+          <p className="text-[#8E8E93] text-center text-[10px]">News</p>
+        </div>
+        <div className="flex flex-col items-center">
+          <StarIcon w={24} h={24} fill="#8E8E93" />
+        </div>
+      </div>
+      <div className="mt-auto mb-4 flex flex-col items-center space-y-8">
+        <IconLink
+          href="https://colomboai.com/genai-search"
+          Icon={NewGenSearchIcon as IconComponent}
+          label="New Chat"
+        />
+        <IconLink
+          href="https://colomboai.com/genai-search/library/"
+          Icon={HistoryIcon as IconComponent}
+          label="History"
+        />
+      </div>
+    </div>
+  );
+};
 
-
+export default LeftSidebar;
 
 // 'use client'
 // import React, { useEffect, useState, FunctionComponent as FC } from 'react'
@@ -158,7 +145,6 @@ export default LeftSidebar
 // import { usePathname, useRouter } from "next/navigation"
 // import ProfilePicture from "@/components/LeftSidebar/ProfilePicture"
 // import { FeedIcon, VibesIcon, GenAiIcon, ShopIcon, NewsIcon, StarIcon, NewGenSearchIcon, HistoryIcon } from "./Icons"
-
 
 // interface IconProps {
 //   w: number;
@@ -182,9 +168,9 @@ export default LeftSidebar
 //     <Link href={href}>
 //       <div className="flex flex-col items-center">
 //         <div className="w-6 h-6 mb-1">
-//           <Icon 
-//             w={24} 
-//             h={24} 
+//           <Icon
+//             w={24}
+//             h={24}
 //             fill={isActive ? "#1E71F2" : "#8E8E93"}
 //           />
 //         </div>
@@ -193,7 +179,7 @@ export default LeftSidebar
 //           text-center text-[10px]
 //         `}>
 //           {label}
-//         </p> 
+//         </p>
 //       </div>
 //     </Link>
 //   )
@@ -218,16 +204,16 @@ export default LeftSidebar
 //                 <ProfilePicture image={profilePic} />
 //             </div>
 //             <div className="flex flex-col items-center space-y-6 flex-grow">
-//             {/* <IconLink 
+//             {/* <IconLink
 //                   href="https://colomboai.com/genai-search"
 //                   Icon={GenAiIcon as IconComponent}
 //                   label="Gen AI"
 //                 /> */}
 //    <div className="flex flex-col items-center">
 //         <div className="w-6 h-6 mb-1">
-//           <GenAiIcon 
-//             w={24} 
-//             h={24} 
+//           <GenAiIcon
+//             w={24}
+//             h={24}
 //             fill={"#8E8E93"}
 //           />
 //         </div>
@@ -236,14 +222,14 @@ export default LeftSidebar
 //           text-center text-[10px]
 //         `}>
 //           Gen AI
-//         </p> 
+//         </p>
 //       </div>
 
 //       <div className="flex flex-col items-center">
 //         <div className="w-6 h-6 mb-1">
-//           <VibesIcon 
-//             w={24} 
-//             h={24} 
+//           <VibesIcon
+//             w={24}
+//             h={24}
 //             fill={"#8E8E93"}
 //           />
 //         </div>
@@ -252,13 +238,13 @@ export default LeftSidebar
 //           text-center text-[10px]
 //         `}>
 //           Vibes
-//         </p> 
+//         </p>
 //       </div>
 //       <div className="flex flex-col items-center">
 //         <div className="w-6 h-6 mb-1">
-//           <FeedIcon 
-//             w={24} 
-//             h={24} 
+//           <FeedIcon
+//             w={24}
+//             h={24}
 //             fill={"#8E8E93"}
 //           />
 //         </div>
@@ -267,13 +253,13 @@ export default LeftSidebar
 //           text-center text-[10px]
 //         `}>
 //           Feed
-//         </p> 
+//         </p>
 //       </div>
 //       <div className="flex flex-col items-center">
 //         <div className="w-6 h-6 mb-1">
-//           <ShopIcon 
-//             w={24} 
-//             h={24} 
+//           <ShopIcon
+//             w={24}
+//             h={24}
 //             fill={"#8E8E93"}
 //           />
 //         </div>
@@ -282,13 +268,13 @@ export default LeftSidebar
 //           text-center text-[10px]
 //         `}>
 //           Shop
-//         </p> 
+//         </p>
 //       </div>
 //       <div className="flex flex-col items-center">
 //         <div className="w-6 h-6 mb-1">
-//           <NewsIcon 
-//             w={24} 
-//             h={24} 
+//           <NewsIcon
+//             w={24}
+//             h={24}
 //             fill={"#8E8E93"}
 //           />
 //         </div>
@@ -297,43 +283,43 @@ export default LeftSidebar
 //           text-center text-[10px]
 //         `}>
 //           News
-//         </p> 
+//         </p>
 //       </div>
-      
-//                 {/* <IconLink 
+
+//                 {/* <IconLink
 //                   href="https://colomboai.com/vibes"
 //                   Icon={VibesIcon as IconComponent}
 //                   label="Vibes"
 //                 /> */}
-//                 {/* <IconLink 
+//                 {/* <IconLink
 //                   href="https://colomboai.com/feed"
 //                   Icon={FeedIcon as IconComponent}
 //                   label="Feed"
 //                 /> */}
-//                 {/* <IconLink 
+//                 {/* <IconLink
 //                   href="https://colomboai.com/shop"
 //                   Icon={ShopIcon as IconComponent}
 //                   label="Shop"
 //                 /> */}
-//                 {/* <IconLink 
+//                 {/* <IconLink
 //                   href="https://colomboai.com/news"
 //                   Icon={NewsIcon as IconComponent}
 //                   label="News"
 //                 /> */}
 //                 <div className="flex flex-col items-center">
-//                     <StarIcon 
-//                       w={24} 
-//                       h={24} 
+//                     <StarIcon
+//                       w={24}
+//                       h={24}
 //                       fill="#8E8E93"
 //                     />
 //                 </div>
 
-//             <IconLink 
+//             <IconLink
 //             href='https://colomboai.com/genai-search'
 //             Icon={NewGenSearchIcon as IconComponent}
 //             label='New Chat'
 //             />
-//             <IconLink 
+//             <IconLink
 //             href='https://colomboai.com/genai-search/library/'
 //             Icon={HistoryIcon as IconComponent}
 //             label='History'
@@ -349,8 +335,6 @@ export default LeftSidebar
 // }
 
 // export default LeftSidebar
-
-
 
 // 'use client'
 // import React from 'react'
@@ -382,7 +366,7 @@ export default LeftSidebar
 
 //     return (
 //         <div className="w-[100%] mt-[20px] overflow-hidden">
-//             <div className="mb-[46px] mt-[5px] relative">          
+//             <div className="mb-[46px] mt-[5px] relative">
 //                 <div className="flex z-50 justify-center items-center rounded-full hover:text-brandprimary cursor-pointer mx-auto">
 //                     <ProfilePicture image={profilePic} />
 //                 </div>
@@ -396,7 +380,7 @@ export default LeftSidebar
 //                         </div>
 //                          <p className="text-black text-center text-[14px] mt-[7px] font-sans">
 //                             Gen AI
-//                          </p> 
+//                          </p>
 //                     </div>
 //                 </Link> */}
 
@@ -407,7 +391,7 @@ export default LeftSidebar
 //                         </div>
 //                          <p className="text-black text-center text-[14px] mt-[7px] font-sans">
 //                             Vibes
-//                          </p> 
+//                          </p>
 //                     </div>
 //                 </Link>
 
@@ -418,7 +402,7 @@ export default LeftSidebar
 //                         </div>
 //                          <p className="text-black text-center text-[14px] mt-[7px] font-sans">
 //                             Feed
-//                          </p> 
+//                          </p>
 //                     </div>
 //                 </Link>
 
@@ -429,7 +413,7 @@ export default LeftSidebar
 //                         </div>
 //                          <p className="text-black text-center text-[14px] mt-[7px] font-sans">
 //                             Shop
-//                          </p> 
+//                          </p>
 //                     </div>
 //                 </Link>
 
@@ -440,7 +424,7 @@ export default LeftSidebar
 //                         </div>
 //                          <p className="text-black text-center text-[14px] mt-[7px] font-sans">
 //                             News
-//                          </p> 
+//                          </p>
 //                     </div>
 //                 </Link>
 

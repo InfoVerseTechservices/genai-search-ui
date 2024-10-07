@@ -6,8 +6,8 @@ on:
       - dev  # Trigger deployment on pushes to the qa branch
 
 jobs:
-  deploy:
-    runs-on: self-hosted
+  build-and-deploy:
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code

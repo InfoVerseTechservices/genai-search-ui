@@ -4,6 +4,7 @@ import DeleteChat from '@/components/DeleteChat';
 import { formatTimeDifference } from '@/lib/utils';
 import { BookOpenText, ClockIcon, Delete, ScanEye, TrashIcon } from 'lucide-react';
 import Link from 'next/link';
+import { getCookie } from '@/components/LeftSidebar/cookies';
 import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from 'react';
 
 export interface Chat {
@@ -43,6 +44,7 @@ const Page = () => {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': getCookie('token'),
           },
         },
       );
@@ -72,6 +74,7 @@ const Page = () => {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': getCookie('token'),
           },
         },
       );

@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { useSearchParams } from 'next/navigation';
 import { getSuggestions } from '@/lib/actions';
 import Error from 'next/error';
-import { getCookie } from "./LeftSidebar/cookies"
 
 import { useUserProfile } from '@/app/context/user';
 import { useRouter } from 'next/navigation';
@@ -46,7 +45,6 @@ const useSocket = (
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': getCookie('token')
             },
           },
         ).then(async (res) => await res.json());
@@ -145,8 +143,6 @@ const useSocket = (
 
         const wsURL = new URL(url);
         const searchParams = new URLSearchParams({});
-        const token = getCookie('token');
-        console.log("token is :"+token);
 
         searchParams.append('chatModel', chatModel!);
         searchParams.append('chatModelProvider', chatModelProvider);
@@ -164,9 +160,6 @@ const useSocket = (
 
         searchParams.append('embeddingModel', embeddingModel!);
         searchParams.append('embeddingModelProvider', embeddingModelProvider);
-        if (token) {
-          searchParams.append('token', token);
-        }
 
         wsURL.search = searchParams.toString();
 
@@ -229,7 +222,6 @@ const loadMessages = async (
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': getCookie('token')
       },
     },
   );

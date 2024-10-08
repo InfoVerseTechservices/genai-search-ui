@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { getCookie } from '@/components/LeftSidebar/cookies';
 import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from 'react';
 
-
 export interface Chat {
   id: string;
   title: string;
@@ -152,7 +151,6 @@ const Page = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': getCookie('token'),
         },
       });
 

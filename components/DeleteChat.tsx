@@ -3,7 +3,6 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, useState } from 'react';
 import { toast } from 'sonner';
 import { Chat } from '@/app/library/page';
-import { getCookie } from "./LeftSidebar/cookies"
 
 const DeleteChat = ({
   chatId,
@@ -26,7 +25,6 @@ const DeleteChat = ({
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': getCookie('token'),
           },
         },
       );

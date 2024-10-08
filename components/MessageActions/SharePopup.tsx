@@ -10,7 +10,9 @@ interface SharePopupComponent {
     const handleVisibility = () => {
       setIsVisible(!isVisible);
     };
-  
+    React.useEffect(()=>{
+      
+    },[isVisible])
     const copyToClipboard = (text: string) => {
       navigator.clipboard.writeText(text)
         .then(() => {

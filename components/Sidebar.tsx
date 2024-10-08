@@ -8,6 +8,11 @@ import React, { useState, type ReactNode } from 'react';
 import Layout from './Layout';
 import SettingsDialog from './SettingsDialog';
 
+// USER PROFILE Context
+import { useUserProfile } from '@/app/context/user';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 const VerticalIconContainer = ({ children }: { children: ReactNode }) => {
   return (
     <div className="flex flex-col items-center gap-y-3 w-full">{children}</div>
@@ -18,7 +23,19 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
   const segments = useSelectedLayoutSegments();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  
+
+  // NOT SURE IF THIS IS NEEDED FOR SIDEBAR
+  // // USER PROFILE Context
+  // const { userDetails, isLoggedIn } = useUserProfile();
+  // const router = useRouter();
+
+  // // CHECK IF USER IS LOGGED IN
+  // useEffect(() => {
+  //   if (!isLoggedIn) {
+  //     router.push('/login'); // Redirect to the login page if not logged in
+  //   }
+  // }, [isLoggedIn, router]);
+
   const navLinks = [
     // {
     //   icon: Home,
@@ -41,7 +58,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
   ];
 
   return (
-    <div className=''>
+    <div className="">
       <div className="hidden  lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-18 lg:flex-col">
         <div className="flex grow w-16  flex-col items-center justify-between gap-y-5 overflow-y-auto bg-[#D2E3FD]  border-[0.5px] border-[#1E71F2] dark:bg-dark-secondary px-2 py-8">
           <a href="/">
@@ -51,9 +68,8 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
             {navLinks.map((link, i) => (
               <Link
                 key={i}
-
                 href={link.href}
-                color='black'
+                color="black"
                 className={cn(
                   'relative flex flex-row items-center justify-center cursor-pointer text-black duration-150 transition w-full py-2 rounded-lg',
                   link.active
@@ -61,14 +77,10 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                     : 'text-black/70 dark:text-white/70',
                 )}
               >
-                
-                {link.active ?
-                ( 
-                  <link.icon color='black'/> 
-                )
-                : 
-                (
-                  <link.icon color='#646464'/> 
+                {link.active ? (
+                  <link.icon color="black" />
+                ) : (
+                  <link.icon color="#646464" />
                 )}
                 {/* {link.active && (
                   <div className="absolute right-0 -mr-2 h-full w-1 rounded-l-lg bg-black dark:bg-white" />
@@ -81,7 +93,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
             onClick={() => setIsSettingsOpen(!isSettingsOpen)}
             className="cursor-pointer"
             // color='#646464'
-            color='transparent'
+            color="transparent"
           />
 
           <SettingsDialog
@@ -96,7 +108,6 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
           <Link
             href={link.href}
             key={i}
-
             className={cn(
               'relative flex flex-col items-center space-y-1 text-center w-full',
               link.active

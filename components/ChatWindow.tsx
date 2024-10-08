@@ -11,6 +11,9 @@ import { getSuggestions } from '@/lib/actions';
 import Error from 'next/error';
 import { getCookie } from "./LeftSidebar/cookies"
 
+import { useUserProfile } from '@/app/context/user';
+import { useRouter } from 'next/navigation';
+
 export type Message = {
   messageId: string;
   chatId: string;
@@ -262,6 +265,10 @@ const loadMessages = async (
 };
 
 const ChatWindow = ({ id }: { id?: string }) => {
+  // USER PROFILE Context
+  const { userDetails, isLoggedIn } = useUserProfile();
+  const router = useRouter();
+
   const searchParams = useSearchParams();
   const initialMessage = searchParams.get('q');
 
@@ -290,6 +297,11 @@ const ChatWindow = ({ id }: { id?: string }) => {
 
   const [notFound, setNotFound] = useState(false);
   useEffect(() => {
+    if (!isLoggedIn) {
+      router.push('/login');
+      return;
+    }
+
     if (
       chatId &&
       !newChatCreated &&
@@ -513,7 +525,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
     notFound ? (
       <Error statusCode={404} />
     ) : (
-      <div className=''>
+      <div className="">
         {messages.length > 0 ? (
           <>
             <Navbar messages={messages} />

@@ -81,7 +81,7 @@ const LeftSidebar: FC = () => {
   };
 
   return (
-    <div className="w-16 bg-white h-screen flex flex-col items-center py-4 border-r border-gray-200">
+    <div className="  xl:w-20 lg:w-[3.5rem] bg-white h-screen flex flex-col items-center py-4 border-r  border-[#1E71F2]">
       <div className="mt-0 mb-6">
         <ProfilePicture image={profilePic} />
       </div>

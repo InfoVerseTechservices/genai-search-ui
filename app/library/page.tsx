@@ -190,7 +190,7 @@ const Page = () => {
   ) : (
     <>
    
-     <div className='flex justify-between items-center  my-4 '>
+     <div className='flex justify-between items-center  my-4 mt-12 '>
         
         <p className=' text-center flex-grow font-[700] text-[21px] text-[#333333]'>GenAI Search History</p>
         <p className='cursor-pointer  ' onClick={handleDeleteAll}><TrashIcon size={20}  color={deleteAllDialog? '#E95050': 'black'}/></p>

@@ -81,7 +81,7 @@ const LeftSidebar: FC = () => {
   };
 
   return (
-    <div className="w-16 bg-white h-screen flex flex-col items-center py-4 border-r border-gray-200">
+    <div className="  xl:w-20 lg:w-[3.5rem] bg-white h-screen flex flex-col items-center py-4 border-r  border-[#1E71F2]">
       <div className="mt-0 mb-6">
         <ProfilePicture image={profilePic} />
       </div>
@@ -123,12 +123,12 @@ const LeftSidebar: FC = () => {
       </div>
       <div className="mt-auto mb-4 flex flex-col items-center space-y-8">
         <IconLink
-          href="https://colomboai.com/genai-search"
+          href="https://caidev.colomboai.com/genai-search/"
           Icon={NewGenSearchIcon as IconComponent}
           label="New Chat"
         />
         <IconLink
-          href="https://colomboai.com/genai-search/library/"
+          href="https://caidev.colomboai.com/genai-search/library/"
           Icon={HistoryIcon as IconComponent}
           label="History"
         />

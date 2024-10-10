@@ -123,12 +123,12 @@ const LeftSidebar: FC = () => {
       </div>
       <div className="mt-auto mb-4 flex flex-col items-center space-y-8">
         <IconLink
-          href="https://colomboai.com/genai-search"
+          href="https://caidev.colomboai.com/genai-search/"
           Icon={NewGenSearchIcon as IconComponent}
           label="New Chat"
         />
         <IconLink
-          href="https://colomboai.com/genai-search/library/"
+          href="https://caidev.colomboai.com/genai-search/library/"
           Icon={HistoryIcon as IconComponent}
           label="History"
         />

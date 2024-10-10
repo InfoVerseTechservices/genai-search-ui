@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
-import { FunctionComponent as FC } from 'react';
+import { FunctionComponent as FC ,useState} from 'react';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
@@ -12,7 +12,7 @@ import ShopImage from '../public/images/icons/sidebar/shop.svg'
 import NewsImage from '../public/images/icons/sidebar/news.svg'
 import LeftSidebar from '@/components/LeftSidebar'; // Ensure this path is correct
 import { Toaster } from 'sonner';
-import { FeedIcon, GenAiIcon, HistoryIcon, NewGenSearchIcon, NewsIcon, ShopIcon, VibesIcon } from '@/components/Icons';
+import { ChatBubbleIcon, FeedIcon, GenAiIcon, HistoryIcon, NewGenSearchIcon, NewsIcon, NotificationIcon, SearchIcon, ShopIcon, VibesIcon } from '@/components/Icons';
 import ThemeProvider from '@/components/theme/Provider';
 import NewSidebar from '@/components/NewSidebar';
 import Link from 'next/link';
@@ -56,6 +56,8 @@ const IconLink: FC<IconLinkProps> = ({ href, Icon, label }) => {
   );
 };
 import UserProfileContextProvider from '@/app/context/user';
+import ProfilePicture from '@/components/LeftSidebar/ProfilePicture';
+import ProfileLoader from '@/components/ProfileLoader';
 
 const montserrat = Montserrat({
   weight: ['300', '400', '500', '700'],
@@ -82,7 +84,7 @@ export default function RootLayout({
           {/* Wrapping all children with UserProfileContext (Context) */}
           <UserProfileContextProvider>
             <div className="flex h-full ">
-              <aside className="hidden md:flex lg:flex xl:flex fixed left-0 top-0 h-full w-[4%] bg-gray-100 dark:bg-white">
+              <aside className="hidden md:flex lg:flex xl:flex fixed left-0 top-0 h-full w-[5%] bg-gray-100 dark:bg-white">
                 <LeftSidebar />
               </aside>
               <main className="flex-1 w-[4%] flex flex-col">
@@ -181,21 +183,41 @@ export default function RootLayout({
                
               </main>
 
-
-<div className="mt-auto mb-4 flex space-x-4 md:hidden bg-white fixed top-[13%] right-10">
-<Link href='https://caidev.colomboai.com/genai-search/'>
-<div className="flex flex-col items-center">
-<div className="w-6 h-6 mb-1">
-<NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} />
+<div className="mt-auto mb-4 flex space-x-4  md:hidden bg-transparent fixed top-[13%] left-10">
+<div className="w-6 h-6 ">
+<ProfileLoader/>
 </div>
-<p
+<Link href=''>
+<div className="flex flex-col items-center">
+
+  <SearchIcon w={24} h={24} fill={'#8E8E93'}/>
+{/* <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} /> */}
+{/* </div> */}
+{/* <p
 className="
 text-[#8E8E93]
 text-center text-[10px]
 "
 >
 New Chat
-</p>
+</p> */}
+</div>
+</Link>
+  </div>
+<div className="mt-auto mb-4 flex space-x-4 md:hidden bg-transparent fixed top-[13%] right-10">
+<Link href='https://caidev.colomboai.com/genai-search/'>
+<div className="flex flex-col items-center">
+<div className="w-6 h-6 mb-1">
+<NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} />
+</div>
+{/* <p
+className="
+text-[#8E8E93]
+text-center text-[10px]
+"
+>
+New Chat
+</p> */}
 </div>
 </Link>
 <Link href='https://caidev.colomboai.com/genai-search/library/'>
@@ -203,14 +225,32 @@ New Chat
 <div className="w-6 h-6 mb-1">
 <HistoryIcon w={24} h={24} fill={'#8E8E93'} />
 </div>
-<p
+{/* <p
 className="
 text-[#8E8E93]
 text-center text-[10px]
 "
 >
 History
-</p>
+</p> */}
+</div>
+</Link>
+<Link href=''>
+<div className="flex flex-col items-center">
+<div className="w-6 h-6 mb-1">
+  <NotificationIcon w={24} h={24} fill={'#8E8E93'} />
+{/* <Noti w={24} h={24} fill={'#8E8E93'} /> */}
+</div>
+
+</div>
+</Link>
+<Link href=''>
+<div className="flex flex-col items-center">
+<div className="w-6 h-6 mb-1">
+{/* <HistoryIcon w={24} h={24} fill={'#8E8E93'} /> */}
+<ChatBubbleIcon w={24} h={24} fill={'#8E8E93'}/>
+</div>
+
 </div>
 </Link>
 {/* <IconLink

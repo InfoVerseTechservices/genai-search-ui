@@ -3,6 +3,7 @@ import React, { useEffect, useState, FunctionComponent as FC } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import ProfilePicture from '@/components/LeftSidebar/ProfilePicture';
+import Dropdown from './LeftSidebar/Dropdown'
 import {
   FeedIcon,
   VibesIcon,
@@ -82,57 +83,80 @@ const LeftSidebar: FC = () => {
 
   return (
     <div className="  xl:w-20 lg:w-[3.5rem] bg-white h-screen flex flex-col items-center py-4 border-r  border-[#1E71F2]">
-      <div className="mt-0 mb-6">
-        <ProfilePicture image={profilePic} />
-      </div>
-      <div className="flex flex-col items-center space-y-6 flex-grow">
-        <div className="flex flex-col items-center">
-          <div className="w-6 h-6 mb-1">
-            <GenAiIcon w={24} h={24} fill={'#8E8E93'} />
-          </div>
-          <p className="text-[#8E8E93] text-center text-[10px]">Gen AI</p>
-        </div>
+    
+      {/* <div className="lg:mb-[40px] md:mt-[1.5rem] md:mb-[46px] xl:mt-[1.5rem] lg:mt-[1.5rem] relative"> */}
+<div className='mt-2 mb-6 relative'>
+<Dropdown
+    offset={[0, 10]}
+    placement="bottom-start"
+    btnClassName="flex z-[150] justify-center items-center rounded-full hover:text-brandprimary cursor-pointer mx-auto"
+    button={<ProfilePicture  image={profilePic} />}
+>
+    <ul className="min-w-[160px] rounded-lg bg-white shadow-md">
 
-        <div className="flex flex-col items-center">
-          <div className="w-6 h-6 mb-1">
-            <VibesIcon w={24} h={24} fill={'#8E8E93'} />
-          </div>
-          <p className="text-[#8E8E93] text-center text-[10px]">Vibes</p>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="w-6 h-6 mb-1">
-            <FeedIcon w={24} h={24} fill={'#8E8E93'} />
-          </div>
-          <p className="text-[#8E8E93] text-center text-[10px]">Feed</p>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="w-6 h-6 mb-1">
-            <ShopIcon w={24} h={24} fill={'#8E8E93'} />
-          </div>
-          <p className="text-[#8E8E93] text-center text-[10px]">Shop</p>
-        </div>
-        <div className="flex flex-col items-center">
-          <div className="w-6 h-6 mb-1">
-            <NewsIcon w={24} h={24} fill={'#8E8E93'} />
-          </div>
-          <p className="text-[#8E8E93] text-center text-[10px]">News</p>
-        </div>
-        <div className="flex flex-col items-center">
+      {/* user name to be imported here */}
+        <Link href="/profile"><li className="px-4 py-2 hover:bg-gray-100 cursor-pointer  text-brandprimary">Name Here</li></Link>
+        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer " onClick={handleSignOut}>Log out</li>
+    </ul>
+</Dropdown>
+</div>
+      <div className="flex flex-col items-center space-y-6 flex-grow">
+        {/* <div className="flex flex-col items-center"> */}
+        <div className="flex flex-col items-center space-y-6 flex-grow">
+             <IconLink
+                   href="/genai-search"
+                   Icon={GenAiIcon as IconComponent}
+                   label="Gen AI"
+                 />
+                 </div>
+                 <div className="flex flex-col items-center space-y-6 flex-grow">
+             <IconLink
+                   href="/vibes"
+                   Icon={VibesIcon as IconComponent}
+                   label="Vibes"
+                 />
+                 </div>
+                 <div className="flex flex-col items-center space-y-6 flex-grow">
+             <IconLink
+                   href="/feed"
+                   Icon={FeedIcon as IconComponent}
+                   label="Feed"
+                 />
+                 </div>
+                 <div className="flex flex-col items-center space-y-6 flex-grow">
+             <IconLink
+                   href="/shop"
+                   Icon={ShopIcon as IconComponent}
+                   label="Shop"
+                 />
+                 </div>
+                 <div className="flex flex-col items-center space-y-6 flex-grow">
+             <IconLink
+                   href="/news"
+                   Icon={NewsIcon as IconComponent}
+                   label="News"
+                 />
+                 </div>
+               
+        <div className="flex flex-col items-center space-y-6 flex-grow">
           <StarIcon w={24} h={24} fill="#8E8E93" />
         </div>
-      </div>
-      <div className="mt-auto mb-4 flex flex-col items-center space-y-8">
+        <div className="flex flex-col items-center space-y-6 flex-grow">
         <IconLink
-          href="https://caidev.colomboai.com/genai-search/"
+          href="/genai-search"
           Icon={NewGenSearchIcon as IconComponent}
           label="New Chat"
         />
+          </div>
+          <div className="flex flex-col items-center space-y-6 flex-grow">
         <IconLink
-          href="https://caidev.colomboai.com/genai-search/library/"
+          href="/genai-search/library"
           Icon={HistoryIcon as IconComponent}
           label="History"
         />
+          </div>
       </div>
+ 
     </div>
   );
 };

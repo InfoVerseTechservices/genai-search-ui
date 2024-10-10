@@ -3,8 +3,8 @@ import { Montserrat } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import Sidebar from '@/components/Sidebar';
-import GenAIImage from '../public/images/icons/sidebar/gen-ai-icon.svg'
-import VibesImage from '../public/images/icons/sidebar/vibes.svg'
+import GenAIImage from '../public/images/icons/sidebar/genai-pen.svg'
+import VibesImage from '../public/images/icons/sidebar/vibes-icon.svg'
 import FeedImage from '../public/images/icons/sidebar/feed.svg'
 import ShopImage from '../public/images/icons/sidebar/shop.svg'
 import NewsImage from '../public/images/icons/sidebar/news.svg'
@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html className="h-full" lang="en" suppressHydrationWarning>
+    <html className="h-full w-full" lang="en" suppressHydrationWarning>
       <body className={cn('h-full', montserrat.className)}>
         <ThemeProvider>
           {/* Wrapping all children with UserProfileContext (Context) */}
@@ -51,7 +51,7 @@ export default function RootLayout({
                 {/* <Sidebar>{children}</Sidebar> */}
                 <div className="md:hidden bg-white fixed w-full bottom-0 z-50 border-t-2 border-[#1E71F2] rounded-xl">
           <div className="shadow-[0px_2px_4px_0px_#0000001A]">
-            <div className="py-2 flex flex-wrap items-center justify-evenly">
+            <div className="py-1 flex flex-wrap items-center justify-evenly">
               <Link href="/genai-search">
                 <div className="mx-4">
                   <div className="w-[29px] mx-auto">
@@ -66,7 +66,7 @@ export default function RootLayout({
               <Link href="/vibes">
                 <div className="mx-4">
                   <div className="w-[29px] mx-auto">
-                  <Image src={VibesImage} alt="Vibes" />
+                  <Image src={VibesImage} alt="Vibes" height={30} width={30} />
                   {/* {pathname === '/vibes' ? <Image src={blue_vibes_icon} alt="colombo"/> : <Image src={vibes_icon} alt="colombo"/>} */}
                   </div>
                   <p

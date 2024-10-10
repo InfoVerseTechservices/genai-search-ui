@@ -187,23 +187,8 @@ export default function RootLayout({
 <div className="w-6 h-6 ">
 <ProfileLoader/>
 </div>
-<Link href=''>
-<div className="flex flex-col items-center">
 
-  <SearchIcon w={24} h={24} fill={'#8E8E93'}/>
-{/* <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} /> */}
-{/* </div> */}
-{/* <p
-className="
-text-[#8E8E93]
-text-center text-[10px]
-"
->
-New Chat
-</p> */}
 </div>
-</Link>
-  </div>
 <div className="mt-auto mb-4 flex space-x-4 md:hidden bg-transparent fixed top-[13%] right-10">
 <Link href='https://caidev.colomboai.com/genai-search/'>
 <div className="flex flex-col items-center">

@@ -259,7 +259,7 @@ const Page = () => {
                       onChange={handleCheckboxChange}
                       value={chat.id}
                     />
-                    <Link href={`/c/${chat.id}`}>
+                    <Link href={`/library/c/${chat.id}`}>
                       <span className="whitespace-nowrap overflow-hidden text-ellipsis  lg:text-xl font-[18px]   cursor-pointer text-[#515151]">
                         {chat.title}
                       </span>

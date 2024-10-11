@@ -110,7 +110,6 @@ const LeftSidebar: FC = () => {
       <div className="flex flex-col items-center space-y-6 flex-grow">
         {/* <div className="flex flex-col items-center"> */}
         <div className="flex flex-col items-center space-y-6 flex-grow">
-          hello
           <IconLink
             href="/genai-search"
             Icon={GenAiIcon as IconComponent}

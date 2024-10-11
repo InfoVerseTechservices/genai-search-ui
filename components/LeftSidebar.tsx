@@ -118,28 +118,28 @@ const LeftSidebar: FC = () => {
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/vibes"
+            href="https://colomboai.com/vibes"
             Icon={VibesIcon as IconComponent}
             label="Vibes"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/feed"
+            href="https://colomboai.com/feed"
             Icon={FeedIcon as IconComponent}
             label="Feed"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/shop"
+            href="https://colomboai.com/shop"
             Icon={ShopIcon as IconComponent}
             label="Shop"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/news"
+            href="https://colomboai.com/news"
             Icon={NewsIcon as IconComponent}
             label="News"
           />

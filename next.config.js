@@ -8,6 +8,7 @@ const nextConfig = {
   // Enforce trailing slashes in URLs
   trailingSlash: true,
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

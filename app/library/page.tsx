@@ -151,6 +151,7 @@ const Page = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': getCookie('token'),
         },
       });
 

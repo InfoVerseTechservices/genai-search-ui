@@ -291,6 +291,7 @@ import axios from 'axios';
 // import '../app/global.css'
 // import '../../../src/app/globals.css';
 import { Message } from './ChatWindow';
+import { getCookie } from '@/components/LeftSidebar/cookies';
 
 interface Image {
   img_src: string;
@@ -328,6 +329,7 @@ const RelatedImages: React.FC<RelatedImagesProps> = ({ chat_history, query }) =>
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
+                  'Authorization': getCookie('token'),
                 },
                 body: JSON.stringify({
                   query: query,

@@ -8,6 +8,7 @@ import React, {
   type SelectHTMLAttributes,
 } from 'react';
 import ThemeSwitcher from './theme/Switcher';
+import { getCookie } from '@/components/LeftSidebar/cookies';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
@@ -91,6 +92,7 @@ const SettingsDialog = ({
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/config`, {
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': getCookie('token'),
           },
         });
 
@@ -152,6 +154,7 @@ const SettingsDialog = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': getCookie('token'),
         },
         body: JSON.stringify(config),
       });

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Lightbox, { GenericSlide, VideoSlide } from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { Message } from './ChatWindow';
+import { getCookie } from '@/components/LeftSidebar/cookies';
 
 type Video = {
   url: string;
@@ -59,6 +60,7 @@ const Searchvideos = ({
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
+                  'Authorization': getCookie('token'),
                 },
                 body: JSON.stringify({
                   query: query,

@@ -1,4 +1,5 @@
 import { Message } from '@/components/ChatWindow';
+import { getCookie } from '@/components/LeftSidebar/cookies';
 
 export const getSuggestions = async (chatHisory: Message[]) => {
   const chatModel = localStorage.getItem('chatModel');
@@ -8,6 +9,7 @@ export const getSuggestions = async (chatHisory: Message[]) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': getCookie('token'),
     },
     body: JSON.stringify({
       chat_history: chatHisory,

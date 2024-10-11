@@ -14,13 +14,20 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({
   className,
 }) => {
   return (
-    <Image
+    // <Image
+    //   src={image}
+    //   alt="avatar"
+    //   className={`rounded-full${className ? ` ${className}` : ''}`}
+    //   width={size}
+    //   height={size}
+    //   referrerPolicy={'no-referrer'}
+    // />
+    <img
       src={image}
       alt="avatar"
-      className={`rounded-full${className ? ` ${className}` : ''}`}
+      className={`rounded-full ${className}`}
       width={size}
       height={size}
-      referrerPolicy={'no-referrer'}
     />
   );
 };

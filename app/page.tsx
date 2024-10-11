@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'ColomboAI',
-  description: 'Chat with the internet, chat with Perplexica.',
+  //description: 'Chat with the internet, chat with Perplexica.',
 };
 
 const Home = () => {

@@ -13,8 +13,8 @@ const EmptyChat = ({
 }) => {
    return (
     
-    <div className="flex">
-   <div className="flex-grow mr-[20px]  xl:mr-[30px] ">
+    <div className="flex h-full w-full">
+   <div className="flex-grow  xl:mr-[30px] ">
      <div className="relative">
        <div className="flex flex-col items-center justify-center min-h-screen w-full mx-auto p-2 space-y-8">
          

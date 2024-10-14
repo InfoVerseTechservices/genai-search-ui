@@ -47,7 +47,8 @@ jobs:
           # Navigate to the genai-search directory
           cd /var/www/html/adfjrgjf/genai-search
 
-          
+          # Pull the latest changes from the GitHub repository
+          git stash
           
           # Pull the latest changes from the GitHub repository
           git pull origin dev

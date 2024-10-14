@@ -182,7 +182,7 @@ export default function RootLayout({
                 <NewSidebar>{children} </NewSidebar>
 
               </main>
-              <div className='flex flex-row w-full bg-white fixed top-[4.6rem] justify-between px-8 md:hidden '>
+              {/* <div className='flex flex-row w-full bg-white fixed top-[4.6rem] justify-between px-8 md:hidden '>
                 <div className="flex space-x-4">
                   <div className="w-6 h-6 ">
                     <ProfileLoader />
@@ -195,14 +195,7 @@ export default function RootLayout({
                       <div className="w-6 h-6 mb-1">
                         <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} />
                       </div>
-                      {/* <p
-className="
-text-[#8E8E93]
-text-center text-[10px]
-"
->
-New Chat
-</p> */}
+ 
                     </div>
                   </Link>
                   <Link href='https://caidev.colomboai.com/genai-search/library/'>
@@ -210,46 +203,13 @@ New Chat
                       <div className="w-6 h-6 mb-1">
                         <HistoryIcon w={24} h={24} fill={'#8E8E93'} />
                       </div>
-                      {/* <p
-className="
-text-[#8E8E93]
-text-center text-[10px]
-"
->
-History
-</p> */}
+       
                     </div>
                   </Link>
-                  <Link href=''>
-                    <div className="flex flex-col items-center">
-                      <div className="w-6 h-6 mb-1">
-                        <NotificationIcon w={24} h={24} fill={'#8E8E93'} />
-                        {/* <Noti w={24} h={24} fill={'#8E8E93'} /> */}
-                      </div>
-
-                    </div>
-                  </Link>
-                  <Link href=''>
-                    <div className="flex flex-col items-center">
-                      <div className="w-6 h-6 mb-1">
-                        {/* <HistoryIcon w={24} h={24} fill={'#8E8E93'} /> */}
-                        <ChatBubbleIcon w={24} h={24} fill={'#8E8E93'} />
-                      </div>
-
-                    </div>
-                  </Link>
-                  {/* <IconLink
-href="https://colomboai.com/genai-search"
-Icon={NewGenSearchIcon as IconComponent}
-label="New Chat"
-/>
-<IconLink
-href="https://colomboai.com/genai-search/library/"
-Icon={HistoryIcon as IconComponent}
-label="History"
-/> */}
+                 
+           
                 </div>
-              </div>
+              </div> */}
             </div>
 
 

@@ -17,11 +17,11 @@ export interface Chat {
 const Page = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
-  const [chatGroups, setChatGroups] = useState<Record<string, Chat[]>>({});
+  const [chatGroups, setChatGroups] = useState<Record<string, Chat[]>>({}); 
   const [selectedChats, setSelectedChats] = useState<string[]>([]);
-  const [deleteDialog, setDeleteDialog] = useState(false)
-  const [deleteAllDialog, setDeleteAllDialog] = useState(false)
-  const [selectedGroup, setSelectedGroup] = useState<Chat[]>([]);
+  const [deleteDialog,setDeleteDialog] = useState(false)
+  const [deleteAllDialog,setDeleteAllDialog] = useState(false)
+  const [selectedGroup,setSelectedGroup] = useState <Chat[]>([]);
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { checked, value } = event.target;
     if (checked) {
@@ -31,85 +31,85 @@ const Page = () => {
     }
   };
 
-  const handleDelete = async () => {
-    if (selectedGroup.length === 0) {
+  const handleDelete = async()=>{
+    if (selectedGroup.length === 0){
       setLoading(true);
-      try {
-        const idsToDelete = chats.map(group => group.id)
-        console.log("deleting these ids ", idsToDelete)
-        for (const id of idsToDelete) {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/chats/${id}`,
-            {
-              method: 'DELETE',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': getCookie('token'),
-              },
-            },
-          );
-          if (res.status != 200) {
-            throw new Error('Failed to delete chat');
-          }
-        }
-      } catch (err: any) {
-        console.error(err)
-      } finally {
-        setChats([]);
-        console.log("done")
-        setLoading(false);
-        setDeleteAllDialog(false)
-        setSelectedGroup([])
-
+    try {
+      const idsToDelete = chats.map(group => group.id)
+      console.log("deleting these ids ",idsToDelete)
+      for (const id of idsToDelete){
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/chats/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': getCookie('token'),
+          },
+        },
+      );
+      if (res.status != 200) {
+        throw new Error('Failed to delete chat');
       }
     }
-    else {
+    } catch (err: any) {
+      console.error(err)
+    } finally {
+      setChats([]);
+      console.log("done")
+      setLoading(false);
+      setDeleteAllDialog(false)
+      setSelectedGroup([])
+      
+    }
+    }
+    else{
       setLoading(true);
-      try {
-        const idsToDelete = selectedGroup.map(group => group.id)
-        for (const id of idsToDelete) {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/chats/${id}`,
-            {
-              method: 'DELETE',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': getCookie('token'),
-              },
-            },
-          );
-          if (res.status != 200) {
-            throw new Error('Failed to delete chat');
-          }
-        }
-      } catch (err: any) {
-        console.error(err)
-      } finally {
-        const newChats = chats.filter(chat => !selectedGroup.some(group => group.id === chat.id));
-        setChats(newChats);
-        setDeleteDialog(false)
-        setSelectedGroup([])
-        setLoading(false);
+    try {
+      const idsToDelete = selectedGroup.map(group => group.id)
+      for (const id of idsToDelete){
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/chats/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': getCookie('token'),
+          },
+        },
+      );
+      if (res.status != 200) {
+        throw new Error('Failed to delete chat');
       }
+    }
+    } catch (err: any) {
+      console.error(err)
+    } finally {
+      const newChats = chats.filter(chat => !selectedGroup.some(group => group.id === chat.id));
+      setChats(newChats);
+      setDeleteDialog(false)
+      setSelectedGroup([])
+      setLoading(false);
+    }
     }
 
   }
 
-  const handleDeleteAll = () => {
+  const handleDeleteAll = () =>{
     setDeleteAllDialog(true)
   }
 
-  const handleDeleteToggle = (chatGroup: Chat[]) => {
+  const handleDeleteToggle = (chatGroup:Chat[]) =>{
     setDeleteDialog(true)
     const hasSelectedChats = chatGroup.some(chat => selectedChats.includes(chat.id));
 
     if (hasSelectedChats) {
       const updatedChatGroup = chatGroup.filter(chat => selectedChats.includes(chat.id));
-
+      
       setSelectedGroup(updatedChatGroup)
     }
   }
-  const handleCloseDeleteToggle = () => {
+  const handleCloseDeleteToggle = ()=>{
     setDeleteDialog(false)
     setDeleteAllDialog(false)
   }
@@ -164,11 +164,11 @@ const Page = () => {
     fetchChats();
   }, []);
 
-  useEffect(() => {
+  useEffect(()=>{
     groupChatsByDate(chats);
-  }, [chats])
+  },[chats])
 
-
+  
   return loading ? (
     <div className="flex flex-row items-center justify-center min-h-screen border ">
       <svg
@@ -190,91 +190,92 @@ const Page = () => {
     </div>
   ) : (
     <>
-
-      <div className='flex justify-between items-center  my-4 mt-12 '>
-
+   
+     <div className='flex justify-between items-center  my-4 mt-12 '>
+        
         <p className=' text-center flex-grow font-[700] text-[21px] text-[#333333]'>GenAI Search History</p>
-        <p className='cursor-pointer  ' onClick={handleDeleteAll}><TrashIcon size={20} color={deleteAllDialog ? '#E95050' : 'black'} /></p>
-
+        <p className='cursor-pointer  ' onClick={handleDeleteAll}><TrashIcon size={20}  color={deleteAllDialog? '#E95050': 'black'}/></p>
+        
       </div>
 
       {deleteDialog && (
-        <div className="fixed top-0 left-0 w-full h-full  flex justify-center items-center">
-          <div className="bg-white   lg:ml-0 ml-16
+           <div className="fixed top-0 left-0 w-full h-full  flex justify-center items-center">
+           <div className="bg-white   lg:ml-0 ml-16
       p-4 rounded-[20px] border-[1.5px] w-[200px] h-[180px] xl:w-[387.97px] sm:w-[387.97px] sm:h-[264px] xl:h-[264px] md:w-[387.97px] md:h-[264px] lg:w-[387.97px] lg:h-[264px] border-[#EEEEEE] shadow-md  ">
-            <p className="text-center text-[10px] lg:text-[20px] xl:text-[20px] md:text-[20px] sm:text-[20px] text-[#515151] font-[450] mb-4 mt-6">Are you sure you want to delete your selected search history?</p>
-            <div className='flex items-center justify-center '>
-              <button className='lg:w-[275.48px] xl:w-[275.48px] md:w-[275.48px] sm:w-[275.48px] w-[100px] bg-[#E95050] rounded-[100px] text-white text-[10px] lg:text-[16px] md:text-[16px] xl:text-[16px] sm:text-[16px] h-[25px] lg:h-[41.32px] md:h-[41.32px] xl:h-[41.32px] sm:h-[41.32px] flex items-center font-[500] justify-center' onClick={() => handleDelete()}>DELETE</button>
-            </div>
-            <div className='flex items-center justify-center mt-4'>
-              <button className='lg:w-[275.48px] xl:w-[275.48px] md:w-[275.48px] sm:w-[275.48px] w-[100px] bg-[#D1D1D1] rounded-[100px] text-[#333333] font-[500] text-[10px] lg:text-[16px] md:text-[16px] sm:text-[16px] xl:text-[16px] h-[25px] lg:h-[41.32px] md:h-[41.32px] sm:h-[41.32px] xl:h-[41.32px] flex items-center justify-center' onClick={() => handleCloseDeleteToggle()}>CANCEL</button>
-            </div>
-          </div>
+             <p className="text-center text-[10px] lg:text-[20px] xl:text-[20px] md:text-[20px] sm:text-[20px] text-[#515151] font-[450] mb-4 mt-6">Are you sure you want to delete your selected search history?</p>
+              <div className='flex items-center justify-center '>
+                <button className='lg:w-[275.48px] xl:w-[275.48px] md:w-[275.48px] sm:w-[275.48px] w-[100px] bg-[#E95050] rounded-[100px] text-white text-[10px] lg:text-[16px] md:text-[16px] xl:text-[16px] sm:text-[16px] h-[25px] lg:h-[41.32px] md:h-[41.32px] xl:h-[41.32px] sm:h-[41.32px] flex items-center font-[500] justify-center' onClick={()=>handleDelete()}>DELETE</button>
+              </div>
+              <div className='flex items-center justify-center mt-4'>
+                <button className='lg:w-[275.48px] xl:w-[275.48px] md:w-[275.48px] sm:w-[275.48px] w-[100px] bg-[#D1D1D1] rounded-[100px] text-[#333333] font-[500] text-[10px] lg:text-[16px] md:text-[16px] sm:text-[16px] xl:text-[16px] h-[25px] lg:h-[41.32px] md:h-[41.32px] sm:h-[41.32px] xl:h-[41.32px] flex items-center justify-center' onClick={()=>handleCloseDeleteToggle()}>CANCEL</button>
+              </div>
+           </div>
+         </div>
+      )}
+ 
+ {deleteAllDialog && (
+           <div className="fixed  top-0 left-0 w-full h-full  flex justify-center items-center">
+           <div className="bg-white   lg:ml-0 ml-16
+      p-4 rounded-[20px] border-[1.5px] w-[200px] h-[180px] xl:w-[387.97px] sm:w-[387.97px] sm:h-[264px] xl:h-[264px] md:w-[387.97px] md:h-[264px] lg:w-[387.97px] lg:h-[264px] border-[#EEEEEE] shadow-md  ">
+             <p className="text-center text-[10px] lg:text-[20px] xl:text-[20px] md:text-[20px] sm:text-[20px] text-[#515151] font-[450] mb-4 mt-6">Are you sure you want to Clear your selected search history?</p>
+              <div className='flex items-center justify-center '>
+                <button className='lg:w-[275.48px] xl:w-[275.48px] md:w-[275.48px] sm:w-[275.48px] w-[100px] bg-[#E95050] rounded-[100px] text-white text-[10px] lg:text-[16px] md:text-[16px] xl:text-[16px] sm:text-[16px] h-[25px] lg:h-[41.32px] md:h-[41.32px] xl:h-[41.32px] sm:h-[41.32px] flex items-center font-[500] justify-center' onClick={()=>handleDelete()}>CLEAR ALL</button>
+              </div>
+              <div className='flex items-center justify-center mt-4'>
+                <button className='lg:w-[275.48px] xl:w-[275.48px] md:w-[275.48px] sm:w-[275.48px] w-[100px] bg-[#D1D1D1] rounded-[100px] text-[#333333] font-[500] text-[10px] lg:text-[16px] md:text-[16px] sm:text-[16px] xl:text-[16px] h-[25px] lg:h-[41.32px] md:h-[41.32px] sm:h-[41.32px] xl:h-[41.32px] flex items-center justify-center' onClick={()=>handleCloseDeleteToggle()}>CANCEL</button>
+              </div>
+           </div>
+         </div>
+      )}
+    <div className='overflow-x-hidden'>
+      
+   
+      {chats.length=== 0 && (
+        <div className="flex  items-center justify-center h-[70vh] ">
+        <div className='text-center   text-[#515151]  text-[18px] font-[450]   w-[477px]'>
+        Looks like your GenAI search history is as clean as a whistle! Keep browsing and let us know if you need any help finding what you&apos;re looking for.
+        </div>
         </div>
       )}
-
-      {deleteAllDialog && (
-        <div className="fixed  top-0 left-0 w-full h-full  flex justify-center items-center">
-          <div className="bg-white   lg:ml-0 ml-16
-      p-4 rounded-[20px] border-[1.5px] w-[200px] h-[180px] xl:w-[387.97px] sm:w-[387.97px] sm:h-[264px] xl:h-[264px] md:w-[387.97px] md:h-[264px] lg:w-[387.97px] lg:h-[264px] border-[#EEEEEE] shadow-md  ">
-            <p className="text-center text-[10px] lg:text-[20px] xl:text-[20px] md:text-[20px] sm:text-[20px] text-[#515151] font-[450] mb-4 mt-6">Are you sure you want to Clear your selected search history?</p>
-            <div className='flex items-center justify-center '>
-              <button className='lg:w-[275.48px] xl:w-[275.48px] md:w-[275.48px] sm:w-[275.48px] w-[100px] bg-[#E95050] rounded-[100px] text-white text-[10px] lg:text-[16px] md:text-[16px] xl:text-[16px] sm:text-[16px] h-[25px] lg:h-[41.32px] md:h-[41.32px] xl:h-[41.32px] sm:h-[41.32px] flex items-center font-[500] justify-center' onClick={() => handleDelete()}>CLEAR ALL</button>
-            </div>
-            <div className='flex items-center justify-center mt-4'>
-              <button className='lg:w-[275.48px] xl:w-[275.48px] md:w-[275.48px] sm:w-[275.48px] w-[100px] bg-[#D1D1D1] rounded-[100px] text-[#333333] font-[500] text-[10px] lg:text-[16px] md:text-[16px] sm:text-[16px] xl:text-[16px] h-[25px] lg:h-[41.32px] md:h-[41.32px] sm:h-[41.32px] xl:h-[41.32px] flex items-center justify-center' onClick={() => handleCloseDeleteToggle()}>CANCEL</button>
-            </div>
-          </div>
-        </div>
-      )}
-      <div className='overflow-x-hidden'>
-
-
-        {chats.length === 0 && (
-          <div className="flex  items-center justify-center h-[70vh] ">
-            <div className='text-center   text-[#515151]  text-[18px] font-[450]   w-[477px]'>
-              Looks like your GenAI search history is as clean as a whistle! Keep browsing and let us know if you need any help finding what you&apos;re looking for.
-            </div>
-          </div>
-        )}
-        {chats.length > 0 && (
-          <div className='flex justify-center w-full'>
-            <div className='w-full justify-center flex flex-col items-center md:mx-20'>
-              {Object.entries(chatGroups).map(([date, chatGroup]) => (
-                <div key={date} className="bg-[#F7F7F7] overflow-hidden mb-4 border w-full border-[#ACACAC] rounded-lg p-4">
-                  <div className="flex justify-between">
-                    <p className="text-center flex-grow text-wrap text-[9px] lg:text-[14px] xl:text-[14px] md:text-[14px] sm:text-[14px] font-[450] text-[#8B8B8B]">{date}</p>
-                    <div className='text-right w-[42px]'>
-                      {chatGroup.some(chat => selectedChats.includes(chat.id)) && (
-                        <p className="text-[#E95050] text-[9px] lg:text-[14px] xl:text-[14px] md:text-[14px] sm:text-[14px] cursor-pointer" onClick={() => handleDeleteToggle(chatGroup)}>Delete</p>
-                      )}
-                    </div>
-                  </div>
-                  <ul className="space-y-2 mt-4  lg:ml-0 xl:ml-0 ">
-                    {chatGroup.map((chat, i) => (
-                      <li key={chat.id} className="flex items-center">
-                        <input type="checkbox"
-                          className="mr-4"
-                          checked={selectedChats.includes(chat.id)}
-                          onChange={handleCheckboxChange}
-                          value={chat.id}
-                        />
-                        <Link href={`/library/c/${chat.id}`}>
-                          <span className="whitespace-nowrap overflow-hidden text-ellipsis text-wrap lg:text-xl font-[18px]   cursor-pointer text-[#515151]">
-                            {chat.title}
-                          </span>
-                        </Link>
+      {chats.length > 0 && (
+        <div className='flex justify-center'>
+        <div className='max-w-screen  '>
+      {Object.entries(chatGroups).map(([date, chatGroup]) => (
+            <div key={date} className="bg-[#F7F7F7] overflow-hidden mb-4  border xl:w-[683px] w-[250px] lg:w-[683px] md:w-[600px] sm:w-[400px] xs:w-[400px] border-[#ACACAC] rounded-lg p-4">
+              <div className="flex justify-between">
+  <p className="text-center flex-grow  text-[9px] lg:text-[14px] xl:text-[14px] md:text-[14px] sm:text-[14px] font-[450] text-[#8B8B8B]">{date}</p>
+  <div className='text-right w-[42px]'>
+  {chatGroup.some(chat => selectedChats.includes(chat.id)) && (
+    <p className="text-[#E95050] text-[9px] lg:text-[14px] xl:text-[14px] md:text-[14px] sm:text-[14px] cursor-pointer" onClick={()=>handleDeleteToggle(chatGroup)}>Delete</p>
+  )}
+  </div>
+</div>
+              <ul className="space-y-2 mt-4  lg:ml-0 xl:ml-0 ">
+                {chatGroup.map((chat, i) => (
+                  <li key={chat.id} className="flex items-center">
+                    <input type="checkbox" 
+                    className="mr-4"
+                    checked={selectedChats.includes(chat.id)}
+                      onChange={handleCheckboxChange}
+                      value={chat.id}
+                    />
+                    <Link href={`/library/c/${chat.id}`}>
+                      <span className="whitespace-nowrap overflow-hidden text-ellipsis  lg:text-xl font-[18px]   cursor-pointer text-[#515151]">
+                        {chat.title}
+                      </span>
+                      </Link>
                       </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
+                ))}
+                      </ul>
+                      </div>
+                      ))}
+          
       </div>
+      </div>
+      )}
 
+    </div>
+   
     </>
   );
 };

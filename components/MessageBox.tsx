@@ -1392,16 +1392,16 @@ const MessageBox = ({
   }
 
   // Define the props type, including node
-  interface CodeBlockProps {
-    node: any; // Define a more specific type if possible
-    inline: boolean;
+  interface MarkdownCodeProps {
+    inline?: boolean;
     className?: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
+    node?: any; // adjust this based on what node actually is
   }
 
-  const CodeBlock: React.FC<CodeBlockProps> = ({
+  const CodeBlock: React.FC<MarkdownCodeProps> = ({
     node,
-    inline,
+    inline = false,
     className,
     children,
   }) => {
@@ -1504,7 +1504,16 @@ const MessageBox = ({
                 remarkPlugins={[remarkGfm, remarkMath]}
                 rehypePlugins={[rehypeKatex]}
                 components={{
-                  code: CodeBlock,
+                  code({ node, inline, className, children, ...props }: MarkdownCodeProps) {
+                    return (
+                      <CodeBlock
+                        node={node}
+                        inline={inline}
+                        className={className}
+                        children={children}
+                      />
+                    );
+                  },
                 }}
                 className={cn(
                   'prose prose-p:leading-relaxed prose-pre:p-0',

@@ -1510,8 +1510,9 @@ const MessageBox = ({
                         node={node}
                         inline={inline}
                         className={className}
-                        children={children}
-                      />
+                      >
+                        {children}
+                      </CodeBlock>
                     );
                   },
                 }}

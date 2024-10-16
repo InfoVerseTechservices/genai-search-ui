@@ -29,6 +29,9 @@ const useSocket = (
   setError: (error: boolean) => void,
 ) => {
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
+  const maxReconnectAttempts = 5;
+  const reconnectDelay = 2000; // Start with 2 seconds
 
   useEffect(() => {
     if (!ws) {
@@ -190,6 +193,7 @@ const useSocket = (
         ws.onclose = () => {
           clearTimeout(timeoutId);
           setError(true);
+          reconnectWebSocket();
           console.log('[DEBUG] closed');
         };
 
@@ -201,6 +205,19 @@ const useSocket = (
         });
 
         setWs(ws);
+      };
+
+      const reconnectWebSocket = () => {
+        if (reconnectAttempts < maxReconnectAttempts) {
+          const delay = reconnectDelay * reconnectAttempts;
+          setTimeout(() => {
+            setReconnectAttempts((prev) => prev + 1);
+            connectWs();
+          }, delay);
+        } else {
+          console.error("Max reconnect attempts reached.");
+          toast.error("Unable to reconnect to the server.");
+        }
       };
 
       connectWs();
@@ -433,7 +450,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
             if (message.messageId === data.messageId) {
               return { ...message, content: message.content + data.data };
             }
-
+            
             return message;
           }),
         );

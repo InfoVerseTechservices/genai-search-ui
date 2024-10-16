@@ -1293,6 +1293,13 @@ import SideTopAdComponent from './Ads/SideAdTop';
 import SideBottomAdComponent from './Ads/SideAdBottom';
 import Share from './MessageActions/Share';
 import RelatedImages from './GetOneImage';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { base16AteliersulphurpoolLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Check, ClipboardList } from 'lucide-react';
 
 const MessageBox = ({
   message,
@@ -1384,6 +1391,54 @@ const MessageBox = ({
    
   }
 
+  // Define the props type, including node
+  interface CodeBlockProps {
+    node: any; // Define a more specific type if possible
+    inline: boolean;
+    className?: string;
+    children: React.ReactNode;
+  }
+
+  const CodeBlock: React.FC<CodeBlockProps> = ({
+    node,
+    inline,
+    className,
+    children,
+  }) => {
+    // Extract the language from the className
+    const match = /language-(\w+)/.exec(className || '');
+    const language = match ? match[1] : 'text';
+    const [copied, setCopied] = useState(false);
+    // Render code block or inline code based on the `inline` prop
+    return !inline && match? (
+      <div className="relative group">
+        <SyntaxHighlighter
+          language={language}
+          style={base16AteliersulphurpoolLight}
+          customStyle={{ margin: 0, padding: '1rem' }}
+        >
+          {String(children).replace(/\n$/, '')}
+        </SyntaxHighlighter>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(String(children))
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1000);
+          }}
+          className="absolute top-2 right-2  opacity-0 group-hover:opacity-100 text-black dark transition-opacity"
+          aria-label="Copy code to clipboard"
+          
+        >
+          {copied ? <Check size={18}  /> : <ClipboardList size={18} />}
+        </button>
+      </div>
+    ) : (
+      <code className="bg-gray dark:bg-gray px-1 py-0.5 rounded">{children}</code>
+      
+    );
+  };
+
+
 
   return (
     <>
@@ -1445,14 +1500,20 @@ const MessageBox = ({
                 />
                 <h3 className="text-black font-medium text-xl">Answer</h3>
               </div>
-              <Markdown
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, remarkMath]}
+                rehypePlugins={[rehypeKatex]}
+                components={{
+                  code: CodeBlock,
+                }}
                 className={cn(
                   'prose prose-p:leading-relaxed prose-pre:p-0',
-                  'max-w-none break-words text-black text-sm md:text-base font-medium',
+                  'break-words text-black text-sm md:text-base font-medium',
                 )}
               >
                 {parsedMessage}
-              </Markdown>
+              </ReactMarkdown>
+
               {loading && isLast ? null : (
                 <div className="flex flex-row items-center justify-between w-full text-black py-4 -mx-2">
                   <div className="flex flex-row items-center space-x-1">

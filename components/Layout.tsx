@@ -23,7 +23,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <Image src={Logo} alt='ColomboAI' className='w-[10rem]'/>
             </div>
             <div className="flex space-x-4 mr-8 mt-3">
-                  <Link href='https://caidev.colomboai.com/genai-search/'>
+                  <Link href='https://colomboai.com/genai-search/'>
                     <div className="flex flex-col items-center">
                       <div className="w-6 h-6 mb-1">
                         <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} />
@@ -31,7 +31,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
  
                     </div>
                   </Link>
-                  <Link href='https://caidev.colomboai.com/genai-search/library/'>
+                  <Link href='https://colomboai.com/genai-search/library/'>
                     <div className="flex flex-col items-center">
                       <div className="w-6 h-6 mb-1">
                         <HistoryIcon w={24} h={24} fill={'#8E8E93'} />

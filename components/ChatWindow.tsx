@@ -161,7 +161,7 @@ const useSocket = (
 
         searchParams.append('embeddingModel', embeddingModel!);
         searchParams.append('embeddingModelProvider', embeddingModelProvider);
-        searchParams.append('token', getCookie('token'))
+        searchParams.append('token', getCookie('token'));
 
         wsURL.search = searchParams.toString();
 
@@ -433,7 +433,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
             if (message.messageId === data.messageId) {
               return { ...message, content: message.content + data.data };
             }
-
+            
             return message;
           }),
         );

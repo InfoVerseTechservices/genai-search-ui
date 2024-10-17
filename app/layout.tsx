@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
-import { FunctionComponent as FC ,useState} from 'react';
+import { FunctionComponent as FC, useState } from 'react';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
@@ -89,169 +89,130 @@ export default function RootLayout({
               </aside>
               <main className="flex-1 w-[4%] flex flex-col">
                 {/* <Sidebar>{children}</Sidebar> */}
-               
+
                 <div className="md:hidden bg-white fixed w-full bottom-0 z-50 border-t-2 border-[#1E71F2] rounded-xl">
-          <div className="shadow-[0px_2px_4px_0px_#0000001A]">
-            <div className="py-2 flex flex-wrap items-center justify-evenly">
-              <Link href="/genai-search">
-                <div className="mx-4">
-                  <div className="w-[29px] mx-auto">
-                  {/* <GenAiIcon w={24} h={24} fill={ "#8E8E93"} /> */}
-                  <Image src={GenAIImage} alt="colombo" />
-                  </div>
-                  <p className='text-center text-[14px] mt-2'>
-                    Gen AI
-                  </p>
-                </div>
-              </Link>
-              <Link href="/vibes">
-                <div className="mx-4">
-                  <div className="w-[29px] mx-auto">
-                  <Image src={VibesImage} alt="Vibes" height={30} width={30} />
-                  {/* {pathname === '/vibes' ? <Image src={blue_vibes_icon} alt="colombo"/> : <Image src={vibes_icon} alt="colombo"/>} */}
-                  </div>
-                  <p
-                   className='text-center text-[14px] mt-2'
-                  >
-                    Vibes
-                  </p>
-                </div>
-              </Link>
+                  <div className="shadow-[0px_2px_4px_0px_#0000001A]">
+                    <div className="py-2 flex flex-wrap items-center justify-evenly">
+                      <Link href="/genai-search">
+                        <div className="mx-4">
+                          <div className="w-[29px] mx-auto">
+                            {/* <GenAiIcon w={24} h={24} fill={ "#8E8E93"} /> */}
+                            <Image src={GenAIImage} alt="colombo" />
+                          </div>
+                          <p className='text-center text-[14px] mt-2'>
+                            Gen AI
+                          </p>
+                        </div>
+                      </Link>
+                      <Link href="/vibes">
+                        <div className="mx-4">
+                          <div className="w-[29px] mx-auto">
+                            <Image src={VibesImage} alt="Vibes" height={30} width={30} />
+                            {/* {pathname === '/vibes' ? <Image src={blue_vibes_icon} alt="colombo"/> : <Image src={vibes_icon} alt="colombo"/>} */}
+                          </div>
+                          <p
+                            className='text-center text-[14px] mt-2'
+                          >
+                            Vibes
+                          </p>
+                        </div>
+                      </Link>
 
-              <Link href="/feed">
-                <div className="mx-4 ">
-                  <div className="w-[29px] mx-auto">
-                  {/* <Image src={FeedImage} alt="feed" /> */}
-                    <FeedIcon
-                      w={30}
-                      h={30}
-                      fill={
-                        
-                          "#8E8E93"
-                      }
-                    />
-                  </div>
-                  <p
-                  className='text-center text-[14px] mt-2'
-                  >
-                    Feed
-                  </p>
-                </div>
-              </Link>
+                      <Link href="/feed">
+                        <div className="mx-4 ">
+                          <div className="w-[29px] mx-auto">
+                            {/* <Image src={FeedImage} alt="feed" /> */}
+                            <FeedIcon
+                              w={30}
+                              h={30}
+                              fill={
 
-              <Link href="/shop">
-                <div className="mx-4">
-                  <div className="w-[29px] mx-auto">
-                  {/* <Image src={ShopImage} alt="shop" /> */}
-                    <ShopIcon
-                      w={30}
-                      h={30}
-                      fill={ "#8E8E93"}
-                    />
-                  </div>
-                  <p
-                   className='text-center text-[14px] mt-2'
-                  >
-                    Shop
-                  </p>
-                </div>
-              </Link>
+                                "#8E8E93"
+                              }
+                            />
+                          </div>
+                          <p
+                            className='text-center text-[14px] mt-2'
+                          >
+                            Feed
+                          </p>
+                        </div>
+                      </Link>
 
-              <Link href="/news">
-                <div className="mx-4">
-                  <div className="w-[29px] mx-auto">
-                  {/* <Image src={NewsImage} alt="colombo" /> */}
-                    <NewsIcon
-                      w={30}
-                      h={30}
-                      fill={"#8E8E93"}
-                    />
+                      <Link href="/shop">
+                        <div className="mx-4">
+                          <div className="w-[29px] mx-auto">
+                            {/* <Image src={ShopImage} alt="shop" /> */}
+                            <ShopIcon
+                              w={30}
+                              h={30}
+                              fill={"#8E8E93"}
+                            />
+                          </div>
+                          <p
+                            className='text-center text-[14px] mt-2'
+                          >
+                            Shop
+                          </p>
+                        </div>
+                      </Link>
+
+                      <Link href="/news">
+                        <div className="mx-4">
+                          <div className="w-[29px] mx-auto">
+                            {/* <Image src={NewsImage} alt="colombo" /> */}
+                            <NewsIcon
+                              w={30}
+                              h={30}
+                              fill={"#8E8E93"}
+                            />
+                          </div>
+                          <p
+                            className='text-center text-[14px] mt-2'
+                          >
+                            News
+                          </p>
+                        </div>
+                      </Link>
+                    </div>
                   </div>
-                  <p
-                  className='text-center text-[14px] mt-2'
-                  >
-                    News
-                  </p>
                 </div>
-              </Link>
-              </div>
-              </div>
-              </div>
-              
-      
+
+
                 <NewSidebar>{children} </NewSidebar>
-               
+
               </main>
+              {/* <div className='flex flex-row w-full bg-white fixed top-[4.6rem] justify-between px-8 md:hidden '>
+                <div className="flex space-x-4">
+                  <div className="w-6 h-6 ">
+                    <ProfileLoader />
+                  </div>
 
-<div className="mt-auto mb-4 flex space-x-4  md:hidden bg-transparent fixed top-[13%] left-10">
-<div className="w-6 h-6 ">
-<ProfileLoader/>
-</div>
-
-</div>
-<div className="mt-auto mb-4 flex space-x-4 md:hidden bg-transparent fixed top-[13%] right-10">
-<Link href='https://caidev.colomboai.com/genai-search/'>
-<div className="flex flex-col items-center">
-<div className="w-6 h-6 mb-1">
-<NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} />
-</div>
-{/* <p
-className="
-text-[#8E8E93]
-text-center text-[10px]
-"
->
-New Chat
-</p> */}
-</div>
-</Link>
-<Link href='https://caidev.colomboai.com/genai-search/library/'>
-<div className="flex flex-col items-center">
-<div className="w-6 h-6 mb-1">
-<HistoryIcon w={24} h={24} fill={'#8E8E93'} />
-</div>
-{/* <p
-className="
-text-[#8E8E93]
-text-center text-[10px]
-"
->
-History
-</p> */}
-</div>
-</Link>
-<Link href=''>
-<div className="flex flex-col items-center">
-<div className="w-6 h-6 mb-1">
-  <NotificationIcon w={24} h={24} fill={'#8E8E93'} />
-{/* <Noti w={24} h={24} fill={'#8E8E93'} /> */}
-</div>
-
-</div>
-</Link>
-<Link href=''>
-<div className="flex flex-col items-center">
-<div className="w-6 h-6 mb-1">
-{/* <HistoryIcon w={24} h={24} fill={'#8E8E93'} /> */}
-<ChatBubbleIcon w={24} h={24} fill={'#8E8E93'}/>
-</div>
-
-</div>
-</Link>
-{/* <IconLink
-href="https://colomboai.com/genai-search"
-Icon={NewGenSearchIcon as IconComponent}
-label="New Chat"
-/>
-<IconLink
-href="https://colomboai.com/genai-search/library/"
-Icon={HistoryIcon as IconComponent}
-label="History"
-/> */}
-</div>
-</div>         
-
+                </div>
+                <div className="flex space-x-4">
+                  <Link href='https://caidev.colomboai.com/genai-search/'>
+                    <div className="flex flex-col items-center">
+                      <div className="w-6 h-6 mb-1">
+                        <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} />
+                      </div>
+ 
+                    </div>
+                  </Link>
+                  <Link href='https://caidev.colomboai.com/genai-search/library/'>
+                    <div className="flex flex-col items-center">
+                      <div className="w-6 h-6 mb-1">
+                        <HistoryIcon w={24} h={24} fill={'#8E8E93'} />
+                      </div>
+       
+                    </div>
+                  </Link>
+                 
            
+                </div>
+              </div> */}
+            </div>
+
+
           </UserProfileContextProvider>
 
           <Toaster

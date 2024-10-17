@@ -150,14 +150,14 @@ const LeftSidebar: FC = () => {
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/genai-search"
+            href="https://colomboai.com/genai-search"
             Icon={NewGenSearchIcon as IconComponent}
             label="New Chat"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/genai-search/library"
+            href="https://colomboai.com/genai-search/library"
             Icon={HistoryIcon as IconComponent}
             label="History"
           />

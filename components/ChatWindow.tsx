@@ -29,6 +29,8 @@ const useSocket = (
   setError: (error: boolean) => void,
 ) => {
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const heartbeatInterval = 30000; // 30 seconds
+  let heartbeatTimeoutId: any;
 
   useEffect(() => {
     if (!ws) {
@@ -179,6 +181,7 @@ const useSocket = (
           console.log('[DEBUG] open');
           clearTimeout(timeoutId);
           setIsWSReady(true);
+          startHeartbeat(ws);
         };
 
         ws.onerror = () => {
@@ -189,18 +192,44 @@ const useSocket = (
 
         ws.onclose = () => {
           clearTimeout(timeoutId);
-          setError(true);
+          // setError(true);
           console.log('[DEBUG] closed');
+          stopHeartbeat();
         };
 
         ws.addEventListener('message', (e) => {
           const data = JSON.parse(e.data);
-          if (data.type === 'error') {
+          if (data.type === 'pong') {
+            clearTimeout(heartbeatTimeoutId); // Server responded with pong
+          } else if (data.type === 'error') {
             toast.error(data.data);
           }
         });
 
         setWs(ws);
+      };
+
+      const startHeartbeat = (socket: WebSocket) => {
+        const sendPing = () => {
+          if (socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ type: 'ping' }));
+            console.log('Ping sent');
+            heartbeatTimeoutId = setTimeout(() => {
+              console.error('No pong received, closing WebSocket.');
+              socket.close();
+            }, heartbeatInterval - 7000); 
+          }
+        };
+
+        sendPing();
+        const heartbeatIntervalId = setInterval(sendPing, heartbeatInterval);
+
+        
+        return () => clearInterval(heartbeatIntervalId);
+      };
+
+      const stopHeartbeat = () => {
+        clearTimeout(heartbeatTimeoutId);
       };
 
       connectWs();

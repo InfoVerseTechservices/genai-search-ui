@@ -33,7 +33,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   </Link>
                   <Link href='https://caidev.colomboai.com/genai-search/library/'>
                     <div className="flex flex-col items-center">
-                      <div className="w-6 h-6 mb-1">
+                      <div className="w-8 sm:w-6 h-6 mb-1">
                         <HistoryIcon w={24} h={24} fill={'#8E8E93'} />
                       </div>
        

@@ -1324,7 +1324,7 @@ const MessageBox = ({
   sendMessage: (message: string) => void;
   editMessage: (messageId: string, newContent: string) => void;
   setMessages: (messages: Message[]) => void;
-  callAd : boolean
+  callAd: boolean
 }) => {
   const [parsedMessage, setParsedMessage] = useState(message.content);
   const [speechMessage, setSpeechMessage] = useState(message.content);
@@ -1375,20 +1375,20 @@ const MessageBox = ({
     }
     setIsEditing(false);
   };
-  const [isImage,setImage] = useState(false)
-  const [isVideo,setVideo] = useState(false)
+  const [isImage, setImage] = useState(false)
+  const [isVideo, setVideo] = useState(false)
 
-  const handleComplete = async(success:boolean) =>{
- 
+  const handleComplete = async (success: boolean) => {
+
     setVideo(!success)
     setImage(success)
 
   }
-  const handleImg = async(success:boolean)=>{
+  const handleImg = async (success: boolean) => {
 
     setImage(!success)
     setVideo(success)
-   
+
   }
 
   // Define the props type, including node
@@ -1410,7 +1410,7 @@ const MessageBox = ({
     const language = match ? match[1] : 'text';
     const [copied, setCopied] = useState(false);
     // Render code block or inline code based on the `inline` prop
-    return !inline && match? (
+    return !inline && match ? (
       <div className="relative group">
         <SyntaxHighlighter
           language={language}
@@ -1427,14 +1427,14 @@ const MessageBox = ({
           }}
           className="absolute top-2 right-2  opacity-0 group-hover:opacity-100 text-black dark transition-opacity"
           aria-label="Copy code to clipboard"
-          
+
         >
-          {copied ? <Check size={18}  /> : <ClipboardList size={18} />}
+          {copied ? <Check size={18} /> : <ClipboardList size={18} />}
         </button>
       </div>
     ) : (
       <code className="bg-gray dark:bg-gray px-1 py-0.5 rounded">{children}</code>
-      
+
     );
   };
 
@@ -1442,180 +1442,180 @@ const MessageBox = ({
 
   return (
     <>
-    <div className=''>
-      {message.role === 'user' && (
-        <div
-          className={cn(
-            'flex items-center',
-            messageIndex === 0 ? 'pt-16' : 'pt-8',
-          )}
-        >
-          <div className="flex items-center">
-            {isEditing ? (
-              <textarea
-                value={editedContent}
-                onChange={(e) => setEditedContent(e.target.value)}
-                className="edit-input p-2 text-[#000080] bg-[#D2E3FD] font-medium text-3xl rounded-md"
-              />
-            ) : (
-              <h2 className="text-[#000080] bg-[#D2E3FD] font-medium text-3xl inline-block rounded-md whitespace-normal">
-                {message.content}
-              </h2>
-            )}
-            {/* Edit button or Save button right after the content */}
-            <button
-              onClick={isEditing ? handleSave : handleEdit}
-              className="ml-2"
-            >
-              {isEditing ? 'Save' : <Edit size={18} />}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {message.role === 'assistant' && (
-        <div className="flex  flex-col space-y-9 lg:space-y-0 lg:flex-row lg:justify-between lg:space-x-9">
+      <div className=''>
+        {message.role === 'user' && (
           <div
-            ref={dividerRef}
-            className="flex flex-col space-y-6 w-full lg:w-9/12 h-full"
-
-          >
-            {message.sources && message.sources.length > 0 && (
-              <div className="flex flex-col space-y-2">
-                <div className="flex flex-row items-center space-x-2">
-                  <BookCopy className="text-black" size={20} />
-                  <h3 className="text-black font-medium text-xl">Sources</h3>
-                </div>
-                <MessageSources sources={message.sources} />
-              </div>
+            className={cn(
+              'flex items-center',
+              messageIndex === 0 ? 'pt-16' : 'pt-8',
             )}
-            <div className="flex flex-col space-y-2">
-              <div className="flex flex-row items-center space-x-2">
-                <Disc3
-                  className={cn(
-                    'text-black',
-                    isLast && loading ? 'animate-spin' : 'animate-none',
-                  )}
-                  size={20}
+          >
+            <div className="flex items-center">
+              {isEditing ? (
+                <textarea
+                  value={editedContent}
+                  onChange={(e) => setEditedContent(e.target.value)}
+                  className="edit-input p-2 text-[#000080] bg-[#D2E3FD] font-medium text-3xl rounded-md"
                 />
-                <h3 className="text-black font-medium text-xl">Answer</h3>
-              </div>
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkMath]}
-                rehypePlugins={[rehypeKatex]}
-                components={{
-                  code({ node, inline, className, children, ...props }: MarkdownCodeProps) {
-                    return (
-                      <CodeBlock
-                        node={node}
-                        inline={inline}
-                        className={className}
-                      >
-                        {children}
-                      </CodeBlock>
-                    );
-                  },
-                }}
-                className={cn(
-                  'prose prose-p:leading-relaxed prose-pre:p-0',
-                  'break-words text-black text-sm md:text-base font-medium',
-                )}
+              ) : (
+                <h2 className="text-[#000080] bg-[#D2E3FD] font-medium text-3xl inline-block rounded-md whitespace-normal">
+                  {message.content}
+                </h2>
+              )}
+              {/* Edit button or Save button right after the content */}
+              <button
+                onClick={isEditing ? handleSave : handleEdit}
+                className="ml-2"
               >
-                {parsedMessage}
-              </ReactMarkdown>
+                {isEditing ? 'Save' : <Edit size={18} />}
+              </button>
+            </div>
+          </div>
+        )}
 
-              {loading && isLast ? null : (
-                <div className="flex flex-row items-center justify-between w-full text-black py-4 -mx-2">
-                  <div className="flex flex-row items-center space-x-1">
-                  <Share message={message.content} />
-                    <Rewrite rewrite={rewrite} messageId={message.messageId} />
+        {message.role === 'assistant' && (
+          <div className="flex flex-col space-y-9 lg:space-y-0 lg:flex-row lg:justify-between lg:space-x-24 lg:w-[65rem]">
+            <div
+              ref={dividerRef}
+              className="flex flex-col space-y-6 w-full lg:w-8/12 h-full"
+
+            >
+              {message.sources && message.sources.length > 0 && (
+                <div className="flex flex-col space-y-2">
+                  <div className="flex flex-row items-center space-x-2">
+                    <BookCopy className="text-black" size={20} />
+                    <h3 className="text-black font-medium text-xl">Sources</h3>
                   </div>
-                  <div className="flex flex-row items-center space-x-1">
-                    <Copy initialMessage={message.content} message={message} />
-                    
-                    <button
-                      onClick={() => {
-                        if (speechStatus === 'started') {
-                          stop();
-                        } else {
-                          start();
-                        }
-                      }}
-                      className="p-2 text-black rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black dark:hover:text-white"
-                    >
-                      {speechStatus === 'started' ? (
-                        <StopCircle size={18} />
-                      ) : (
-                        <Volume2 size={18} />
-                      )}
-                    </button>
-                  </div>
+                  <MessageSources sources={message.sources} />
                 </div>
               )}
-            </div>
-          </div>
-          <div className="lg:sticky lg:top-20  flex flex-col items-center space-y-3 w-[300px] z-30 h-full pb-4">
-          <div className=' w-[300px] h-[207.36px]'>
-          <div className="h-full w-full">
+              <div className="flex flex-col space-y-2">
+                <div className="flex flex-row items-center space-x-2">
+                  <Disc3
+                    className={cn(
+                      'text-black',
+                      isLast && loading ? 'animate-spin' : 'animate-none',
+                    )}
+                    size={20}
+                  />
+                  <h3 className="text-black font-medium text-xl">Answer</h3>
+                </div>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm, remarkMath]}
+                  rehypePlugins={[rehypeKatex]}
+                  components={{
+                    code({ node, inline, className, children, ...props }: MarkdownCodeProps) {
+                      return (
+                        <CodeBlock
+                          node={node}
+                          inline={inline}
+                          className={className}
+                        >
+                          {children}
+                        </CodeBlock>
+                      );
+                    },
+                  }}
+                  className={cn(
+                    'prose prose-p:leading-relaxed prose-pre:p-0',
+                    'break-words text-black text-sm md:text-base font-medium',
+                  )}
+                >
+                  {parsedMessage}
+                </ReactMarkdown>
 
-            {/* add the images code here */}
-            <RelatedImages 
-            chat_history={history.slice(0, messageIndex - 1)} 
-            query={history[messageIndex - 1].content}
-            />
-        </div>
+                {loading && isLast ? null : (
+                  <div className="flex flex-row items-center justify-between w-full text-black py-4 -mx-2">
+                    <div className="flex flex-row items-center space-x-1">
+                      <Share message={message.content} />
+                      <Rewrite rewrite={rewrite} messageId={message.messageId} />
+                    </div>
+                    <div className="flex flex-row items-center space-x-1">
+                      <Copy initialMessage={message.content} message={message} />
+
+                      <button
+                        onClick={() => {
+                          if (speechStatus === 'started') {
+                            stop();
+                          } else {
+                            start();
+                          }
+                        }}
+                        className="p-2 text-black rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black dark:hover:text-white"
+                      >
+                        {speechStatus === 'started' ? (
+                          <StopCircle size={18} />
+                        ) : (
+                          <Volume2 size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-            {isImage ?
-            <>
-            <SearchImages key="image-true" query={history[messageIndex - 1].content} chat_history={history.slice(0, messageIndex - 1)} complete={handleImg} visible={false}/>
-          
-            </>
-            :
-            <>
-            <SearchImages
-              key="image-false"
-              query={history[messageIndex - 1].content}
-              chat_history={history.slice(0, messageIndex - 1)}
-              complete={handleImg}
-              visible = {true}
-            />
-        
-            </>
-}
-{isVideo?
-<SearchVideos
-            key={`video-${isVideo}`}
-              chat_history={history.slice(0, messageIndex - 1)}
-              query={history[messageIndex - 1].content}
-              complete={handleComplete}
-              visible = {false}
-            /> 
-            :
-            <SearchVideos
-            key={`video-${isVideo}`}
-              chat_history={history.slice(0, messageIndex - 1)}
-              query={history[messageIndex - 1].content}
-              complete={handleComplete}
-              visible = {true}
-            /> 
-}
-{callAd && 
-      <div className=" w-[300px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-2.5  h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden">
-               <div className="w-[300px]  h-[250px] cursor-pointer">
-                 <SideTopAdComponent divid={`top-message-${messageIndex-1}`} />
-               </div>
-               <div className="w-[300px] h-[600px] cursor-pointer">
-                 <SideBottomAdComponent divid={`bottom-message-${messageIndex-1}`} />
-               </div>
-             </div> 
-     }
+            <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3 w-[300px] z-30 h-full pb-4">
+              <div className=' w-[300px] h-[207.36px]'>
+                <div className="h-full w-full">
+
+                  {/* add the images code here */}
+                  <RelatedImages
+                    chat_history={history.slice(0, messageIndex - 1)}
+                    query={history[messageIndex - 1].content}
+                  />
+                </div>
+              </div>
+              {isImage ?
+                <>
+                  <SearchImages key="image-true" query={history[messageIndex - 1].content} chat_history={history.slice(0, messageIndex - 1)} complete={handleImg} visible={false} />
+
+                </>
+                :
+                <>
+                  <SearchImages
+                    key="image-false"
+                    query={history[messageIndex - 1].content}
+                    chat_history={history.slice(0, messageIndex - 1)}
+                    complete={handleImg}
+                    visible={true}
+                  />
+
+                </>
+              }
+              {isVideo ?
+                <SearchVideos
+                  key={`video-${isVideo}`}
+                  chat_history={history.slice(0, messageIndex - 1)}
+                  query={history[messageIndex - 1].content}
+                  complete={handleComplete}
+                  visible={false}
+                />
+                :
+                <SearchVideos
+                  key={`video-${isVideo}`}
+                  chat_history={history.slice(0, messageIndex - 1)}
+                  query={history[messageIndex - 1].content}
+                  complete={handleComplete}
+                  visible={true}
+                />
+              }
+              {callAd &&
+                <div className=" w-[300px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-2.5  h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden">
+                  <div className="w-[300px]  h-[250px] cursor-pointer">
+                    <SideTopAdComponent divid={`top-message-${messageIndex - 1}`} />
+                  </div>
+                  <div className="w-[300px] h-[600px] cursor-pointer">
+                    <SideBottomAdComponent divid={`bottom-message-${messageIndex - 1}`} />
+                  </div>
+                </div>
+              }
+            </div>
           </div>
-        </div>
-      )}
-   
-    </div>
-  
-  </>
+        )}
+
+      </div>
+
+    </>
   );
 };
 

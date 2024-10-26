@@ -14,9 +14,9 @@ const EmptyChat = ({
    return (
     
     <div className="flex h-full w-full">
-   <div className="flex-grow  xl:mr-[30px] pr-[5rem]">
+   <div className="flex-grow  xl:mr-[30px] pr-[2rem] sm:pr-[5rem]">
      <div className="relative">
-       <div className="flex flex-col items-center justify-center min-h-screen w-full mx-auto p-2 space-y-8">
+       <div className="flex flex-col items-center justify-center min-h-screen w-full mx-auto p-2 space-y-4 sm:space-y-8">
          
          <EmptyChatMessageInput
            sendMessage={sendMessage}

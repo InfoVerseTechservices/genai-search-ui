@@ -605,7 +605,7 @@ const EmptyChatMessageInput = ({
     : 
     (
       <>
-      <h2 className="text-[#000080] text-xl sm:text-xl md:text-xl  lg:text-2xl xl:text-3xl font-medium -mt-8">
+      <h2 className="text-[#000080] text-md sm:text-xl md:text-xl  lg:text-2xl xl:text-3xl font-medium -mt-8">
            Discover and Do More with AI
          </h2>
     <form
@@ -621,10 +621,10 @@ const EmptyChatMessageInput = ({
       }}
       className="w-full"
     >
-      <div className="flex flex-col gap-[2rem] items-center w-full text-center">
+      <div className="flex flex-col gap-[1rem] sm:gap-[2rem] items-center w-full text-center">
         <div
           style={borderStyle}
-          className="relative flex flex-col bg-white px-5 pt-5 pb-2 rounded-lg items-center w-[22rem] sm:w-[30rem] md:w-[35rem] lg:w-[38rem]   xl:w-[48rem] border"
+          className="relative flex flex-col bg-white px-2 sm:px-5 pt-2 sm:pt-5 pb-2 rounded-lg items-center w-[19rem] sm:w-[30rem] md:w-[35rem] lg:w-[38rem]  xl:w-[48rem] border"
         >
           <TextareaAutosize
             ref={inputRef}
@@ -632,7 +632,7 @@ const EmptyChatMessageInput = ({
             onChange={(e) => setMessage(e.target.value)}
             minRows={6}
             maxRows={6}
-            className="bg-transparent p-1 placeholder:text-[#ACACAC] text-sm self-start text-black resize-none focus:outline-none w-full max-h-24 lg:max-h-36 xl:max-h-48"
+            className="bg-transparent p-1 placeholder:text-[#ACACAC] text-xs sm:text-sm self-start text-black resize-none focus:outline-none w-full max-h-24 lg:max-h-36 xl:max-h-48"
             placeholder="Ask Coco..."
           />
           <button 
@@ -651,7 +651,7 @@ const EmptyChatMessageInput = ({
             <ArrowRight className="bg-background" size={17} />
           </button>
         </div>
-        <p className="text-[#ACACAC] text-[14px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] w-[375px] sm:w-[600px] md:w-[600px] lg:w-[600px]   xl:w-[700px]">
+        <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] w-[19rem] sm:w-[600px] md:w-[600px] lg:w-[600px]   xl:w-[700px]">
           Welcome to GenAI Search, your go-to tool for instant answers and web
           exploration! 
           Simply type your question or topic of interest, and GenAI will provide

@@ -15,6 +15,7 @@ import {
   HistoryIcon,
 } from './Icons';
 
+
 // USER PROFILE Context
 import { useUserProfile } from '@/app/context/user';
 // import { useRouter } from 'next/router';
@@ -59,6 +60,7 @@ const IconLink: FC<IconLinkProps> = ({ href, Icon, label }) => {
 const LeftSidebar: FC = () => {
   const [profilePic, setProfilePic] = useState<string | undefined>(undefined);
   const router = useRouter();
+  const [username, setUsername] = useState("")
 
   const { userDetails, isLoggedIn } = useUserProfile();
 
@@ -70,6 +72,7 @@ const LeftSidebar: FC = () => {
     // }
 
     if (isLoggedIn) {
+      setUsername(userDetails.name || "Name Here")
       setProfilePic(userDetails.profile_picture || undefined);
     }
 
@@ -94,9 +97,9 @@ const LeftSidebar: FC = () => {
           <ul className="min-w-[160px] rounded-lg bg-white shadow-md">
             {/* user name to be imported here */}
             <Link href="/profile">
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer  text-brandprimary">
-                Name Here
-              </li>
+              <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer  text-brandprimary">
+                {username}
+              </p>
             </Link>
             <li
               className="px-4 py-2 hover:bg-gray-100 cursor-pointer "

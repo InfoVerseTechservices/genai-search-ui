@@ -8,6 +8,7 @@ import Link from 'next/link';
 const ProfileLoader: FC = () => {
     const [profilePic, setProfilePic] = useState<string | undefined>(undefined);
     const router = useRouter();
+    const [name, setName] = useState("")
   
     const { userDetails, isLoggedIn } = useUserProfile();
   
@@ -19,6 +20,7 @@ const ProfileLoader: FC = () => {
       // }
   
       if (isLoggedIn) {
+        setName(userDetails.name || "Name Here")
         setProfilePic(userDetails.profile_picture || undefined);
       }
   
@@ -41,7 +43,7 @@ const ProfileLoader: FC = () => {
     <ul className="min-w-[160px] rounded-lg bg-white shadow-md">
 
       {/* user name to be imported here */}
-        <Link href="/profile"><li className="px-4 py-2 hover:bg-gray-100 cursor-pointer  text-brandprimary">Name Here</li></Link>
+        <Link href="/profile"><li className="px-4 py-2 hover:bg-gray-100 cursor-pointer  text-brandprimary">{name}</li></Link>
         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer " onClick={handleSignOut}>Log out</li>
     </ul>
 </Dropdown>

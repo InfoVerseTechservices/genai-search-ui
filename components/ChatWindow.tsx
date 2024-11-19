@@ -12,6 +12,8 @@ import Error from 'next/error';
 import { getCookie } from '@/components/LeftSidebar/cookies';
 import { useUserProfile } from '@/app/context/user';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { NewGenSearchIcon, HistoryIcon } from './Icons';
 
 export type Message = {
   messageId: string;
@@ -217,14 +219,14 @@ const useSocket = (
             heartbeatTimeoutId = setTimeout(() => {
               console.error('No pong received, closing WebSocket.');
               socket.close();
-            }, heartbeatInterval - 7000); 
+            }, heartbeatInterval - 7000);
           }
         };
 
         sendPing();
         const heartbeatIntervalId = setInterval(sendPing, heartbeatInterval);
 
-        
+
         return () => clearInterval(heartbeatIntervalId);
       };
 
@@ -462,7 +464,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
             if (message.messageId === data.messageId) {
               return { ...message, content: message.content + data.data };
             }
-            
+
             return message;
           }),
         );
@@ -484,10 +486,10 @@ const ChatWindow = ({ id }: { id?: string }) => {
         const lastMsg = messagesRef.current[messagesRef.current.length - 1];
 
         if (
-          lastMsg.role === 'assistant' &&
-          lastMsg.sources &&
-          lastMsg.sources.length > 0 &&
-          !lastMsg.suggestions
+          lastMsg?.role === 'assistant' &&
+          lastMsg?.sources &&
+          lastMsg?.sources.length > 0 &&
+          !lastMsg?.suggestions
         ) {
           const suggestions = await getSuggestions(messagesRef.current);
           setMessages((prev) =>
@@ -550,6 +552,28 @@ const ChatWindow = ({ id }: { id?: string }) => {
       <Error statusCode={404} />
     ) : (
       <div className="">
+        <div className='absolute top-3 right-2 z-[999]'>
+        <div className="flex space-x-4 mt-3">
+          <button onClick={e => setMessages([])}>
+            <div className="flex flex-col items-center">
+              <div className="w-6 h-6 mb-1">
+                <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} />
+              </div>
+
+            </div>
+          </button>
+          <Link href='https://caidev.colomboai.com/genai-search/library/'>
+            <div className="flex flex-col items-center">
+              <div className="w-8 sm:w-6 h-6 mb-1">
+                <HistoryIcon w={24} h={24} fill={'#8E8E93'} />
+              </div>
+
+            </div>
+          </Link>
+
+
+        </div>
+        </div>
         {messages.length > 0 ? (
           <>
             <Navbar messages={messages} />

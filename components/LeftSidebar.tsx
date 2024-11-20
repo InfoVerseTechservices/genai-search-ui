@@ -87,7 +87,7 @@ const LeftSidebar: FC = () => {
   return (
     <div className="  xl:w-20 lg:w-[3.5rem] bg-white h-screen md:pr-2 xl:pr-0 flex flex-col items-center py-4 border-r  border-[#1E71F2]">
       {/* <div className="lg:mb-[40px] md:mt-[1.5rem] md:mb-[46px] xl:mt-[1.5rem] lg:mt-[1.5rem] relative"> */}
-      <div className="mt-6 mb-6 relative">
+      <div className="lg:mt-6 mb-6 relative">
         <Dropdown
           offset={[0, 10]}
           placement="bottom-start"

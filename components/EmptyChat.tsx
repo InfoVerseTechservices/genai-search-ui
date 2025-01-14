@@ -26,7 +26,7 @@ const EmptyChat = ({
           </div>
         </div>
       </div>
-      <div className='border-[1px] border-black w-[400px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-[2rem] h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden'>
+      <div className='w-[400px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-[2rem] h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden'>
         <div className="w-[400px] h-[250px]  cursor-pointer">
           <SideTopAdComponent divid='top-emptychat' />
         </div>

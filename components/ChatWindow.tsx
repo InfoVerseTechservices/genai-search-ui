@@ -49,7 +49,7 @@ const useSocket = (
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': getCookie('token'),
+              Authorization: getCookie('token'),
             },
           },
         ).then(async (res) => await res.json());
@@ -226,7 +226,6 @@ const useSocket = (
         sendPing();
         const heartbeatIntervalId = setInterval(sendPing, heartbeatInterval);
 
-
         return () => clearInterval(heartbeatIntervalId);
       };
 
@@ -255,7 +254,7 @@ const loadMessages = async (
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': getCookie('token'),
+        Authorization: getCookie('token'),
       },
     },
   );
@@ -324,7 +323,9 @@ const ChatWindow = ({ id }: { id?: string }) => {
   const [notFound, setNotFound] = useState(false);
   useEffect(() => {
     if (!isLoggedIn) {
-      router.push('/login');
+      // router.push('/login');
+      router.push('/sign-in');
+      // window.location.href = 'https://caidev.colomboai.com/sign-in';
       return;
     }
 
@@ -552,27 +553,23 @@ const ChatWindow = ({ id }: { id?: string }) => {
       <Error statusCode={404} />
     ) : (
       <div className="">
-        <div className='absolute top-3 right-2 z-[999]'>
-        <div className="flex space-x-4 mt-3">
-          <button onClick={e => setMessages([])}>
-            <div className="flex flex-col items-center">
-              <div className="w-6 h-6 mb-1">
-                <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} />
+        <div className="absolute top-3 right-2 z-[999]">
+          <div className="flex space-x-4 mt-3">
+            <button onClick={(e) => setMessages([])}>
+              <div className="flex flex-col items-center">
+                <div className="w-6 h-6 mb-1">
+                  <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} />
+                </div>
               </div>
-
-            </div>
-          </button>
-          <Link href='https://caidev.colomboai.com/genai-search/library/'>
-            <div className="flex flex-col items-center">
-              <div className="w-8 sm:w-6 h-6 mb-1">
-                <HistoryIcon w={24} h={24} fill={'#8E8E93'} />
+            </button>
+            <Link href="https://caidev.colomboai.com/genai-search/library/">
+              <div className="flex flex-col items-center">
+                <div className="w-8 sm:w-6 h-6 mb-1">
+                  <HistoryIcon w={24} h={24} fill={'#8E8E93'} />
+                </div>
               </div>
-
-            </div>
-          </Link>
-
-
-        </div>
+            </Link>
+          </div>
         </div>
         {messages.length > 0 ? (
           <>

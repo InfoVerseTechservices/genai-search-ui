@@ -304,11 +304,13 @@ interface RelatedImagesProps {
   query: string;
 }
 
-const RelatedImages: React.FC<RelatedImagesProps> = ({ chat_history, query }) => {
+const RelatedImages: React.FC<RelatedImagesProps> = ({
+  chat_history,
+  query,
+}) => {
   const [images, setImages] = useState<Image[]>([]);
 
   useEffect(() => {
-
     // Function to fetch chat messages and images
     const fetchChatAndImages = async () => {
       try {
@@ -320,46 +322,43 @@ const RelatedImages: React.FC<RelatedImagesProps> = ({ chat_history, query }) =>
 
         // Check if there's a new query to fetch images for
         if (query) {
-            const chatModelProvider = localStorage.getItem('chatModelProvider');
-            const chatModel = localStorage.getItem('chatModel');
+          const chatModelProvider = localStorage.getItem('chatModelProvider');
+          const chatModel = localStorage.getItem('chatModel');
 
-            const res = await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/images`,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': getCookie('token'),
-                },
-                body: JSON.stringify({
-                  query: query,
-                  chat_history: chat_history,
-                  chat_model_provider: chatModelProvider,
-                  chat_model: chatModel,
-                }),
-              },
-            );
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/images`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: getCookie('token'),
+            },
+            body: JSON.stringify({
+              query: query,
+              chat_history: chat_history,
+              chat_model_provider: chatModelProvider,
+              chat_model: chatModel,
+            }),
+          });
 
-            const data = await res.json();
+          const data = await res.json();
 
-            const images = data.images;
-            setImages(images);
-        
-          
+          const images = data.images;
+          setImages(images);
+
           // Fetch images based on the query
-        //   const imagesResponse = await axios.post(
-        //     'https://genaimlapi.colomboai.com/images',
-        //     {
-        //       query: query,
-        //       chat_history: messages,
-        //       chat_model_provider: 'groq',
-        //       chat_model: 'Llama 3.1 70B',
-        //     },
-        //   );
-        //   setImages(imagesResponse.data.images.slice(0, 1)); // Only store the first image
-        //   console.log(images)
+          //   const imagesResponse = await axios.post(
+          //     'https://genaimlapi.colomboai.com/images',
+          //     {
+          //       query: query,
+          //       chat_history: messages,
+          //       chat_model_provider: 'groq',
+          //       chat_model: 'Llama 3.1 70B',
+          //     },
+          //   );
+          //   setImages(imagesResponse.data.images.slice(0, 1)); // Only store the first image
+          //   console.log(images)
         }
       } catch (error) {
+        console.log(error);
         console.error('Error fetching data:', error);
       }
     };
@@ -374,18 +373,18 @@ const RelatedImages: React.FC<RelatedImagesProps> = ({ chat_history, query }) =>
     // <div className="flex flex-col items-center md:gap-1 md:mr-[6.3rem] lg:gap-1.5 xl:gap-2.5 hide-scrollbar overflow-y-auto">
     //   <div className="grid grid-cols-2 gap-2">
     <>
-    {images.length > 0 && (
-      <a href={images[0].url} target="_blank" rel="noopener noreferrer">
-        <img
-          src={images[0].img_src}
-          alt={images[0].title}
-          className="h-full w-[351px] aspect-video object-cover rounded-lg hover:scale-[1.02] cursor-pointer"
-        />
-      </a>
-    )}
-  </>
+      {images && images.length > 0 && (
+        <a href={images[0].url} target="_blank" rel="noopener noreferrer">
+          <img
+            src={images[0].img_src}
+            alt={images[0].title}
+            className="h-full w-[351px] aspect-video object-cover rounded-lg hover:scale-[1.02] cursor-pointer"
+          />
+        </a>
+      )}
+    </>
     //   </div>
- 
+
     // </div>
   );
 };

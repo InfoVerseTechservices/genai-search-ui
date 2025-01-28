@@ -1,3 +1,4 @@
+'use client';
 import Image from 'next/image';
 import Logo from '../public/ColomboAI-logo.svg';
 import ProfileLoader from './ProfileLoader';

@@ -1,18 +1,15 @@
-import Image from "next/image";
-import Logo from "../public/ColomboAI-logo.svg"
-import ProfileLoader from "./ProfileLoader";
-import Link from "next/link";
-import { HistoryIcon, NewGenSearchIcon } from "./Icons";
+import Image from 'next/image';
+import Logo from '../public/ColomboAI-logo.svg';
+import ProfileLoader from './ProfileLoader';
+import Link from 'next/link';
+import { HistoryIcon, NewGenSearchIcon } from './Icons';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <main className="bg-white sm:pl-0 md:pl-20 lg:pl-20 min-h-screen">
       <header className="sticky top-0 z-50 xl:border-b-[1px] w-full flex flex-row justify-center lg:border-b-[1px] border-[#E3E3E3] bg-white sm:border-0">
-
         <div className="py-[14px] md:flex hidden lg:flex sm:hidden">
-
-          <Image src={Logo} alt='ColomboAI' className='w-[10rem]' />
-
+          <Image src={Logo} alt="ColomboAI" className="w-[10rem]" />
         </div>
 
         <div className="py-[14px] sm:flex md:hidden lg:hidden flex flex-row items-center w-full">
@@ -20,7 +17,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <ProfileLoader />
           </div>
           <div className="w-full flex flex-row justify-center">
-            <Image src={Logo} alt='ColomboAI' className='w-[10rem]' />
+            <Image src={Logo} alt="ColomboAI" className="w-[10rem]" />
           </div>
           {/* <div className="flex space-x-4 mr-8 mt-3">
                   <button>

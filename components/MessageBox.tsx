@@ -1312,7 +1312,7 @@ const MessageBox = ({
   sendMessage,
   editMessage,
   setMessages,
-  callAd
+  callAd,
 }: {
   message: Message;
   messageIndex: number;
@@ -1324,7 +1324,7 @@ const MessageBox = ({
   sendMessage: (message: string) => void;
   editMessage: (messageId: string, newContent: string) => void;
   setMessages: (messages: Message[]) => void;
-  callAd: boolean
+  callAd: boolean;
 }) => {
   const [parsedMessage, setParsedMessage] = useState(message.content);
   const [speechMessage, setSpeechMessage] = useState(message.content);
@@ -1527,7 +1527,7 @@ const MessageBox = ({
                 {loading && isLast ? null : (
                   <div className="flex flex-row items-center justify-between w-full text-black py-4 -mx-2">
                     <div className="flex flex-row items-center space-x-1">
-                      <Share message={message.content} />
+                      <Share message={message.content} chatId={message.chatId} messageId={message.messageId}/>
                       <Rewrite rewrite={rewrite} messageId={message.messageId} />
                     </div>
                     <div className="flex flex-row items-center space-x-1">

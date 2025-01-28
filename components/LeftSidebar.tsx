@@ -15,6 +15,7 @@ import {
   HistoryIcon,
 } from './Icons';
 
+
 // USER PROFILE Context
 import { useUserProfile } from '@/app/context/user';
 // import { useRouter } from 'next/router';
@@ -59,6 +60,7 @@ const IconLink: FC<IconLinkProps> = ({ href, Icon, label }) => {
 const LeftSidebar: FC = () => {
   const [profilePic, setProfilePic] = useState<string | undefined>(undefined);
   const router = useRouter();
+  const [username, setUsername] = useState("")
 
   const { userDetails, isLoggedIn } = useUserProfile();
 
@@ -70,6 +72,7 @@ const LeftSidebar: FC = () => {
     // }
 
     if (isLoggedIn) {
+      setUsername(userDetails.name || "Name Here")
       setProfilePic(userDetails.profile_picture || undefined);
     }
 
@@ -84,7 +87,7 @@ const LeftSidebar: FC = () => {
   return (
     <div className="  xl:w-20 lg:w-[3.5rem] bg-white h-screen md:pr-2 xl:pr-0 flex flex-col items-center py-4 border-r  border-[#1E71F2]">
       {/* <div className="lg:mb-[40px] md:mt-[1.5rem] md:mb-[46px] xl:mt-[1.5rem] lg:mt-[1.5rem] relative"> */}
-      <div className="mt-6 mb-6 relative">
+      <div className="lg:mt-6 mb-6 relative">
         <Dropdown
           offset={[0, 10]}
           placement="bottom-start"
@@ -94,9 +97,9 @@ const LeftSidebar: FC = () => {
           <ul className="min-w-[160px] rounded-lg bg-white shadow-md">
             {/* user name to be imported here */}
             <Link href="/profile">
-              <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer  text-brandprimary">
-                Name Here
-              </li>
+              <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer  text-brandprimary">
+                {username}
+              </p>
             </Link>
             <li
               className="px-4 py-2 hover:bg-gray-100 cursor-pointer "
@@ -111,35 +114,35 @@ const LeftSidebar: FC = () => {
         {/* <div className="flex flex-col items-center"> */}
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="https://colomboai.com/genai-search"
+            href="/genai-search"
             Icon={GenAiIcon as IconComponent}
             label="Gen AI"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="https://colomboai.com/vibes"
+            href="/vibes"
             Icon={VibesIcon as IconComponent}
             label="Vibes"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="https://colomboai.com/feed"
+            href="/feed"
             Icon={FeedIcon as IconComponent}
             label="Feed"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="https://colomboai.com/shop"
+            href="/shop"
             Icon={ShopIcon as IconComponent}
             label="Shop"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="https://colomboai.com/news"
+            href="/news"
             Icon={NewsIcon as IconComponent}
             label="News"
           />

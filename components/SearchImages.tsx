@@ -16,28 +16,28 @@ const SearchImages = ({
   query,
   chat_history,
   complete,
-  visible
+  visible,
 }: {
   query: string;
   chat_history: Message[];
-  complete? : (success:boolean)=>void;
-  visible: boolean
+  complete?: (success: boolean) => void;
+  visible: boolean;
 }) => {
   const [images, setImages] = useState<Image[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [slides, setSlides] = useState<any[]>([]);
-  const [isVisible,setVisible] = useState(visible)
+  const [isVisible, setVisible] = useState(visible);
   return (
     <>
       {!loading && images === null && (
         <button
           onClick={async () => {
             setLoading(true);
-            if(complete){
-              complete(true)
+            if (complete) {
+              complete(true);
             }
-            setVisible(true)
+            setVisible(true);
             const chatModelProvider = localStorage.getItem('chatModelProvider');
             const chatModel = localStorage.getItem('chatModel');
 
@@ -47,7 +47,7 @@ const SearchImages = ({
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  'Authorization': getCookie('token'),
+                  Authorization: getCookie('token'),
                 },
                 body: JSON.stringify({
                   query: query,
@@ -80,7 +80,7 @@ const SearchImages = ({
           <PlusIcon className="text-[#24A0ED]" size={17} />
         </button>
       )}
-      {loading && isVisible &&(
+      {loading && isVisible && (
         <div className="grid grid-cols-2 gap-2">
           {[...Array(4)].map((_, i) => (
             <div
@@ -90,7 +90,7 @@ const SearchImages = ({
           ))}
         </div>
       )}
-      {images !== null && images.length > 0 && isVisible &&(
+      {images && images?.length > 0 && isVisible && (
         <>
           <div className="grid grid-cols-2 gap-2">
             {images.length > 4

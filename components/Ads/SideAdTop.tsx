@@ -67,7 +67,7 @@ const SideTopAdComponent: React.FC<SideTopAdComponentProps> = ({ divid }) => {
       <Head>
         <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
       </Head>
-      <div id={divid} style={{ minHeight:'250px',minWidth:'300px' }}></div>
+      <div id={divid} style={{ minHeight:'250px',minWidth:'400px' }}></div>
     </>
   );
 };

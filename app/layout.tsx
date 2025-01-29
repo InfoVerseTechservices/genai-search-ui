@@ -5,14 +5,25 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
-import GenAIImage from '../public/images/icons/sidebar/genai-pen.svg'
-import VibesImage from '../public/images/icons/sidebar/vibes-icon.svg'
-import FeedImage from '../public/images/icons/sidebar/feed.svg'
-import ShopImage from '../public/images/icons/sidebar/shop.svg'
-import NewsImage from '../public/images/icons/sidebar/news.svg'
+import GenAIImage from '../public/images/icons/sidebar/genai-pen.svg';
+import VibesImage from '../public/images/icons/sidebar/vibes-icon.svg';
+import FeedImage from '../public/images/icons/sidebar/feed.svg';
+import ShopImage from '../public/images/icons/sidebar/shop.svg';
+import NewsImage from '../public/images/icons/sidebar/news.svg';
 import LeftSidebar from '@/components/LeftSidebar'; // Ensure this path is correct
 import { Toaster } from 'sonner';
-import { ChatBubbleIcon, FeedIcon, GenAiIcon, HistoryIcon, NewGenSearchIcon, NewsIcon, NotificationIcon, SearchIcon, ShopIcon, VibesIcon } from '@/components/Icons';
+import {
+  ChatBubbleIcon,
+  FeedIcon,
+  GenAiIcon,
+  HistoryIcon,
+  NewGenSearchIcon,
+  NewsIcon,
+  NotificationIcon,
+  SearchIcon,
+  ShopIcon,
+  VibesIcon,
+} from '@/components/Icons';
 import ThemeProvider from '@/components/theme/Provider';
 import NewSidebar from '@/components/NewSidebar';
 import Link from 'next/link';
@@ -68,8 +79,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: 'ColomboAI',
-  description:
-    'ColomboAI',
+  description: 'ColomboAI',
 };
 
 export default function RootLayout({
@@ -93,94 +103,64 @@ export default function RootLayout({
                 <div className="md:hidden bg-white fixed w-full bottom-0 z-50 border-t-2 border-[#1E71F2] rounded-xl">
                   <div className="shadow-[0px_2px_4px_0px_#0000001A]">
                     <div className="py-2 flex flex-wrap items-center justify-evenly">
-                      <Link href="/genai-search">
+                      <Link href="https://colomboai.com/genai-search">
                         <div className="mx-4">
                           <div className="w-[29px] mx-auto">
                             {/* <GenAiIcon w={24} h={24} fill={ "#8E8E93"} /> */}
                             <Image src={GenAIImage} alt="colombo" />
                           </div>
-                          <p className='text-center text-[14px] mt-2'>
-                            Gen AI
-                          </p>
+                          <p className="text-center text-[14px] mt-2">Gen AI</p>
                         </div>
                       </Link>
-                      <Link href="/vibes">
+                      <Link href="https://colomboai.com/vibes">
                         <div className="mx-4">
                           <div className="w-[29px] mx-auto">
-                            <Image src={VibesImage} alt="Vibes" height={30} width={30} />
+                            <Image
+                              src={VibesImage}
+                              alt="Vibes"
+                              height={30}
+                              width={30}
+                            />
                             {/* {pathname === '/vibes' ? <Image src={blue_vibes_icon} alt="colombo"/> : <Image src={vibes_icon} alt="colombo"/>} */}
                           </div>
-                          <p
-                            className='text-center text-[14px] mt-2'
-                          >
-                            Vibes
-                          </p>
+                          <p className="text-center text-[14px] mt-2">Vibes</p>
                         </div>
                       </Link>
 
-                      <Link href="/feed">
+                      <Link href="https://colomboai.com/feed">
                         <div className="mx-4 ">
                           <div className="w-[29px] mx-auto">
                             {/* <Image src={FeedImage} alt="feed" /> */}
-                            <FeedIcon
-                              w={30}
-                              h={30}
-                              fill={
-
-                                "#8E8E93"
-                              }
-                            />
+                            <FeedIcon w={30} h={30} fill={'#8E8E93'} />
                           </div>
-                          <p
-                            className='text-center text-[14px] mt-2'
-                          >
-                            Feed
-                          </p>
+                          <p className="text-center text-[14px] mt-2">Feed</p>
                         </div>
                       </Link>
 
-                      <Link href="/shop">
+                      <Link href="https://colomboai.com/shop">
                         <div className="mx-4">
                           <div className="w-[29px] mx-auto">
                             {/* <Image src={ShopImage} alt="shop" /> */}
-                            <ShopIcon
-                              w={30}
-                              h={30}
-                              fill={"#8E8E93"}
-                            />
+                            <ShopIcon w={30} h={30} fill={'#8E8E93'} />
                           </div>
-                          <p
-                            className='text-center text-[14px] mt-2'
-                          >
-                            Shop
-                          </p>
+                          <p className="text-center text-[14px] mt-2">Shop</p>
                         </div>
                       </Link>
 
-                      <Link href="/news">
+                      <Link href="https://colomboai.com/news">
                         <div className="mx-4">
                           <div className="w-[29px] mx-auto">
                             {/* <Image src={NewsImage} alt="colombo" /> */}
-                            <NewsIcon
-                              w={30}
-                              h={30}
-                              fill={"#8E8E93"}
-                            />
+                            <NewsIcon w={30} h={30} fill={'#8E8E93'} />
                           </div>
-                          <p
-                            className='text-center text-[14px] mt-2'
-                          >
-                            News
-                          </p>
+                          <p className="text-center text-[14px] mt-2">News</p>
                         </div>
                       </Link>
                     </div>
                   </div>
                 </div>
 
-
                 <NewSidebar>{children} </NewSidebar>
-
               </main>
               {/* <div className='flex flex-row w-full bg-white fixed top-[4.6rem] justify-between px-8 md:hidden '>
                 <div className="flex space-x-4">
@@ -211,8 +191,6 @@ export default function RootLayout({
                 </div>
               </div> */}
             </div>
-
-
           </UserProfileContextProvider>
 
           <Toaster

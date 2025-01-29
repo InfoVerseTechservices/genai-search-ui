@@ -15,7 +15,6 @@ import {
   HistoryIcon,
 } from './Icons';
 
-
 // USER PROFILE Context
 import { useUserProfile } from '@/app/context/user';
 // import { useRouter } from 'next/router';
@@ -60,7 +59,7 @@ const IconLink: FC<IconLinkProps> = ({ href, Icon, label }) => {
 const LeftSidebar: FC = () => {
   const [profilePic, setProfilePic] = useState<string | undefined>(undefined);
   const router = useRouter();
-  const [username, setUsername] = useState("")
+  const [username, setUsername] = useState('');
 
   const { userDetails, isLoggedIn } = useUserProfile();
 
@@ -72,7 +71,7 @@ const LeftSidebar: FC = () => {
     // }
 
     if (isLoggedIn) {
-      setUsername(userDetails.name || "Name Here")
+      setUsername(userDetails.name || 'Name Here');
       setProfilePic(userDetails.profile_picture || undefined);
     }
 
@@ -96,7 +95,7 @@ const LeftSidebar: FC = () => {
         >
           <ul className="min-w-[160px] rounded-lg bg-white shadow-md">
             {/* user name to be imported here */}
-            <Link href="/profile">
+            <Link href="https://colomboai.com/profile">
               <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer  text-brandprimary">
                 {username}
               </p>
@@ -114,35 +113,35 @@ const LeftSidebar: FC = () => {
         {/* <div className="flex flex-col items-center"> */}
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/genai-search"
+            href="https://colomboai.com/genai-search"
             Icon={GenAiIcon as IconComponent}
             label="Gen AI"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/vibes"
+            href="https://colomboai.com/vibes"
             Icon={VibesIcon as IconComponent}
             label="Vibes"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/feed"
+            href="https://colomboai.com/feed"
             Icon={FeedIcon as IconComponent}
             label="Feed"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/shop"
+            href="https://colomboai.com/shop"
             Icon={ShopIcon as IconComponent}
             label="Shop"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/news"
+            href="https://colomboai.com/news"
             Icon={NewsIcon as IconComponent}
             label="News"
           />
@@ -153,14 +152,14 @@ const LeftSidebar: FC = () => {
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/genai-search"
+            href="/"
             Icon={NewGenSearchIcon as IconComponent}
             label="New Chat"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
-            href="/genai-search/library"
+            href="/library"
             Icon={HistoryIcon as IconComponent}
             label="History"
           />

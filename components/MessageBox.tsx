@@ -1,13 +1,21 @@
 // components/MessageBox.tsx
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @next/next/no-img-element */ // Keep for existing image type
 import React, { MutableRefObject, useEffect, useState } from 'react';
-import { Message } from './ChatWindow'; // Updated Message type
+import { Message } from './ChatWindow'; // Message type now includes audio fields
 import { cn } from '@/lib/utils';
-import { Edit, Image as ImageIconLucide } from 'lucide-react'; // Added ImageIconLucide
+import { Edit, Image as ImageIconLucide, Waves as AudioIconLucide } from 'lucide-react'; // Added AudioIconLucide
 import { BookCopy, Disc3, Volume2, StopCircle } from 'lucide-react';
-// import Markdown from 'markdown-to-jsx'; // Will use ReactMarkdown
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { base16AteliersulphurpoolLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Check, ClipboardList } from 'lucide-react';
+
+// ... (Copy, Rewrite, MessageSources, SearchImages, SearchVideos, useSpeech, Ads, Share, RelatedImages imports)
 import Copy from './MessageActions/Copy';
 import Rewrite from './MessageActions/Rewrite';
 import MessageSources from './MessageSources';
@@ -18,25 +26,19 @@ import SideTopAdComponent from './Ads/SideAdTop';
 import SideBottomAdComponent from './Ads/SideAdBottom';
 import Share from './MessageActions/Share';
 import RelatedImages from './GetOneImage';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { base16AteliersulphurpoolLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Check, ClipboardList } from 'lucide-react';
+
 
 const MessageBox = ({
   message,
   messageIndex,
   history,
-  loading, // This is general loading for assistant text response
+  loading,
   dividerRef,
   isLast,
   rewrite,
-  sendMessage, // For resending user message or suggestions
-  editMessage, // For editing user message
-  setMessages, // For editing user message
+  sendMessage,
+  editMessage,
+  setMessages,
   callAd,
 }: {
   message: Message;
@@ -46,8 +48,7 @@ const MessageBox = ({
   dividerRef?: MutableRefObject<HTMLDivElement | null>;
   isLast: boolean;
   rewrite: (messageId: string) => void;
-  sendMessage: (message: string, file?: File | null) // Added file optional param
-    => void;
+  sendMessage: (message: string, file?: File | null) => void;
   editMessage: (messageId: string, newContent: string) => void;
   setMessages: (messages: Message[]) => void;
   callAd: boolean;
@@ -58,11 +59,11 @@ const MessageBox = ({
   const [editedContent, setEditedContent] = useState(message.content);
 
   useEffect(() => {
-    const regex = /\[(\d+)\]/g; // This regex seems specific, ensure it's correct: /\[(\d+)\]/g might be more common for [1] style links
+    const regex = /\[(\d+)\]/g; // Ensure this regex is intended for source links like [1], [2]
 
     if (
       message.role === 'assistant' &&
-      message.type !== 'generated_image' && // Don't process generated images this way
+      (message.type === 'text' || !message.type) && // Only for text-based assistant messages
       message?.sources &&
       message.sources.length > 0
     ) {
@@ -76,7 +77,7 @@ const MessageBox = ({
     } else {
       setParsedMessage(message.content);
     }
-
+    // Prepare content for speech, stripping out any complex HTML/markdown for source links.
     setSpeechMessage(message.content.replace(regex, ''));
   }, [message.content, message.sources, message.role, message.type]);
 
@@ -89,7 +90,6 @@ const MessageBox = ({
 
   const handleSave = () => {
     if (editedContent !== message.content) {
-      // Logic for saving edited user messages (as provided in existing file)
       const updatedHistory = history.filter((msg, index) => {
         return (
           msg.messageId !== message.messageId &&
@@ -97,7 +97,7 @@ const MessageBox = ({
         );
       });
       setMessages(updatedHistory);
-      sendMessage(editedContent); // Resend the edited query
+      sendMessage(editedContent);
     }
     setIsEditing(false);
   };
@@ -106,8 +106,8 @@ const MessageBox = ({
   const [isVideoSearchVisible, setIsVideoSearchVisible] = useState(true);
 
   const handleImageSearchCompletion = (success: boolean) => {
-    setIsImageSearchVisible(!success); // Hide if successful, or handle as needed
-    setIsVideoSearchVisible(success); // Show video if image was successful (example logic)
+    setIsImageSearchVisible(!success);
+    setIsVideoSearchVisible(success);
   };
   const handleVideoSearchCompletion = (success: boolean) => {
     setIsVideoSearchVisible(!success);
@@ -119,8 +119,7 @@ const MessageBox = ({
     className?: string;
     children?: React.ReactNode;
     node?: any;
-  }
-
+   }
   const CodeBlock: React.FC<MarkdownCodeProps> = ({ node, inline = false, className, children }) => {
     const match = /language-(\w+)/.exec(className || '');
     const language = match ? match[1] : 'text';
@@ -128,8 +127,7 @@ const MessageBox = ({
     return !inline && match ? (
       <div className="relative group my-2">
         <SyntaxHighlighter language={language} style={base16AteliersulphurpoolLight} customStyle={{ margin: 0, padding: '1rem', borderRadius: '0.5rem' }}>
-          {String(children).replace(/
-$/, '')}
+          {String(children).replace(/\n$/, '')}
         </SyntaxHighlighter>
         <button
           onClick={() => { navigator.clipboard.writeText(String(children)); setCopied(true); setTimeout(() => setCopied(false), 1000); }}
@@ -144,11 +142,11 @@ $/, '')}
     );
   };
 
-  // Main rendering logic
+
   return (
-    <div className='dark:text-white'> {/* Added dark:text-white for better dark mode visibility */}
+    <div className='dark:text-white'>
+      {/* Standard User Text Message */}
       {message.role === 'user' && (message.type === 'text' || !message.type) && (
-        // Standard User Text Message
         <div className={cn('flex items-center', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
           <div className="flex items-center">
             {isEditing ? (
@@ -169,22 +167,38 @@ $/, '')}
         </div>
       )}
 
+      {/* User Image Prompt Message */}
       {message.role === 'user' && message.type === 'image_prompt' && (
-        // User Image Prompt Message
         <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
            <ImageIconLucide size={24} className="mr-2 mt-1 text-blue-500 flex-shrink-0" />
           <div className="flex flex-col">
             <span className="text-sm text-gray-500 dark:text-gray-400">Image prompt:</span>
             <h2 className="text-[#000080] dark:text-blue-300 bg-[#D2E3FD] dark:bg-slate-700 self-start font-medium text-lg sm:text-xl max-w-max inline rounded-md whitespace-normal p-2">
-              {message.imagePromptText || message.content} {/* Display the specific image prompt text */}
+              {message.imagePromptText || message.content}
             </h2>
             {message.status === 'loading' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Generating image...</p>}
+             {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Image generation failed. {message.content.includes("Error: ") ? message.content.split("Error: ")[1] : ""}</p>}
           </div>
         </div>
       )}
 
+      {/* New: User Audio Prompt Message */}
+      {message.role === 'user' && message.type === 'audio_prompt' && (
+        <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
+           <AudioIconLucide size={24} className="mr-2 mt-1 text-purple-500 flex-shrink-0" />
+          <div className="flex flex-col">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Audio prompt:</span>
+            <h2 className="text-[#000080] dark:text-purple-300 bg-[#E0D2FD] dark:bg-slate-700 self-start font-medium text-lg sm:text-xl max-w-max inline rounded-md whitespace-normal p-2">
+              {message.audioPromptText || message.content}
+            </h2>
+            {message.status === 'loading' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Generating audio...</p>}
+            {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Audio generation failed. {message.content.includes("Error: ") ? message.content.split("Error: ")[1] : ""}</p>}
+          </div>
+        </div>
+      )}
+
+      {/* Assistant Generated Image Message */}
       {message.role === 'assistant' && message.type === 'generated_image' && message.b64Json && (
-        // Assistant Generated Image Message
         <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
           <div className="flex flex-col space-y-2">
              <div className="flex flex-row items-center space-x-2">
@@ -197,18 +211,37 @@ $/, '')}
               alt={message.imagePromptText || "Generated image"}
               className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto"
             />
-            {/* Add download or other actions if needed */}
           </div>
         </div>
       )}
 
+      {/* New: Assistant Generated Audio Message */}
+      {message.role === 'assistant' && message.type === 'generated_audio' && message.b64JsonAudio && (
+        <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
+          <div className="flex flex-col space-y-2">
+             <div className="flex flex-row items-center space-x-2">
+                <AudioIconLucide className="text-black dark:text-white" size={20} />
+                <h3 className="text-black dark:text-white font-medium text-xl">Generated Audio</h3>
+              </div>
+            {message.audioPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.audioPromptText}"</p>}
+            <audio
+              controls
+              src={`data:audio/mpeg;base64,${message.b64JsonAudio}`}
+              className="rounded-lg border dark:border-gray-600 w-full max-w-md"
+            >
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        </div>
+      )}
+
+      {/* Standard Assistant Text Message */}
       {message.role === 'assistant' && (message.type === 'text' || !message.type) && (
-        // Standard Assistant Text Message (existing logic)
         <div className="flex flex-col space-y-9 lg:space-y-0 lg:flex-row lg:justify-between lg:space-x-24 lg:w-[65rem]">
-          <div ref={dividerRef} className="flex flex-col space-y-6 w-full lg:w-8/12 h-full">
+           <div ref={dividerRef} className="flex flex-col space-y-6 w-full lg:w-8/12 h-full">
             {message.sources && message.sources.length > 0 && (
               <div className="flex flex-col space-y-2">
-                <div className="flex flex-row items-center space-x-2">
+                 <div className="flex flex-row items-center space-x-2">
                   <BookCopy className="text-black dark:text-white" size={20} />
                   <h3 className="text-black dark:text-white font-medium text-xl">Sources</h3>
                 </div>
@@ -247,15 +280,14 @@ $/, '')}
               )}
             </div>
           </div>
-          {/* Right sidebar with SearchImages, SearchVideos, Ads */}
           <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3 w-[300px] z-30 h-full pb-4">
             <div className='w-[300px] h-[207.36px]'>
               <div className="h-full w-full">
-                <RelatedImages chat_history={history.slice(0, messageIndex -1)} query={history[messageIndex - 1]?.content} />
+                <RelatedImages chat_history={history.slice(0, messageIndex > 0 ? messageIndex -1 : 0)} query={history[messageIndex > 0 ? messageIndex - 1 : 0]?.content} />
               </div>
             </div>
-            {isImageSearchVisible && <SearchImages key="image-search" query={history[messageIndex -1]?.content} chat_history={history.slice(0, messageIndex -1)} complete={handleImageSearchCompletion} visible={true} />}
-            {isVideoSearchVisible && <SearchVideos key="video-search" chat_history={history.slice(0, messageIndex-1)} query={history[messageIndex-1]?.content} complete={handleVideoSearchCompletion} visible={true} />}
+            {isImageSearchVisible && <SearchImages key="image-search" query={history[messageIndex > 0 ? messageIndex -1 : 0]?.content} chat_history={history.slice(0, messageIndex > 0 ? messageIndex -1 : 0)} complete={handleImageSearchCompletion} visible={true} />}
+            {isVideoSearchVisible && <SearchVideos key="video-search" chat_history={history.slice(0, messageIndex > 0 ? messageIndex -1 : 0)} query={history[messageIndex > 0 ? messageIndex -1 : 0]?.content} complete={handleVideoSearchCompletion} visible={true} />}
             {callAd && (
               <div className="w-[300px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-2.5 h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden">
                 <div className="w-[300px] h-[250px] cursor-pointer"><SideTopAdComponent divid={`top-message-${messageIndex}`} /></div>
@@ -266,7 +298,6 @@ $/, '')}
         </div>
       )}
     </div>
-    </>
   );
 };
 

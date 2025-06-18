@@ -2,12 +2,23 @@ import SideBottomAdComponent from './Ads/SideAdBottom';
 import SideTopAdComponent from './Ads/SideAdTop';
 import EmptyChatMessageInput from './EmptyChatMessageInput';
 
+// Define ImageGenParams if not globally available or imported
+interface ImageGenParams {
+  prompt: string;
+  negative_prompt?: string;
+  model?: string;
+  size?: string;
+  guidance_scale?: number;
+}
+
 const EmptyChat = ({
   sendMessage,
+  onImagePromptSubmit, // Add this
   focusMode,
   setFocusMode,
 }: {
-  sendMessage: (message: string) => void;
+  sendMessage: (message: string, file: File | null) => void; // sendMessage in ChatWindow now takes file
+  onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void; // Add this
   focusMode: string;
   setFocusMode: (mode: string) => void;
 }) => {
@@ -22,6 +33,7 @@ const EmptyChat = ({
               sendMessage={sendMessage}
               focusMode={focusMode}
               setFocusMode={setFocusMode}
+              onImagePromptSubmit={onImagePromptSubmit} // Pass it down
             />
           </div>
         </div>

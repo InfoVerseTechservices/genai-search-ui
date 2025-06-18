@@ -6,17 +6,28 @@ import { Message } from './ChatWindow';
 import MessageBox from './MessageBox';
 import MessageBoxLoading from './MessageBoxLoading';
 
+// Define ImageGenParams if not globally available or imported
+interface ImageGenParams {
+  prompt: string;
+  negative_prompt?: string;
+  model?: string;
+  size?: string;
+  guidance_scale?: number;
+}
+
 const Chat = ({
   loading,
   messages,
   sendMessage,
+  onImagePromptSubmit, // Add this
   messageAppeared,
   rewrite,
   editMessage,
   setMessages,
 }: {
   messages: Message[];
-  sendMessage: (message: string) => void;
+  sendMessage: (message: string, file: File | null) => void; // sendMessage in ChatWindow now takes file
+  onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void; // Add this
   loading: boolean;
   messageAppeared: boolean;
   rewrite: (messageId: string) => void;
@@ -86,7 +97,7 @@ const Chat = ({
           className="bottom-24 lg:bottom-10 fixed z-40"
           style={{ width: dividerWidth }}
         >
-          <MessageInput loading={loading} sendMessage={sendMessage} />
+          <MessageInput loading={loading} sendMessage={sendMessage} onImagePromptSubmit={onImagePromptSubmit} />
         </div>
       )}
     </div>

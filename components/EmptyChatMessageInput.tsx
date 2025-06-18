@@ -190,9 +190,9 @@ const EmptyChatMessageInput = ({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyDown} // Use this for Enter key submission
-              minRows={isImageModeActive && showImageParamsPanel ? 3 : 6} // Adjust rows
-              maxRows={6}
-              className="bg-transparent p-1 placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 text-xs sm:text-sm self-start text-black dark:text-white resize-none focus:outline-none w-full max-h-24 lg:max-h-36 xl:max-h-48"
+              minRows={6} // Corrected: Keep minRows consistent
+              maxRows={6} // Keep maxRows or adjust if it should also be more flexible
+              className="bg-transparent p-1 placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 text-xs sm:text-sm self-start text-black dark:text-white resize-none focus:outline-none w-full max-h-24 lg:max-h-36 xl:max-h-48" // Check if max-height also needs adjustment or if it's fine
               placeholder={isImageModeActive ? "Describe the image you want to create..." : "Ask Coco..."}
             />
             <div className="flex items-center justify-between w-full mt-1">

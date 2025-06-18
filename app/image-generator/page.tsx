@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import InputPanel from '@/components/ImageGenerator/InputPanel';
 import ResultDisplay from '@/components/ImageGenerator/ResultDisplay';
 import { toast } from 'sonner';
-import { ApiConfigParams } from '@/lib/imageActions'; // Import the interface
+// No longer need ApiConfigParams from lib/imageActions
 
 interface ImageResponseData {
   b64_json?: string;
@@ -27,24 +27,18 @@ const ImageGeneratorPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPrompt, setCurrentPrompt] = useState<string>('');
 
-  // State for API configuration
-  const [apiConfig, setApiConfig] = useState<ApiConfigParams | null>(null);
+  // Removed apiConfig state
+  const [defaultModelDisplay, setDefaultModelDisplay] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    // This is where environment variables will be read in the next step.
-    // For now, we simulate it being loaded.
-    // In a real scenario, this would involve checking process.env
-    const loadedConfig: ApiConfigParams = {
-      apiKey: process.env.NEXT_PUBLIC_COLOMBO_API_KEY || '',
-      apiUrl: process.env.NEXT_PUBLIC_COLOMBO_API_URL || '',
-      defaultModel: process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || 'flux',
-    };
-
-    if (!loadedConfig.apiKey || !loadedConfig.apiUrl) {
-        toast.error("API Key or URL is not configured. Please set NEXT_PUBLIC_COLOMBO_API_KEY and NEXT_PUBLIC_COLOMBO_API_URL in your .env.local file.");
-        setError("API Key or URL is not configured in environment variables.");
+    // Optionally, still load default model name for display purposes
+    const modelNameFromEnv = process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL;
+    if (modelNameFromEnv) {
+      setDefaultModelDisplay(modelNameFromEnv);
     }
-    setApiConfig(loadedConfig);
+    // No longer need to check for API_KEY or API_URL here for the client
+    // The server-side proxy handles that.
+    // User will be instructed to set server-side env vars (COLOMBO_API_KEY, etc.)
   }, []);
 
   const handleGenerationStart = (promptValue: string) => {
@@ -77,11 +71,11 @@ const ImageGeneratorPage: React.FC = () => {
             onGenerationSuccess={handleGenerationSuccess}
             onGenerationFailure={handleGenerationFailure}
             isLoading={isLoading}
-            apiConfig={apiConfig} // Pass the config
+            defaultModelName={defaultModelDisplay} // Pass for display
+            // Removed apiConfig prop
           />
         </div>
         <div className="mt-6 md:mt-0">
-          {/* ... (Error, Loading, ResultDisplay, Placeholder JSX - same as before) ... */}
           {error && !isLoading && (
             <div className="p-4 mb-4 text-sm text-red-800 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-200" role="alert">
               <span className="font-medium">Error:</span> {error}
@@ -109,7 +103,7 @@ const ImageGeneratorPage: React.FC = () => {
                 </svg>
               <p className="text-lg text-gray-500 dark:text-gray-400">Your generated image will appear here.</p>
               <p className="text-sm text-gray-400 dark:text-gray-500">Enter a prompt and click "Generate Image" to start.</p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Ensure API settings are configured in your .env.local file.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Ensure server API settings are configured.</p>
             </div>
           )}
         </div>

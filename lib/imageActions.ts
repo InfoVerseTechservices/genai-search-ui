@@ -1,7 +1,5 @@
 // lib/imageActions.ts
 
-// Remove: import toml from 'toml';
-
 interface ImageGenerationParams {
   prompt: string;
   n?: number;
@@ -14,16 +12,11 @@ interface ImageGenerationParams {
   height?: number;
   width?: number;
   seed?: number;
-  model?: string; // This model is the user's choice, overriding default if provided
+  model?: string; // User's choice of model, or empty to use server-side default
   show_thinking?: boolean;
 }
 
-// Interface for the API configuration passed to generateImage
-export interface ApiConfigParams {
-  apiKey: string;
-  apiUrl: string;
-  defaultModel: string;
-}
+// Remove ApiConfigParams interface
 
 interface ImageResponseData {
   b64_json?: string;
@@ -36,45 +29,18 @@ interface ImageGenerationResponse {
   data: ImageResponseData[];
   id: string;
   object: string;
-  model: string; // This model is the one returned by the API
-  error?: string; // Added for structured error responses
+  model: string; // Model returned by the API
+  error?: string;
 }
 
-// Remove the ApiConfig interface (related to toml parsing)
-// Remove the loadConfig function
-
+// generateImage no longer needs apiConfig parameter
 export async function generateImage(
-  params: ImageGenerationParams,
-  apiConfig: ApiConfigParams
+  params: ImageGenerationParams
 ): Promise<ImageGenerationResponse> {
-  const { apiKey, apiUrl: baseUrl, defaultModel } = apiConfig;
+  const proxyApiUrl = '/api/image-proxy'; // Calls our local proxy
 
-  if (!apiKey) {
-    console.error('API_KEY is missing.');
-    return Promise.reject({
-      created: Date.now(),
-      data: [],
-      id: '',
-      object: 'error',
-      model: params.model || defaultModel,
-      error: 'API Key is missing. Please configure it in environment variables.',
-    });
-  }
-
-  if (!baseUrl) {
-    console.error('API_URL is missing.');
-    return Promise.reject({
-        created: Date.now(),
-        data: [],
-        id: '',
-        object: 'error',
-        model: params.model || defaultModel,
-        error: 'API URL is missing. Please configure it in environment variables.',
-    });
-  }
-
-  const apiUrl = `${baseUrl.replace(/\/$/, '')}/images/generations`; // Ensure no double slashes
-
+  // The requestBody now directly uses params.model.
+  // If params.model is empty/undefined, the proxy will use its configured default.
   const requestBody = {
     prompt: params.prompt,
     n: params.n || 1,
@@ -87,40 +53,40 @@ export async function generateImage(
     height: params.height,
     width: params.width,
     seed: params.seed,
-    model: params.model || defaultModel, // Use user-provided model or the default from env
+    model: params.model, // Send user's model choice (can be undefined)
     show_thinking: params.show_thinking,
   };
 
   try {
-    const response = await fetch(apiUrl, {
+    const response = await fetch(proxyApiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        // No Authorization header needed here, proxy handles it
       },
       body: JSON.stringify(requestBody),
     });
 
+    // It's crucial to await response.json() here before checking response.ok
+    // because even for errors, the body might contain useful JSON from our proxy
+    const responseData = await response.json();
+
     if (!response.ok) {
-      const errorBody = await response.json();
-      console.error('API Error Response:', errorBody);
-      throw new Error(
-        `API request failed with status ${response.status}: ${errorBody.detail || response.statusText}`
-      );
+      // Use error message from proxy's JSON response if available
+      const errorMessage = responseData.error || `API request via proxy failed with status ${response.status}`;
+      console.error('Proxy API Error Response:', responseData);
+      throw new Error(errorMessage);
     }
 
-    return (await response.json()) as ImageGenerationResponse;
+    return responseData as ImageGenerationResponse;
   } catch (error) {
-    console.error('Error generating image:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred during image generation.';
-    return Promise.reject({
-      created: Date.now(),
-      data: [],
-      id: '',
-      object: 'error',
-      model: params.model || defaultModel,
-      error: errorMessage,
-    });
+    console.error('Error generating image via proxy:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    // Ensure this structure matches what the calling UI expects for errors.
+    // The UI typically expects a message string from onGenerationFailure.
+    // If generateImage is expected to always resolve, then return a structured error.
+    // Here, we rethrow so the catch block in InputPanel handles it.
+    throw error; // Rethrow to be caught by InputPanel's catch block
   }
 }

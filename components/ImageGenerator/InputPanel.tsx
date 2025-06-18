@@ -2,17 +2,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-// Updated import path if generateImage or ApiConfigParams moved or structure changed.
-// Assuming ApiConfigParams is exported from lib/imageActions.ts
-import { generateImage, ApiConfigParams } from '@/lib/imageActions';
+// generateImage no longer needs ApiConfigParams
+import { generateImage } from '@/lib/imageActions';
 
 interface InputPanelProps {
   onGenerationStart: (prompt: string) => void;
-  onGenerationSuccess: (data: any) => void; // Replace 'any' with actual response type
+  onGenerationSuccess: (data: any) => void;
   onGenerationFailure: (error: string) => void;
   isLoading: boolean;
-  // Add apiConfig prop
-  apiConfig: ApiConfigParams | null; // Allow null if config might not be ready initially
+  // Removed apiConfig prop
+  defaultModelName?: string; // Optional: To display default model info from env
 }
 
 const InputPanel: React.FC<InputPanelProps> = ({
@@ -20,7 +19,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
   onGenerationSuccess,
   onGenerationFailure,
   isLoading,
-  apiConfig, // Destructure new prop
+  defaultModelName, // Optional prop
 }) => {
   const [prompt, setPrompt] = useState<string>('');
   const [negativePrompt, setNegativePrompt] = useState<string>('');
@@ -32,7 +31,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
 
   useEffect(() => {
     // Timer logic remains the same
-    if (isLoading) {
+     if (isLoading) {
       const id = setInterval(() => {
         setTimer((prevTimer) => prevTimer + 1);
       }, 1000);
@@ -53,13 +52,10 @@ const InputPanel: React.FC<InputPanelProps> = ({
 
   const handleGenerateClick = async () => {
     if (!prompt.trim()) {
-      onGenerationFailure("Prompt cannot be empty."); // Use callback for consistency
+      onGenerationFailure("Prompt cannot be empty.");
       return;
     }
-    if (!apiConfig || !apiConfig.apiKey || !apiConfig.apiUrl) {
-      onGenerationFailure("API configuration is missing. Please check environment variables.");
-      return;
-    }
+    // No more apiConfig check here
 
     onGenerationStart(prompt);
     try {
@@ -68,29 +64,27 @@ const InputPanel: React.FC<InputPanelProps> = ({
         negative_prompt: negativePrompt,
         size,
         guidance_scale: guidanceScale,
-        model: model || undefined, // Pass user model choice, or undefined to use default from apiConfig
+        model: model.trim() || undefined, // Pass user model choice, or undefined to use proxy's default
         response_format: 'b64_json' as 'b64_json',
       };
-      // Pass apiConfig to generateImage
-      const result = await generateImage(params, apiConfig);
+      // generateImage no longer takes apiConfig
+      const result = await generateImage(params);
 
-      if (result && result.object !== 'error' && result.data && result.data.length > 0) {
-        onGenerationSuccess(result);
-      } else {
-        const errorResponse = result as any;
-        onGenerationFailure(errorResponse.error || 'Image generation failed: No data returned.');
-      }
+      // Assuming result directly is the success data or includes an error field if that's how generateImage is modified
+      // Based on current generateImage, it throws on error, so a direct non-error result is success.
+      onGenerationSuccess(result);
     } catch (error: any) {
-      onGenerationFailure(error.error || error.message || 'An unknown error occurred.');
+      // Error message is now directly from the rethrown error in generateImage
+      onGenerationFailure(error.message || 'An unknown error occurred.');
     }
   };
 
-  // Rest of the component (JSX) remains the same
-  // ... (ensure to copy the existing JSX for the input panel here)
+  // JSX for the component:
+  // The placeholder for the model input can be updated if defaultModelName is provided.
+  // The button's disabled state no longer depends on apiConfig.
   return (
     <div className="p-4 border rounded-lg shadow-md bg-white dark:bg-gray-800">
       <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Image Generation</h2>
-      {/* ... (all the JSX for form elements) ... */}
       <div className="space-y-4">
         <div>
           <label htmlFor="prompt" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Prompt</label>
@@ -126,7 +120,6 @@ const InputPanel: React.FC<InputPanelProps> = ({
               className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
             >
               <option value="512x512">512x512</option>
-              {/* Add other sizes if supported */}
             </select>
           </div>
 
@@ -138,9 +131,9 @@ const InputPanel: React.FC<InputPanelProps> = ({
               value={model}
               onChange={(e) => setModel(e.target.value)}
               className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"
-              placeholder="Default (e.g., flux, bagel)"
+              placeholder={defaultModelName ? `Default: ${defaultModelName}` : "e.g., flux, bagel"}
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave empty to use default model.</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave empty to use server default model.</p>
           </div>
         </div>
 
@@ -164,7 +157,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
       <div className="mt-6">
         <button
           onClick={handleGenerateClick}
-          disabled={isLoading || !prompt.trim() || !apiConfig} // Also disable if apiConfig not ready
+          disabled={isLoading || !prompt.trim()} // No longer disabled by apiConfig presence
           className="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 dark:disabled:bg-gray-500"
         >
           {isLoading ? (
@@ -179,7 +172,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
             'Generate Image'
           )}
         </button>
-         {!apiConfig && <p className="text-xs text-red-500 text-center mt-2">API configuration is loading or missing. Please check setup.</p>}
+        {/* Removed message about apiConfig loading/missing */}
       </div>
     </div>
   );

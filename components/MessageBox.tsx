@@ -1,21 +1,18 @@
 // components/MessageBox.tsx
 'use client';
 
-/* eslint-disable @next/next/no-img-element */ // Keep for existing image type
+/* eslint-disable @next/next/no-img-element */
 import React, { MutableRefObject, useEffect, useState } from 'react';
-import { Message } from './ChatWindow'; // Message type now includes audio fields
+import { Message } from './ChatWindow';
 import { cn } from '@/lib/utils';
-import { Edit, Image as ImageIconLucide, Waves as AudioIconLucide } from 'lucide-react'; // Added AudioIconLucide
-import { BookCopy, Disc3, Volume2, StopCircle } from 'lucide-react';
+import { Edit, Image as ImageIconLucide, Waves as AudioIconLucide, BookCopy, Disc3, Volume2, StopCircle, Check, ClipboardList } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { base16AteliersulphurpoolLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Check, ClipboardList } from 'lucide-react';
 
-// ... (Copy, Rewrite, MessageSources, SearchImages, SearchVideos, useSpeech, Ads, Share, RelatedImages imports)
 import Copy from './MessageActions/Copy';
 import Rewrite from './MessageActions/Rewrite';
 import MessageSources from './MessageSources';
@@ -26,7 +23,6 @@ import SideTopAdComponent from './Ads/SideAdTop';
 import SideBottomAdComponent from './Ads/SideAdBottom';
 import Share from './MessageActions/Share';
 import RelatedImages from './GetOneImage';
-
 
 const MessageBox = ({
   message,
@@ -59,25 +55,29 @@ const MessageBox = ({
   const [editedContent, setEditedContent] = useState(message.content);
 
   useEffect(() => {
-    const regex = /\[(\d+)\]/g; // Ensure this regex is intended for source links like [1], [2]
+    const regex = /\[(\d+)\]/g;
 
     if (
       message.role === 'assistant' &&
-      (message.type === 'text' || !message.type) && // Only for text-based assistant messages
+      (message.type === 'text' || !message.type) &&
       message?.sources &&
       message.sources.length > 0
     ) {
       setParsedMessage(
         message.content.replace(
           regex,
-          (_, number) =>
-            `<a href="${message.sources?.[parseInt(number, 10) - 1]?.metadata?.url}" target="_blank" className="bg-light-secondary dark:bg-dark-secondary px-1 rounded ml-1 no-underline text-xs text-black dark:text-gray-300 relative">${number}</a>`,
+          (_, number) => {
+            const sourceIndex = parseInt(number, 10) - 1;
+            if (message.sources && sourceIndex >= 0 && sourceIndex < message.sources.length) {
+              return `<a href="${message.sources[sourceIndex]?.metadata?.url}" target="_blank" className="bg-light-secondary dark:bg-dark-secondary px-1 rounded ml-1 no-underline text-xs text-black dark:text-gray-300 relative">${number}</a>`;
+            }
+            return `[${number}]`; // Fallback if source not found
+          }
         ),
       );
     } else {
       setParsedMessage(message.content);
     }
-    // Prepare content for speech, stripping out any complex HTML/markdown for source links.
     setSpeechMessage(message.content.replace(regex, ''));
   }, [message.content, message.sources, message.role, message.type]);
 
@@ -96,8 +96,11 @@ const MessageBox = ({
           !(index === messageIndex + 1 && msg.role === 'assistant')
         );
       });
+      // It seems `setMessages` was intended to update the history for the parent `ChatWindow`
+      // And `sendMessage` would then send the new query.
+      // This logic might need review in ChatWindow.tsx if it's not working as expected.
       setMessages(updatedHistory);
-      sendMessage(editedContent);
+      sendMessage(editedContent, null); // Pass null for file explicitly
     }
     setIsEditing(false);
   };
@@ -118,15 +121,16 @@ const MessageBox = ({
     inline?: boolean;
     className?: string;
     children?: React.ReactNode;
-    node?: any;
+    node?: any; // This 'node' prop comes from ReactMarkdown
    }
+
   const CodeBlock: React.FC<MarkdownCodeProps> = ({ node, inline = false, className, children }) => {
     const match = /language-(\w+)/.exec(className || '');
     const language = match ? match[1] : 'text';
     const [copied, setCopied] = useState(false);
     return !inline && match ? (
       <div className="relative group my-2">
-        <SyntaxHighlighter language={language} style={base16AteliersulphurpoolLight} customStyle={{ margin: 0, padding: '1rem', borderRadius: '0.5rem' }}>
+        <SyntaxHighlighter language={language} style={base16AteliersulphurpoolLight} customStyle={{ margin: 0, padding: '1rem', borderRadius: '0.5rem' }} PreTag="div">
           {String(children).replace(/\n$/, '')}
         </SyntaxHighlighter>
         <button
@@ -142,6 +146,8 @@ const MessageBox = ({
     );
   };
 
+  const currentQuery = history[messageIndex > 0 ? messageIndex - 1 : 0]?.content;
+  const historyForSearch = history.slice(0, messageIndex > 0 ? messageIndex - 1 : 0);
 
   return (
     <div className='dark:text-white'>
@@ -177,12 +183,12 @@ const MessageBox = ({
               {message.imagePromptText || message.content}
             </h2>
             {message.status === 'loading' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Generating image...</p>}
-             {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Image generation failed. {message.content.includes("Error: ") ? message.content.split("Error: ")[1] : ""}</p>}
+            {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Image generation failed. {message.content && message.content.includes("Error: ") ? message.content.split("Error: ")[1] : message.content}</p>}
           </div>
         </div>
       )}
 
-      {/* New: User Audio Prompt Message */}
+      {/* User Audio Prompt Message */}
       {message.role === 'user' && message.type === 'audio_prompt' && (
         <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
            <AudioIconLucide size={24} className="mr-2 mt-1 text-purple-500 flex-shrink-0" />
@@ -192,7 +198,7 @@ const MessageBox = ({
               {message.audioPromptText || message.content}
             </h2>
             {message.status === 'loading' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Generating audio...</p>}
-            {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Audio generation failed. {message.content.includes("Error: ") ? message.content.split("Error: ")[1] : ""}</p>}
+            {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Audio generation failed. {message.content && message.content.includes("Error: ") ? message.content.split("Error: ")[1] : message.content}</p>}
           </div>
         </div>
       )}
@@ -215,7 +221,7 @@ const MessageBox = ({
         </div>
       )}
 
-      {/* New: Assistant Generated Audio Message */}
+      {/* Assistant Generated Audio Message */}
       {message.role === 'assistant' && message.type === 'generated_audio' && message.b64JsonAudio && (
         <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
           <div className="flex flex-col space-y-2">
@@ -283,11 +289,11 @@ const MessageBox = ({
           <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3 w-[300px] z-30 h-full pb-4">
             <div className='w-[300px] h-[207.36px]'>
               <div className="h-full w-full">
-                <RelatedImages chat_history={history.slice(0, messageIndex > 0 ? messageIndex -1 : 0)} query={history[messageIndex > 0 ? messageIndex - 1 : 0]?.content} />
+                <RelatedImages chat_history={historyForSearch} query={currentQuery} />
               </div>
             </div>
-            {isImageSearchVisible && <SearchImages key="image-search" query={history[messageIndex > 0 ? messageIndex -1 : 0]?.content} chat_history={history.slice(0, messageIndex > 0 ? messageIndex -1 : 0)} complete={handleImageSearchCompletion} visible={true} />}
-            {isVideoSearchVisible && <SearchVideos key="video-search" chat_history={history.slice(0, messageIndex > 0 ? messageIndex -1 : 0)} query={history[messageIndex > 0 ? messageIndex -1 : 0]?.content} complete={handleVideoSearchCompletion} visible={true} />}
+            {isImageSearchVisible && <SearchImages key="image-search" query={currentQuery} chat_history={historyForSearch} complete={handleImageSearchCompletion} visible={true} />}
+            {isVideoSearchVisible && <SearchVideos key="video-search" chat_history={historyForSearch} query={currentQuery} complete={handleVideoSearchCompletion} visible={true} />}
             {callAd && (
               <div className="w-[300px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-2.5 h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden">
                 <div className="w-[300px] h-[250px] cursor-pointer"><SideTopAdComponent divid={`top-message-${messageIndex}`} /></div>

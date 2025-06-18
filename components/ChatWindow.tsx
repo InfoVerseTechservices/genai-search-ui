@@ -368,16 +368,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
   return isReady ? (
     notFound ? ( <Error statusCode={404} /> ) : (
       <div className="">
-        <div className="absolute top-3 right-2 z-[999]">
-          <div className="flex space-x-4 mt-3">
-            <button onClick={() => { setMessages([]); setChatId(crypto.randomBytes(20).toString('hex')); setNewChatCreated(true); setChatHistory([]); }}>
-              <div className="flex flex-col items-center"><div className="w-6 h-6 mb-1"> <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} /> </div></div>
-            </button>
-            <Link href="/library/">
-              <div className="flex flex-col items-center"><div className="w-8 sm:w-6 h-6 mb-1"> <HistoryIcon w={24} h={24} fill={'#8E8E93'} /> </div></div>
-            </Link>
-          </div>
-        </div>
+        {/* Removed top-right icons div */}
         {messages.length > 0 ? (
           <>
             <Navbar messages={messages} />

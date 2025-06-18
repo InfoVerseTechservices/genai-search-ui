@@ -36,5 +36,3 @@ next-env.d.ts
 
 # config
 config.toml
-package-lock.json
-yarn.lock

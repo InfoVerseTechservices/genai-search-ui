@@ -15,19 +15,30 @@ interface ImageGenParams {
   guidance_scale?: number;
 }
 
+// Define AudioGenParams if not globally available or imported
+interface AudioGenParams {
+  prompt: string;
+  negative_prompt?: string;
+  duration_seconds?: number;
+  seed?: number;
+  model?: string;
+}
+
 const Chat = ({
   loading,
   messages,
   sendMessage,
-  onImagePromptSubmit, // Add this
+  onImagePromptSubmit,
+  onAudioPromptSubmit, // Add this
   messageAppeared,
   rewrite,
   editMessage,
   setMessages,
 }: {
   messages: Message[];
-  sendMessage: (message: string, file: File | null) => void; // sendMessage in ChatWindow now takes file
-  onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void; // Add this
+  sendMessage: (message: string, file: File | null) => void;
+  onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
+  onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void; // Add this
   loading: boolean;
   messageAppeared: boolean;
   rewrite: (messageId: string) => void;
@@ -97,7 +108,7 @@ const Chat = ({
           className="bottom-24 lg:bottom-10 fixed z-40"
           style={{ width: dividerWidth }}
         >
-          <MessageInput loading={loading} sendMessage={sendMessage} onImagePromptSubmit={onImagePromptSubmit} />
+          <MessageInput loading={loading} sendMessage={sendMessage} onImagePromptSubmit={onImagePromptSubmit} onAudioPromptSubmit={onAudioPromptSubmit} />
         </div>
       )}
     </div>

@@ -16,14 +16,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { NewGenSearchIcon, HistoryIcon } from './Icons';
 
-// Import the image generation function
 import { generateImage } from '@/lib/imageActions';
-// Assuming ImageGenParams is defined in EmptyChatMessageInput or a shared types file
-// If not, define it here or import appropriately. For this subtask, we assume it's available.
-// For example, if it were moved to a types file:
-// import { ImageGenParams } from '@/lib/types';
+import { generateAudio } from '@/lib/audioActions'; // Import new audio action
 
-// Local definition for subtask clarity if not imported
+// Define ImageGenParams (from previous subtasks or shared types)
 interface ImageGenParams {
   prompt: string;
   negative_prompt?: string;
@@ -32,8 +28,15 @@ interface ImageGenParams {
   guidance_scale?: number;
 }
 
+// Define AudioGenParams (from lib/audioActions.ts or shared types)
+export interface AudioGenParams {
+  prompt: string;
+  negative_prompt?: string;
+  duration_seconds?: number;
+  seed?: number;
+  model?: string;
+}
 
-// Message type (already updated in previous step)
 export type Message = {
   messageId: string;
   chatId: string;
@@ -42,14 +45,13 @@ export type Message = {
   role: 'user' | 'assistant';
   suggestions?: string[];
   sources?: Document[];
-  type?: 'text' | 'image_prompt' | 'generated_image';
+  type?: 'text' | 'image_prompt' | 'generated_image' | 'audio_prompt' | 'generated_audio'; // Added audio types
   imagePromptText?: string;
-  b64Json?: string;
+  audioPromptText?: string; // New: For the original audio prompt
+  b64Json?: string; // For image b64 data
+  b64JsonAudio?: string; // New: For audio b64 data
   status?: 'loading' | 'completed' | 'error';
 };
-
-// ... (useSocket, loadMessages functions remain largely the same)
-// Ensure useSocket and loadMessages are present from the existing file content.
 
 const useSocket = (
   url: string,
@@ -57,7 +59,7 @@ const useSocket = (
   setError: (error: boolean) => void,
 ) => {
   const [ws, setWs] = useState<WebSocket | null>(null);
-  const heartbeatInterval = 30000; // 30 seconds
+  const heartbeatInterval = 30000;
   let heartbeatTimeoutId: any;
 
   useEffect(() => {
@@ -66,209 +68,115 @@ const useSocket = (
         let chatModel = localStorage.getItem('chatModel');
         let chatModelProvider = localStorage.getItem('chatModelProvider');
         let embeddingModel = localStorage.getItem('embeddingModel');
-        let embeddingModelProvider = localStorage.getItem(
-          'embeddingModelProvider',
+        let embeddingModelProvider = localStorage.getItem('embeddingModelProvider');
+
+        const providersRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/models`,
+          { headers: { 'Content-Type': 'application/json', Authorization: getCookie('token')! } }
         );
 
-        const providers = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/models`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: getCookie('token'),
-            },
-          },
-        ).then(async (res) => await res.json());
+        if (!providersRes.ok) {
+            toast.error("Failed to fetch model providers.");
+            setError(true);
+            return;
+        }
+        const providers = await providersRes.json();
 
-        if (
-          !chatModel ||
-          !chatModelProvider ||
-          !embeddingModel ||
-          !embeddingModelProvider
-        ) {
+
+        if (!chatModel || !chatModelProvider || !embeddingModel || !embeddingModelProvider) {
           if (!chatModel || !chatModelProvider) {
             const chatModelProviders = providers.chatModelProviders;
-
-            chatModelProvider = Object.keys(chatModelProviders)[0];
-
-            if (chatModelProvider === 'custom_openai') {
-              toast.error(
-                'Seems like you are using the custom OpenAI provider, please open the settings and configure the API key and base URL',
-              );
-              setError(true);
-              return;
-            } else {
-              chatModel = Object.keys(chatModelProviders[chatModelProvider])[0];
-              if (
-                !chatModelProviders ||
-                Object.keys(chatModelProviders).length === 0
-              )
-                return toast.error('No chat models available');
+            if (!chatModelProviders || Object.keys(chatModelProviders).length === 0) {
+                toast.error('No chat models available');
+                setError(true); return;
             }
+            chatModelProvider = Object.keys(chatModelProviders)[0];
+            if (chatModelProvider === 'custom_openai') {
+              toast.error('Custom OpenAI provider selected, please configure API key and base URL in settings.');
+              setError(true); return;
+            }
+            chatModel = Object.keys(chatModelProviders[chatModelProvider])[0];
           }
 
           if (!embeddingModel || !embeddingModelProvider) {
             const embeddingModelProviders = providers.embeddingModelProviders;
-
-            if (
-              !embeddingModelProviders ||
-              Object.keys(embeddingModelProviders).length === 0
-            )
-              return toast.error('No embedding models available');
-
+             if (!embeddingModelProviders || Object.keys(embeddingModelProviders).length === 0) {
+                toast.error('No embedding models available');
+                 setError(true); return;
+             }
             embeddingModelProvider = Object.keys(embeddingModelProviders)[0];
-            embeddingModel = Object.keys(
-              embeddingModelProviders[embeddingModelProvider],
-            )[0];
+            embeddingModel = Object.keys(embeddingModelProviders[embeddingModelProvider])[0];
           }
 
           localStorage.setItem('chatModel', chatModel!);
           localStorage.setItem('chatModelProvider', chatModelProvider!);
           localStorage.setItem('embeddingModel', embeddingModel!);
-          localStorage.setItem(
-            'embeddingModelProvider',
-            embeddingModelProvider!,
-          );
+          localStorage.setItem('embeddingModelProvider', embeddingModelProvider!);
         } else {
-          const chatModelProviders = providers.chatModelProviders;
-          const embeddingModelProviders = providers.embeddingModelProviders;
-
-          if (
-            Object.keys(chatModelProviders).length > 0 &&
-            chatModelProvider && // Check if chatModelProvider is not null
-            !chatModelProviders[chatModelProvider]
-          ) {
+          // Validate existing settings
+          const { chatModelProviders, embeddingModelProviders } = providers;
+          if (chatModelProvider && !chatModelProviders[chatModelProvider]) {
             chatModelProvider = Object.keys(chatModelProviders)[0];
-            localStorage.setItem('chatModelProvider', chatModelProvider);
+            localStorage.setItem('chatModelProvider', chatModelProvider!);
+            chatModel = Object.keys(chatModelProviders[chatModelProvider!])[0];
+            localStorage.setItem('chatModel', chatModel!);
           }
-
-          if (
-            chatModelProvider &&
-            chatModel && // Check if chatModel is not null
-            chatModelProvider != 'custom_openai' &&
-            !chatModelProviders[chatModelProvider][chatModel]
-          ) {
-            chatModel = Object.keys(chatModelProviders[chatModelProvider])[0];
-            localStorage.setItem('chatModel', chatModel);
-          }
-
-          if (
-            Object.keys(embeddingModelProviders).length > 0 &&
-            embeddingModelProvider && // Check if embeddingModelProvider is not null
-            !embeddingModelProviders[embeddingModelProvider]
-          ) {
+          if (embeddingModelProvider && !embeddingModelProviders[embeddingModelProvider]) {
             embeddingModelProvider = Object.keys(embeddingModelProviders)[0];
-            localStorage.setItem(
-              'embeddingModelProvider',
-              embeddingModelProvider,
-            );
-          }
-
-          if (
-            embeddingModelProvider &&
-            embeddingModel && // Check if embeddingModel is not null
-            !embeddingModelProviders[embeddingModelProvider][embeddingModel]
-          ) {
-            embeddingModel = Object.keys(
-              embeddingModelProviders[embeddingModelProvider],
-            )[0];
-            localStorage.setItem('embeddingModel', embeddingModel);
+            localStorage.setItem('embeddingModelProvider', embeddingModelProvider!);
+            embeddingModel = Object.keys(embeddingModelProviders[embeddingModelProvider!])[0];
+            localStorage.setItem('embeddingModel', embeddingModel!);
           }
         }
 
         const wsURL = new URL(url);
         const searchParams = new URLSearchParams({});
-
         searchParams.append('chatModel', chatModel!);
         searchParams.append('chatModelProvider', chatModelProvider!);
-
         if (chatModelProvider === 'custom_openai') {
-          searchParams.append(
-            'openAIApiKey',
-            localStorage.getItem('openAIApiKey')!,
-          );
-          searchParams.append(
-            'openAIBaseURL',
-            localStorage.getItem('openAIBaseURL')!,
-          );
+          searchParams.append('openAIApiKey', localStorage.getItem('openAIApiKey')!);
+          searchParams.append('openAIBaseURL', localStorage.getItem('openAIBaseURL')!);
         }
-
         searchParams.append('embeddingModel', embeddingModel!);
         searchParams.append('embeddingModelProvider', embeddingModelProvider!);
         searchParams.append('token', getCookie('token')!);
-
         wsURL.search = searchParams.toString();
 
-        const wsInstance = new WebSocket(wsURL.toString()); // Renamed to wsInstance
-
-        const timeoutId = setTimeout(() => {
-          if (wsInstance.readyState !== 1) { // Use wsInstance
-            toast.error(
-              'Failed to connect to the server. Please try again later.',
-            );
-          }
-        }, 10000);
-
-        wsInstance.onopen = () => { // Use wsInstance
-          console.log('[DEBUG] open');
-          clearTimeout(timeoutId);
-          setIsWSReady(true);
-          startHeartbeat(wsInstance); // Use wsInstance
-        };
-
-        wsInstance.onerror = () => { // Use wsInstance
-          clearTimeout(timeoutId);
-          setError(true);
-          toast.error('WebSocket connection error.');
-        };
-
-        wsInstance.onclose = () => { // Use wsInstance
-          clearTimeout(timeoutId);
-          // setError(true);
-          console.log('[DEBUG] closed');
-          stopHeartbeat();
-        };
-
-        wsInstance.addEventListener('message', (e) => { // Use wsInstance
+        const wsInstance = new WebSocket(wsURL.toString());
+        const timeoutId = setTimeout(() => { if (wsInstance.readyState !== 1) toast.error('Connection timeout.'); }, 10000);
+        wsInstance.onopen = () => { clearTimeout(timeoutId); setIsWSReady(true); startHeartbeat(wsInstance); };
+        wsInstance.onerror = () => { clearTimeout(timeoutId); setError(true); toast.error('WebSocket error.'); };
+        wsInstance.onclose = () => { clearTimeout(timeoutId); stopHeartbeat(); };
+        wsInstance.addEventListener('message', (e) => {
           const data = JSON.parse(e.data);
-          if (data.type === 'pong') {
-            clearTimeout(heartbeatTimeoutId); // Server responded with pong
-          } else if (data.type === 'error') {
-            toast.error(data.data);
-          }
+          if (data.type === 'pong') clearTimeout(heartbeatTimeoutId);
+          else if (data.type === 'error') toast.error(data.data);
         });
-
-        setWs(wsInstance); // Use wsInstance
+        setWs(wsInstance);
       };
 
       const startHeartbeat = (socket: WebSocket) => {
         const sendPing = () => {
           if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify({ type: 'ping' }));
-            console.log('Ping sent');
-            heartbeatTimeoutId = setTimeout(() => {
-              console.error('No pong received, closing WebSocket.');
-              socket.close();
-            }, heartbeatInterval - 7000);
+            heartbeatTimeoutId = setTimeout(() => socket.close(), heartbeatInterval - 7000);
           }
         };
-
-        sendPing();
-        const heartbeatIntervalId = setInterval(sendPing, heartbeatInterval);
-
-        // Clean up interval on component unmount or socket change
-        return () => clearInterval(heartbeatIntervalId);
+        sendPing(); // Initial ping
+        const intervalId = setInterval(sendPing, heartbeatInterval);
+        (socket as any).heartbeatIntervalId = intervalId; // Store to clear later
       };
 
       const stopHeartbeat = () => {
         clearTimeout(heartbeatTimeoutId);
+        if (ws && (ws as any).heartbeatIntervalId) {
+            clearInterval((ws as any).heartbeatIntervalId);
+        }
       };
-
       connectWs();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ws, url, setIsWSReady, setError]); // Removed heartbeatTimeoutId, heartbeatInterval from dependencies
-
+  }, [ws, url, setIsWSReady, setError]);
   return ws;
 };
 
@@ -282,52 +190,35 @@ const loadMessages = async (
 ) => {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/chats/${chatId}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: getCookie('token')!,
-      },
-    },
+    { headers: { 'Content-Type': 'application/json', Authorization: getCookie('token')! } }
   );
-
-  if (res.status === 404) {
-    setNotFound(true);
-    setIsMessagesLoaded(true);
-    return;
-  }
+  if (res.status === 404) { setNotFound(true); setIsMessagesLoaded(true); return; }
+  if (!res.ok) { toast.error("Failed to load messages."); setIsMessagesLoaded(true); return; } // Added error handling
 
   const data = await res.json();
-
   const messages = data.messages.map((msg: any) => {
-    const metadata = JSON.parse(msg.metadata || '{}'); // Ensure metadata is an object
+    const metadata = JSON.parse(msg.metadata || '{}');
     return {
-      ...msg,
-      ...metadata,
+      ...msg, ...metadata,
       type: msg.type || metadata?.type || 'text',
       imagePromptText: msg.imagePromptText || metadata?.imagePromptText,
+      audioPromptText: msg.audioPromptText || metadata?.audioPromptText, // Added
       b64Json: msg.b64Json || metadata?.b64Json,
+      b64JsonAudio: msg.b64JsonAudio || metadata?.b64JsonAudio, // Added
       status: msg.status || metadata?.status,
     };
   }) as Message[];
 
   setMessages(messages);
-
   const history = messages
     .filter(msg => msg.type === 'text' || !msg.type)
     .map((msg) => [msg.role, msg.content] as [string, string]);
 
-  console.log('[DEBUG] messages loaded');
-
-  if (messages.length > 0 && messages[0].content) {
-    document.title = messages[0].content;
-  }
-
+  if (messages.length > 0 && messages[0].content) document.title = messages[0].content;
   setChatHistory(history);
   setFocusMode(data.chat.focusMode);
   setIsMessagesLoaded(true);
 };
-
 
 const ChatWindow = ({ id }: { id?: string }) => {
   const { userDetails, isLoggedIn } = useUserProfile();
@@ -341,7 +232,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
   const [isReady, setIsReady] = useState(false);
   const [isWSReady, setIsWSReady] = useState(false);
   const ws = useSocket(process.env.NEXT_PUBLIC_WS_URL!, setIsWSReady, setHasError);
-  const [loading, setLoading] = useState(false); // For text generation
+  const [loading, setLoading] = useState(false);
   const [messageAppeared, setMessageAppeared] = useState(false);
   const [chatHistory, setChatHistory] = useState<[string, string][]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -350,15 +241,11 @@ const ChatWindow = ({ id }: { id?: string }) => {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      router.push('/sign-in');
-      return;
-    }
+    if (!isLoggedIn) { router.push('/sign-in'); return; }
     if (chatId && !newChatCreated && !isMessagesLoaded && messages.length === 0) {
       loadMessages(chatId, setMessages, setIsMessagesLoaded, setChatHistory, setFocusMode, setNotFound);
     } else if (!chatId) {
-      setNewChatCreated(true);
-      setIsMessagesLoaded(true);
+      setNewChatCreated(true); setIsMessagesLoaded(true);
       const newChatId = crypto.randomBytes(20).toString('hex');
       setChatId(newChatId);
     }
@@ -366,97 +253,44 @@ const ChatWindow = ({ id }: { id?: string }) => {
   }, [isLoggedIn, router, chatId, newChatCreated, isMessagesLoaded, messages.length]);
 
   const closeWebSocket = useCallback(() => {
-    if (ws?.readyState === 1) {
-      ws.close();
-      console.log('[DEBUG] closed websocket');
-    }
+    if (ws?.readyState === 1) { ws.close(); console.log('[DEBUG] closed websocket'); }
   }, [ws]);
-
-  useEffect(() => {
-    return closeWebSocket;
-  }, [closeWebSocket]);
+  useEffect(() => { return closeWebSocket; }, [closeWebSocket]);
 
   const messagesRef = useRef<Message[]>([]);
   useEffect(() => { messagesRef.current = messages; }, [messages]);
 
-  useEffect(() => {
-    if (isMessagesLoaded && isWSReady) {
-      setIsReady(true);
-    }
-  }, [isMessagesLoaded, isWSReady]);
+  useEffect(() => { if (isMessagesLoaded && isWSReady) setIsReady(true); }, [isMessagesLoaded, isWSReady]);
 
   const sendMessage = async (messageContent: string, file: File | null = null) => {
-    if (loading) return;
-    setLoading(true);
-    setMessageAppeared(false);
-
+    if (loading) return; setLoading(true); setMessageAppeared(false);
     let sources: Document[] | undefined = undefined;
-    let recievedMessage = '';
-    let added = false;
+    let recievedMessage = ''; let added = false;
     const userMessageId = crypto.randomBytes(7).toString('hex');
 
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        content: messageContent,
-        messageId: userMessageId,
-        chatId: chatId!,
-        role: 'user',
-        createdAt: new Date(),
-        type: 'text',
-      },
-    ]);
+    setMessages((prev) => [...prev, { content: messageContent, messageId: userMessageId, chatId: chatId!, role: 'user', createdAt: new Date(), type: 'text' }]);
+    if (file) console.log("File upload initiated:", file.name); // File handling logic would go here
 
-    if (file) {
-      console.log("File upload initiated with message:", messageContent, file.name);
-      // setLoading(false); // Reset loading if file handling is separate.
-      // This part needs more specific logic if file upload is to interact with WS or be handled client-side
-    }
-
-    ws?.send(
-      JSON.stringify({
-        type: 'message',
-        message: { chatId: chatId!, content: messageContent },
-        focusMode: focusMode,
-        history: [...chatHistory, ['human', messageContent]],
-      }),
-    );
+    ws?.send(JSON.stringify({ type: 'message', message: { chatId: chatId!, content: messageContent }, focusMode: focusMode, history: [...chatHistory, ['human', messageContent]] }));
 
     const messageHandler = async (e: MessageEvent) => {
       const data = JSON.parse(e.data);
-      if (data.type === 'error') {
-        toast.error(data.data);
-        setLoading(false); return;
-      }
+      if (data.type === 'error') { toast.error(data.data); setLoading(false); return; }
       if (data.type === 'sources') {
         sources = data.data;
-        if (!added) {
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { content: '', messageId: data.messageId, chatId: chatId!, role: 'assistant', sources: sources, createdAt: new Date(), type: 'text' },
-          ]);
-          added = true;
-        }
+        if (!added) { setMessages((prev) => [...prev, { content: '', messageId: data.messageId, chatId: chatId!, role: 'assistant', sources: sources, createdAt: new Date(), type: 'text' }]); added = true; }
         setMessageAppeared(true);
       }
       if (data.type === 'message') {
-        if (!added) {
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { content: data.data, messageId: data.messageId, chatId: chatId!, role: 'assistant', sources: sources, createdAt: new Date(), type: 'text' },
-          ]);
-          added = true;
-        }
+        if (!added) { setMessages((prev) => [...prev, { content: data.data, messageId: data.messageId, chatId: chatId!, role: 'assistant', sources: sources, createdAt: new Date(), type: 'text' }]); added = true; }
         setMessages((prev) => prev.map((m) => m.messageId === data.messageId ? { ...m, content: m.content + data.data } : m));
-        recievedMessage += data.data;
-        setMessageAppeared(true);
+        recievedMessage += data.data; setMessageAppeared(true);
       }
       if (data.type === 'messageEnd') {
-        setChatHistory((prevHistory) => [...prevHistory, ['human', messageContent], ['assistant', recievedMessage]]);
-        ws?.removeEventListener('message', messageHandler);
-        setLoading(false);
+        setChatHistory((prev) => [...prev, ['human', messageContent], ['assistant', recievedMessage]]);
+        ws?.removeEventListener('message', messageHandler); setLoading(false);
         const lastMsg = messagesRef.current[messagesRef.current.length - 1];
-        if (lastMsg?.role === 'assistant' && lastMsg?.sources && lastMsg?.sources.length > 0 && !lastMsg?.suggestions) {
+        if (lastMsg?.role === 'assistant' && lastMsg?.sources?.length && !lastMsg?.suggestions) {
           const suggestions = await getSuggestions(messagesRef.current.filter(m => m.type === 'text' || !m.type));
           setMessages((prev) => prev.map((msg) => msg.messageId === lastMsg.messageId ? { ...msg, suggestions: suggestions } : msg));
         }
@@ -466,83 +300,56 @@ const ChatWindow = ({ id }: { id?: string }) => {
   };
 
   const handleImageGenerationRequest = async (params: ImageGenParams, imagePromptText: string) => {
-    if (!chatId) {
-      toast.error("Chat ID is not available.");
-      return;
-    }
-    setLoading(true);
-
-    const userPromptMessageId = crypto.randomBytes(7).toString('hex');
-    const assistantImageMessageId = crypto.randomBytes(7).toString('hex');
-
-    const userImagePromptMessage: Message = {
-      messageId: userPromptMessageId,
-      chatId: chatId,
-      createdAt: new Date(),
-      content: `Generating image for: "${imagePromptText}"`,
-      role: 'user',
-      type: 'image_prompt',
-      imagePromptText: imagePromptText,
-      status: 'loading',
-    };
-    setMessages((prevMessages) => [...prevMessages, userImagePromptMessage]);
-
+    if (!chatId) { toast.error("Chat ID missing."); return; } setLoading(true);
+    const userPromptMsgId = crypto.randomBytes(7).toString('hex');
+    const assistantImgMsgId = crypto.randomBytes(7).toString('hex');
+    setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating image for: "${imagePromptText}"`, role: 'user', type: 'image_prompt', imagePromptText, status: 'loading' }]);
     try {
       const result = await generateImage(params);
+      if (result.data?.[0]?.b64_json) {
+        setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Image prompt: "${imagePromptText}"` } : m));
+        setMessages((prev) => [...prev, { messageId: assistantImgMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_image', b64Json: result.data[0].b64_json, imagePromptText }]);
+        toast.success('Image generated!');
+      } else { throw new Error(result.error || "No image data."); }
+    } catch (err: any) {
+      toast.error(`Image generation failed: ${err.message}`);
+      setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed: "${imagePromptText}". Error: ${err.message}` } : m));
+    } finally { setLoading(false); }
+  };
 
-      if (result.data && result.data.length > 0 && result.data[0].b64_json) {
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg.messageId === userPromptMessageId ? { ...msg, status: 'completed', content: `Image prompt: "${imagePromptText}"` } : msg
-          )
-        );
-
-        const assistantImageMessage: Message = {
-          messageId: assistantImageMessageId,
-          chatId: chatId,
-          createdAt: new Date(),
-          content: '',
-          role: 'assistant',
-          type: 'generated_image',
-          b64Json: result.data[0].b64_json,
-          imagePromptText: imagePromptText,
-        };
-        setMessages((prevMessages) => [...prevMessages, assistantImageMessage]);
-        toast.success('Image generated successfully!');
-      } else {
-        throw new Error(result.error || 'Image generation failed: No image data returned.');
-      }
-    } catch (error: any) {
-      console.error("Image generation error:", error);
-      toast.error(`Image generation failed: ${error.message || 'Unknown error'}`);
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg.messageId === userPromptMessageId
-            ? { ...msg, status: 'error', content: `Failed to generate image for: "${imagePromptText}". Error: ${error.message}` }
-            : msg
-        )
-      );
-    } finally {
-      setLoading(false);
-    }
+  const handleAudioGenerationRequest = async (params: AudioGenParams, audioPromptText: string) => {
+    if (!chatId) { toast.error("Chat ID missing for audio generation."); return; } setLoading(true);
+    const userPromptMsgId = crypto.randomBytes(7).toString('hex');
+    const assistantAudioMsgId = crypto.randomBytes(7).toString('hex');
+    setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating audio for: "${audioPromptText}"`, role: 'user', type: 'audio_prompt', audioPromptText, status: 'loading' }]);
+    try {
+      const result = await generateAudio(params);
+      if (result.data?.[0]?.b64_json) {
+        setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Audio prompt: "${audioPromptText}"` } : m));
+        setMessages((prev) => [...prev, { messageId: assistantAudioMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_audio', b64JsonAudio: result.data[0].b64_json, audioPromptText }]);
+        toast.success('Audio generated!');
+      } else { throw new Error(result.error || "No audio data."); }
+    } catch (err: any) {
+      toast.error(`Audio generation failed: ${err.message}`);
+      setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed: "${audioPromptText}". Error: ${err.message}` } : m));
+    } finally { setLoading(false); }
   };
 
   const rewrite = (messageId: string) => {
     const index = messages.findIndex((msg) => msg.messageId === messageId);
-    if (index === -1 || index === 0 || messages[index-1]?.type !== 'text') return;
-    const messageToRewrite = messages[index - 1];
-    if (messageToRewrite.role !== 'user' || (messageToRewrite.type && messageToRewrite.type !== 'text')) return;
+    if (index <= 0) return;
+    const prevUserMessage = messages[index - 1];
+    if (prevUserMessage?.role !== 'user' || (prevUserMessage.type && prevUserMessage.type !== 'text')) return;
 
-    setMessages((prev) => [...prev.slice(0, index - 1)]);
-    // Adjust chatHistory: find the corresponding entry and slice from there.
-    // This is a simplified history adjustment. A more robust way might involve IDs in history.
-    let historyPairsToRemove = 0;
-    for (let i = prev.length -1; i >= index -1; i--) {
-        if (prev[i].type === 'text' || !prev[i].type) historyPairsToRemove++;
+    setMessages((prev) => prev.slice(0, index - 1));
+
+    // More accurate history removal
+    let textMsgsToRemove = 0;
+    for (let i = index -1; i < messages.length; i++) {
+        if (messages[i].type === 'text' || !messages[i].type) textMsgsToRemove++;
     }
-
-    setChatHistory((prevHist) => [...prevHist.slice(0, prevHist.length - historyPairsToRemove )]);
-    sendMessage(messageToRewrite.content);
+    setChatHistory((prevHist) => prevHist.slice(0, prevHist.length - textMsgsToRemove * 2)); // Each text interaction is 2 entries (human, assistant)
+    sendMessage(prevUserMessage.content);
   };
 
   useEffect(() => {
@@ -553,37 +360,21 @@ const ChatWindow = ({ id }: { id?: string }) => {
   }, [isReady, initialMessage]);
 
   const editMessage = (messageId: string, newContent: string) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((msg) =>
-        msg.messageId === messageId ? { ...msg, content: newContent } : msg,
-      ),
-    );
+    setMessages((prev) => prev.map((msg) => msg.messageId === messageId ? { ...msg, content: newContent } : msg));
   };
 
-  if (hasError) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <p className="text-black/70 text-sm">
-          Failed to connect to the server. Please try again later.
-        </p>
-      </div>
-    );
-  }
+  if (hasError) { return <div className="flex flex-col items-center justify-center min-h-screen"><p className="text-black/70 text-sm">Connection error. Try again.</p></div>; }
 
   return isReady ? (
     notFound ? ( <Error statusCode={404} /> ) : (
       <div className="">
         <div className="absolute top-3 right-2 z-[999]">
           <div className="flex space-x-4 mt-3">
-            <button onClick={(e) => { setMessages([]); setChatId(crypto.randomBytes(20).toString('hex')); setNewChatCreated(true); setChatHistory([]); }}>
-              <div className="flex flex-col items-center">
-                <div className="w-6 h-6 mb-1"> <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} /> </div>
-              </div>
+            <button onClick={() => { setMessages([]); setChatId(crypto.randomBytes(20).toString('hex')); setNewChatCreated(true); setChatHistory([]); }}>
+              <div className="flex flex-col items-center"><div className="w-6 h-6 mb-1"> <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} /> </div></div>
             </button>
             <Link href="/library/">
-              <div className="flex flex-col items-center">
-                <div className="w-8 sm:w-6 h-6 mb-1"> <HistoryIcon w={24} h={24} fill={'#8E8E93'} /> </div>
-              </div>
+              <div className="flex flex-col items-center"><div className="w-8 sm:w-6 h-6 mb-1"> <HistoryIcon w={24} h={24} fill={'#8E8E93'} /> </div></div>
             </Link>
           </div>
         </div>
@@ -591,25 +382,19 @@ const ChatWindow = ({ id }: { id?: string }) => {
           <>
             <Navbar messages={messages} />
             <Chat
-              loading={loading}
-              messages={messages}
-              sendMessage={sendMessage}
+              loading={loading} messages={messages} sendMessage={sendMessage}
               onImagePromptSubmit={handleImageGenerationRequest}
-              messageAppeared={messageAppeared}
-              rewrite={rewrite}
-              editMessage={editMessage}
-              setMessages={setMessages}
+              onAudioPromptSubmit={handleAudioGenerationRequest} // New
+              messageAppeared={messageAppeared} rewrite={rewrite} editMessage={editMessage} setMessages={setMessages}
             />
           </>
         ) : (
-          <>
-            <EmptyChat
-              sendMessage={sendMessage}
-              onImagePromptSubmit={handleImageGenerationRequest}
-              focusMode={focusMode}
-              setFocusMode={setFocusMode}
-            />
-          </>
+          <EmptyChat
+            sendMessage={sendMessage}
+            onImagePromptSubmit={handleImageGenerationRequest}
+            onAudioPromptSubmit={handleAudioGenerationRequest} // New
+            focusMode={focusMode} setFocusMode={setFocusMode}
+          />
         )}
       </div>
     )

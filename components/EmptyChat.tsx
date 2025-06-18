@@ -11,14 +11,25 @@ interface ImageGenParams {
   guidance_scale?: number;
 }
 
+// Define AudioGenParams if not globally available or imported
+interface AudioGenParams {
+  prompt: string;
+  negative_prompt?: string;
+  duration_seconds?: number;
+  seed?: number;
+  model?: string;
+}
+
 const EmptyChat = ({
   sendMessage,
-  onImagePromptSubmit, // Add this
+  onImagePromptSubmit,
+  onAudioPromptSubmit, // Add this
   focusMode,
   setFocusMode,
 }: {
-  sendMessage: (message: string, file: File | null) => void; // sendMessage in ChatWindow now takes file
-  onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void; // Add this
+  sendMessage: (message: string, file: File | null) => void;
+  onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
+  onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void; // Add this
   focusMode: string;
   setFocusMode: (mode: string) => void;
 }) => {
@@ -33,7 +44,8 @@ const EmptyChat = ({
               sendMessage={sendMessage}
               focusMode={focusMode}
               setFocusMode={setFocusMode}
-              onImagePromptSubmit={onImagePromptSubmit} // Pass it down
+              onImagePromptSubmit={onImagePromptSubmit}
+              onAudioPromptSubmit={onAudioPromptSubmit} // Pass it down
             />
           </div>
         </div>

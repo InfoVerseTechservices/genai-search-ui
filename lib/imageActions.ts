@@ -1,4 +1,6 @@
-import toml from 'toml';
+// lib/imageActions.ts
+
+// Remove: import toml from 'toml';
 
 interface ImageGenerationParams {
   prompt: string;
@@ -12,18 +14,15 @@ interface ImageGenerationParams {
   height?: number;
   width?: number;
   seed?: number;
-  model?: string;
+  model?: string; // This model is the user's choice, overriding default if provided
   show_thinking?: boolean;
 }
 
-interface ApiConfig {
-  MODELS: {
-    CUSTOM_OPENAI: {
-      API_KEY: string;
-      API_URL: string;
-      MODEL_NAME: string;
-    };
-  };
+// Interface for the API configuration passed to generateImage
+export interface ApiConfigParams {
+  apiKey: string;
+  apiUrl: string;
+  defaultModel: string;
 }
 
 interface ImageResponseData {
@@ -37,61 +36,44 @@ interface ImageGenerationResponse {
   data: ImageResponseData[];
   id: string;
   object: string;
-  model: string;
+  model: string; // This model is the one returned by the API
+  error?: string; // Added for structured error responses
 }
 
-// Function to read and parse config.toml
-async function loadConfig(): Promise<ApiConfig> {
-  try {
-    const response = await fetch('/config.toml'); // Fetch from public folder
-    if (!response.ok) {
-      throw new Error(`Failed to fetch config.toml: ${response.statusText}`);
-    }
-    const text = await response.text();
-    return toml.parse(text) as ApiConfig;
-  } catch (error) {
-    console.error('Error loading config.toml:', error);
-    // Fallback or default config if loading fails, though API key would be missing
-    // For now, rethrow the error as API key is crucial
-    throw new Error('Could not load API configuration. Please ensure config.toml exists and is correctly formatted.');
+// Remove the ApiConfig interface (related to toml parsing)
+// Remove the loadConfig function
+
+export async function generateImage(
+  params: ImageGenerationParams,
+  apiConfig: ApiConfigParams
+): Promise<ImageGenerationResponse> {
+  const { apiKey, apiUrl: baseUrl, defaultModel } = apiConfig;
+
+  if (!apiKey) {
+    console.error('API_KEY is missing.');
+    return Promise.reject({
+      created: Date.now(),
+      data: [],
+      id: '',
+      object: 'error',
+      model: params.model || defaultModel,
+      error: 'API Key is missing. Please configure it in environment variables.',
+    });
   }
-}
 
-export async function generateImage(params: ImageGenerationParams): Promise<ImageGenerationResponse> {
-  let apiConfig;
-  try {
-    apiConfig = await loadConfig();
-  } catch (error) {
-    // If config loading fails, we cannot proceed.
-    // Return a promise that rejects with an error or an error structure.
-    // This ensures the calling code can handle this failure.
-    console.error("Configuration loading failed:", error);
+  if (!baseUrl) {
+    console.error('API_URL is missing.');
     return Promise.reject({
         created: Date.now(),
         data: [],
         id: '',
         object: 'error',
-        model: '',
-        error: 'Failed to load API configuration.',
+        model: params.model || defaultModel,
+        error: 'API URL is missing. Please configure it in environment variables.',
     });
   }
 
-
-  const { API_KEY, API_URL, MODEL_NAME } = apiConfig.MODELS.CUSTOM_OPENAI;
-
-  if (!API_KEY) {
-    console.error('API_KEY is missing from config.toml');
-    return Promise.reject({
-        created: Date.now(),
-        data: [],
-        id: '',
-        object: 'error',
-        model: '',
-        error: 'API Key is missing. Please configure it in config.toml.',
-    });
-  }
-
-  const apiUrl = `${API_URL}images/generations`;
+  const apiUrl = `${baseUrl.replace(/\/$/, '')}/images/generations`; // Ensure no double slashes
 
   const requestBody = {
     prompt: params.prompt,
@@ -105,7 +87,7 @@ export async function generateImage(params: ImageGenerationParams): Promise<Imag
     height: params.height,
     width: params.width,
     seed: params.seed,
-    model: params.model || MODEL_NAME, // Use provided model or default from config
+    model: params.model || defaultModel, // Use user-provided model or the default from env
     show_thinking: params.show_thinking,
   };
 
@@ -115,40 +97,30 @@ export async function generateImage(params: ImageGenerationParams): Promise<Imag
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
-      const errorBody = await response.json(); // Or response.text() if not always JSON
+      const errorBody = await response.json();
       console.error('API Error Response:', errorBody);
-      throw new Error(`API request failed with status ${response.status}: ${errorBody.detail || response.statusText}`);
+      throw new Error(
+        `API request failed with status ${response.status}: ${errorBody.detail || response.statusText}`
+      );
     }
 
-    return await response.json() as ImageGenerationResponse;
+    return (await response.json()) as ImageGenerationResponse;
   } catch (error) {
     console.error('Error generating image:', error);
-    // Ensure the function returns a Promise that rejects or a structured error response
-    // to be handled by the caller.
-    // For instance, re-throwing the error or returning a specific error object.
-    if (error instanceof Error) {
-        return Promise.reject({
-            created: Date.now(),
-            data: [],
-            id: '',
-            object: 'error',
-            model: params.model || MODEL_NAME,
-            error: error.message,
-        });
-    }
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred during image generation.';
     return Promise.reject({
-        created: Date.now(),
-        data: [],
-        id: '',
-        object: 'error',
-        model: params.model || MODEL_NAME,
-        error: 'An unknown error occurred during image generation.',
+      created: Date.now(),
+      data: [],
+      id: '',
+      object: 'error',
+      model: params.model || defaultModel,
+      error: errorMessage,
     });
   }
 }

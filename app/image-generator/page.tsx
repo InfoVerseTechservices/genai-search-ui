@@ -1,11 +1,12 @@
+// app/image-generator/page.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react'; // Added useEffect
+import React, { useState, useEffect } from 'react';
 import InputPanel from '@/components/ImageGenerator/InputPanel';
 import ResultDisplay from '@/components/ImageGenerator/ResultDisplay';
-import { toast } from 'sonner'; // Using sonner as it's already in app/layout.tsx
+import { toast } from 'sonner';
+import { ApiConfigParams } from '@/lib/imageActions'; // Import the interface
 
-// Define the structure of the image data expected by ResultDisplay based on API response
 interface ImageResponseData {
   b64_json?: string;
   url?: string;
@@ -20,27 +21,37 @@ interface ImageGenerationSuccessResponse {
   model: string;
 }
 
-// Interface for error response from generateImage
-interface ImageGenerationErrorResponse {
-    created: number;
-    data: any[];
-    id: string;
-    object: string;
-    model: string;
-    error?: string;
-}
-
 const ImageGeneratorPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [imageData, setImageData] = useState<ImageGenerationSuccessResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [currentPrompt, setCurrentPrompt] = useState<string>('');
 
+  // State for API configuration
+  const [apiConfig, setApiConfig] = useState<ApiConfigParams | null>(null);
+
+  useEffect(() => {
+    // This is where environment variables will be read in the next step.
+    // For now, we simulate it being loaded.
+    // In a real scenario, this would involve checking process.env
+    const loadedConfig: ApiConfigParams = {
+      apiKey: process.env.NEXT_PUBLIC_COLOMBO_API_KEY || '',
+      apiUrl: process.env.NEXT_PUBLIC_COLOMBO_API_URL || '',
+      defaultModel: process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || 'flux',
+    };
+
+    if (!loadedConfig.apiKey || !loadedConfig.apiUrl) {
+        toast.error("API Key or URL is not configured. Please set NEXT_PUBLIC_COLOMBO_API_KEY and NEXT_PUBLIC_COLOMBO_API_URL in your .env.local file.");
+        setError("API Key or URL is not configured in environment variables.");
+    }
+    setApiConfig(loadedConfig);
+  }, []);
+
   const handleGenerationStart = (promptValue: string) => {
     setIsLoading(true);
     setError(null);
-    setImageData(null); // Clear previous image
-    setCurrentPrompt(promptValue); // Capture the prompt
+    setImageData(null);
+    setCurrentPrompt(promptValue);
   };
 
   const handleGenerationSuccess = (data: ImageGenerationSuccessResponse) => {
@@ -56,22 +67,22 @@ const ImageGeneratorPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl"> {/* Added max-w-4xl for better layout */}
-      {/* ToastContainer is likely globally available via app/layout.tsx's Toaster from sonner */}
+    <div className="container mx-auto p-4 max-w-4xl">
       <h1 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">AI Image Generator</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-8 items-start"> {/* Changed to lg:grid-cols-2 */}
-        <div className="md:sticky md:top-8"> {/* Sticky input panel on larger screens */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <div className="md:sticky md:top-8">
           <InputPanel
-            onGenerationStart={handleGenerationStart} // Modified to pass prompt directly
+            onGenerationStart={handleGenerationStart}
             onGenerationSuccess={handleGenerationSuccess}
             onGenerationFailure={handleGenerationFailure}
             isLoading={isLoading}
-            // Removed setCurrentPromptForDisplay as onGenerationStart now handles prompt capture
+            apiConfig={apiConfig} // Pass the config
           />
         </div>
-        <div className="mt-6 md:mt-0"> {/* Ensure spacing on mobile, remove on larger */}
-          {error && !isLoading && ( // Show error only if not loading
+        <div className="mt-6 md:mt-0">
+          {/* ... (Error, Loading, ResultDisplay, Placeholder JSX - same as before) ... */}
+          {error && !isLoading && (
             <div className="p-4 mb-4 text-sm text-red-800 bg-red-100 rounded-lg dark:bg-red-900 dark:text-red-200" role="alert">
               <span className="font-medium">Error:</span> {error}
             </div>
@@ -98,6 +109,7 @@ const ImageGeneratorPage: React.FC = () => {
                 </svg>
               <p className="text-lg text-gray-500 dark:text-gray-400">Your generated image will appear here.</p>
               <p className="text-sm text-gray-400 dark:text-gray-500">Enter a prompt and click "Generate Image" to start.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Ensure API settings are configured in your .env.local file.</p>
             </div>
           )}
         </div>

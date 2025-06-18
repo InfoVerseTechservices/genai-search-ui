@@ -14,6 +14,7 @@ import {
   NewGenSearchIcon,
   HistoryIcon,
 } from './Icons';
+import { Image as ImageIconLucide } from 'lucide-react'; // Import Lucide icon
 
 // USER PROFILE Context
 import { useUserProfile } from '@/app/context/user';
@@ -26,6 +27,11 @@ interface IconProps {
 }
 
 type IconComponent = FC<IconProps>;
+
+// Wrapper for Lucide icon to fit the existing IconComponent type
+const ImageGeneratorIcon: IconComponent = ({ w, h, fill }) => {
+  return <ImageIconLucide width={w} height={h} color={fill} strokeWidth={1.5} />; // Adjusted strokeWidth
+};
 
 interface IconLinkProps {
   href: string;
@@ -155,6 +161,13 @@ const LeftSidebar: FC = () => {
             href="https://colomboai.com/genai-search/"
             Icon={NewGenSearchIcon as IconComponent}
             label="New Chat"
+          />
+        </div>
+        <div className="flex flex-col items-center space-y-6 flex-grow">
+          <IconLink
+            href="/image-generator"
+            Icon={ImageGeneratorIcon}
+            label="Image Gen"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">

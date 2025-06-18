@@ -128,8 +128,7 @@ const MessageBox = ({
     return !inline && match ? (
       <div className="relative group my-2">
         <SyntaxHighlighter language={language} style={base16AteliersulphurpoolLight} customStyle={{ margin: 0, padding: '1rem', borderRadius: '0.5rem' }}>
-          {String(children).replace(/
-$/, '')}
+          {String(children).replace(/\n$/, '')}
         </SyntaxHighlighter>
         <button
           onClick={() => { navigator.clipboard.writeText(String(children)); setCopied(true); setTimeout(() => setCopied(false), 1000); }}
@@ -266,8 +265,7 @@ $/, '')}
         </div>
       )}
     </div>
-    </>
-  );
-};
-
-export default MessageBox;
+    );
+  };
+  
+  export default MessageBox;

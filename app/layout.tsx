@@ -78,7 +78,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'ColomboAI',
+  title: 'ColomboAI: GenAI Powerd by MC-1',
   description: 'ColomboAI',
 };
 

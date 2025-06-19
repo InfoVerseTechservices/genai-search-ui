@@ -176,14 +176,18 @@ const MessageBox = ({
       {/* User Image Prompt Message */}
       {message.role === 'user' && message.type === 'image_prompt' && (
         <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
+
+              <div className="flex flex-row items-center space-x-2">
            <ImageIconLucide size={24} className="mr-2 mt-1 text-blue-500 flex-shrink-0" />
-          <div className="flex flex-col">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Image prompt:</span>
-            <h2 className="text-[#000080] dark:text-blue-300 bg-[#D2E3FD] dark:bg-slate-700 self-start font-medium text-lg sm:text-xl max-w-max inline rounded-md whitespace-normal p-2">
+          <div className="flex flex-col space-y-2">
+            <span className="text-black dark:text-white font-medium text-xl">Answer: Image prompt</span>
+            {/* {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.imagePromptText}"</p>}  */}
+            {/* <h2 className="text-[#000080] dark:text-blue-300 bg-[#D2E3FD] dark:bg-slate-700 self-start font-medium text-lg sm:text-xl max-w-max inline rounded-md whitespace-normal p-2">
               {message.imagePromptText || message.content}
-            </h2>
+            </h2> */}
             {message.status === 'loading' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Generating image...</p>}
             {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Image generation failed. {message.content && message.content.includes("Error: ") ? message.content.split("Error: ")[1] : message.content}</p>}
+          </div>
           </div>
         </div>
       )}
@@ -207,16 +211,17 @@ const MessageBox = ({
       {message.role === 'assistant' && message.type === 'generated_image' && message.b64Json && (
         <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
           <div className="flex flex-col space-y-2">
-             <div className="flex flex-row items-center space-x-2">
+             {/* <div className="flex flex-row items-center space-x-2">
                 <ImageIconLucide className="text-black dark:text-white" size={20} />
                 <h3 className="text-black dark:text-white font-medium text-xl">Generated Image</h3>
-              </div>
-            {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.imagePromptText}"</p>}
+              </div> */}
+            {/* {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.imagePromptText}"</p>} */}
             <img
               src={`data:image/png;base64,${message.b64Json}`}
               alt={message.imagePromptText || "Generated image"}
               className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto"
             />
+             {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.imagePromptText}"</p>} 
           </div>
         </div>
       )}

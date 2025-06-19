@@ -17,6 +17,31 @@ export const SearchIcon:React.FC<IconProps> = ({w,h,fill}) =>{
   </svg>
   )
 }
+
+
+export const ArrowLeft = ({ size = 24, color = "currentColor" }: { size?: number; color?: string }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+  );
+};
+
+
+
+
+
 export const ChatBubbleIcon: React.FC<IconProps> = ({w,h,fill}) =>{
 return (
   <svg width={w} height={h} viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">

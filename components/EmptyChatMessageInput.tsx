@@ -200,7 +200,7 @@ const EmptyChatMessageInput = ({
   return (
     <>
       <h2 className="text-[#000080] dark:text-blue-300 text-md sm:text-xl md:text-xl lg:text-2xl xl:text-3xl font-medium -mt-8 text-center md:text-left">
-        {isImageModeActive ? "Describe an Image" : isAudioModeActive ? "Describe Audio" : "Discover and Do More with AI"}
+        {isImageModeActive ? "Describe an Image" : isAudioModeActive ? "Describe Audio" : "Discover and Do More with ColomboAI MC1"}
       </h2>
       <form onSubmit={handleSubmit} className="w-full flex flex-col items-center"> {/* Centering form content */}
         <div

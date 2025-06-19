@@ -24,6 +24,30 @@ import SideBottomAdComponent from './Ads/SideAdBottom';
 import Share from './MessageActions/Share';
 import RelatedImages from './GetOneImage';
 
+// Define ContextualActionsPlaceholder component
+const ContextualActionsPlaceholder: React.FC<{ messageId: string }> = ({ messageId }) => {
+  const handleRegenerate = () => console.log("Regenerate clicked for:", messageId);
+  const handleFollowUp = () => console.log("More like this clicked for:", messageId); // Changed log message for clarity
+
+  return (
+    <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center space-x-2">
+      <button
+        onClick={handleRegenerate}
+        className="px-2 py-1 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 rounded"
+      >
+        Regenerate
+      </button>
+      <button
+        onClick={handleFollowUp}
+        className="px-2 py-1 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+      >
+        More like this
+      </button>
+    </div>
+  );
+};
+
+
 const MessageBox = ({
   message,
   messageIndex,
@@ -71,7 +95,7 @@ const MessageBox = ({
             if (message.sources && sourceIndex >= 0 && sourceIndex < message.sources.length) {
               return `<a href="${message.sources[sourceIndex]?.metadata?.url}" target="_blank" className="bg-light-secondary dark:bg-dark-secondary px-1 rounded ml-1 no-underline text-xs text-black dark:text-gray-300 relative">${number}</a>`;
             }
-            return `[${number}]`; // Fallback if source not found
+            return `[${number}]`;
           }
         ),
       );
@@ -96,11 +120,8 @@ const MessageBox = ({
           !(index === messageIndex + 1 && msg.role === 'assistant')
         );
       });
-      // It seems `setMessages` was intended to update the history for the parent `ChatWindow`
-      // And `sendMessage` would then send the new query.
-      // This logic might need review in ChatWindow.tsx if it's not working as expected.
       setMessages(updatedHistory);
-      sendMessage(editedContent, null); // Pass null for file explicitly
+      sendMessage(editedContent, null);
     }
     setIsEditing(false);
   };
@@ -121,7 +142,7 @@ const MessageBox = ({
     inline?: boolean;
     className?: string;
     children?: React.ReactNode;
-    node?: any; // This 'node' prop comes from ReactMarkdown
+    node?: any;
    }
 
   const CodeBlock: React.FC<MarkdownCodeProps> = ({ node, inline = false, className, children }) => {
@@ -217,6 +238,7 @@ const MessageBox = ({
               alt={message.imagePromptText || "Generated image"}
               className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto"
             />
+            <ContextualActionsPlaceholder messageId={message.messageId} />
           </div>
         </div>
       )}
@@ -237,6 +259,7 @@ const MessageBox = ({
             >
               Your browser does not support the audio element.
             </audio>
+            <ContextualActionsPlaceholder messageId={message.messageId} />
           </div>
         </div>
       )}
@@ -268,21 +291,24 @@ const MessageBox = ({
                 {parsedMessage}
               </ReactMarkdown>
               {loading && isLast ? null : (
-                <div className="flex flex-row items-center justify-between w-full text-black dark:text-white py-4 -mx-2">
-                  <div className="flex flex-row items-center space-x-1">
-                    <Share message={message.content} chatId={message.chatId} messageId={message.messageId}/>
-                    <Rewrite rewrite={rewrite} messageId={message.messageId} />
+                <>
+                  <div className="flex flex-row items-center justify-between w-full text-black dark:text-white py-4 -mx-2">
+                    <div className="flex flex-row items-center space-x-1">
+                      <Share message={message.content} chatId={message.chatId} messageId={message.messageId}/>
+                      <Rewrite rewrite={rewrite} messageId={message.messageId} />
+                    </div>
+                    <div className="flex flex-row items-center space-x-1">
+                      <Copy initialMessage={message.content} message={message} />
+                      <button
+                        onClick={() => { if (speechStatus === 'started') stop(); else start(); }}
+                        className="p-2 text-black dark:text-white rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200"
+                      >
+                        {speechStatus === 'started' ? <StopCircle size={18} /> : <Volume2 size={18} />}
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex flex-row items-center space-x-1">
-                    <Copy initialMessage={message.content} message={message} />
-                    <button
-                      onClick={() => { if (speechStatus === 'started') stop(); else start(); }}
-                      className="p-2 text-black dark:text-white rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200"
-                    >
-                      {speechStatus === 'started' ? <StopCircle size={18} /> : <Volume2 size={18} />}
-                    </button>
-                  </div>
-                </div>
+                  <ContextualActionsPlaceholder messageId={message.messageId} />
+                </>
               )}
             </div>
           </div>

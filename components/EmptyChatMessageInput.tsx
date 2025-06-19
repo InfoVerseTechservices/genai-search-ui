@@ -1,35 +1,20 @@
 // components/EmptyChatMessageInput.tsx
-// ... other imports ...
-import { ArrowRight, Image as ImageIconLucide, UploadCloud, Waves } from 'lucide-react'; // Added Waves
+import { ArrowRight, Image as ImageIconLucide, Paperclip } from 'lucide-react';
+import CustomAudioWaveformIcon from './Icons/CustomAudioWaveformIcon';
 import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { UploadIcon as CustomUploadIcon } from './Icons';
 import ImageGenerationPanel from './ImageGenerationPanel';
-import AudioGenerationPanel from './AudioGenerationPanel'; // Import new panel
+import AudioGenerationPanel from './AudioGenerationPanel';
 
-// Copied from ChatWindow.tsx or shared types file
-interface ImageGenParams {
-  prompt: string;
-  negative_prompt?: string;
-  model?: string;
-  size?: string;
-  guidance_scale?: number;
-}
-
-export interface AudioGenParams { // Export if it's to be shared, or define locally
-    prompt: string;
-    negative_prompt?: string;
-    duration_seconds?: number;
-    seed?: number;
-    model?: string;
-}
-
+interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
+export interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
 interface EmptyChatMessageInputProps {
   sendMessage: (message: string, file: File | null) => void;
   focusMode: string;
   setFocusMode: (mode: string) => void;
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
-  onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void; // New prop
+  onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
 }
 
 const EmptyChatMessageInput = ({
@@ -37,7 +22,7 @@ const EmptyChatMessageInput = ({
   focusMode,
   setFocusMode,
   onImagePromptSubmit,
-  onAudioPromptSubmit, // New prop
+  onAudioPromptSubmit,
 }: EmptyChatMessageInputProps) => {
   const [message, setMessage] = useState('');
   const [uploadFile, setUploadFile] = useState(false);
@@ -48,12 +33,11 @@ const EmptyChatMessageInput = ({
   const [isImageModeActive, setIsImageModeActive] = useState(false);
   const [showImageParamsPanel, setShowImageParamsPanel] = useState(false);
   const [imageNegativePrompt, setImageNegativePrompt] = useState('');
-  const [imageModel, setImageModel] = useState(process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || ''); // For images
+  const [imageModel, setImageModel] = useState(process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || '');
   const [imageSize, setImageSize] = useState('512x512');
   const [imageGuidanceScale, setImageGuidanceScale] = useState(7.5);
   const [isSubmittingImage, setIsSubmittingImage] = useState(false);
 
-  // New states for Audio Mode
   const [isAudioModeActive, setIsAudioModeActive] = useState(false);
   const [showAudioParamsPanel, setShowAudioParamsPanel] = useState(false);
   const [audioNegativePrompt, setAudioNegativePrompt] = useState('Low quality.');
@@ -62,7 +46,7 @@ const EmptyChatMessageInput = ({
   const [audioSeed, setAudioSeed] = useState(0);
   const [isSubmittingAudio, setIsSubmittingAudio] = useState(false);
 
-  const loading = false; // Parent loading not passed to EmptyChatMessageInput, assume false for its own submit button logic
+  const loading = false;
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -77,9 +61,7 @@ const EmptyChatMessageInput = ({
       }
     };
     document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const borderStyle = {
@@ -132,6 +114,10 @@ const EmptyChatMessageInput = ({
     const selectedFile = e.target.files?.[0] || null;
     setFile(selectedFile);
     setUploadFile(false);
+    if (selectedFile) { // If a file is selected, ensure other modes are off
+        setIsImageModeActive(false); setShowImageParamsPanel(false);
+        setIsAudioModeActive(false); setShowAudioParamsPanel(false);
+    }
   };
 
   const handleUploadFileToggle = () => {
@@ -140,6 +126,9 @@ const EmptyChatMessageInput = ({
     if (newUploadFileState) {
       setIsImageModeActive(false); setShowImageParamsPanel(false);
       setIsAudioModeActive(false); setShowAudioParamsPanel(false);
+    } else { // If toggling off, and a file was selected, clear it
+        if(fileInputRef.current) fileInputRef.current.value = ""; // Clear file input
+        setFile(null);
     }
   };
 
@@ -148,7 +137,7 @@ const EmptyChatMessageInput = ({
     setIsImageModeActive(newImageModeState);
     setShowImageParamsPanel(newImageModeState);
     if (newImageModeState) {
-      setUploadFile(false);
+      setUploadFile(false); setFile(null); if(fileInputRef.current) fileInputRef.current.value = "";
       setIsAudioModeActive(false); setShowAudioParamsPanel(false);
       inputRef.current?.focus();
     }
@@ -159,7 +148,7 @@ const EmptyChatMessageInput = ({
     setIsAudioModeActive(newAudioModeState);
     setShowAudioParamsPanel(newAudioModeState);
     if (newAudioModeState) {
-      setUploadFile(false);
+      setUploadFile(false); setFile(null); if(fileInputRef.current) fileInputRef.current.value = "";
       setIsImageModeActive(false); setShowImageParamsPanel(false);
       inputRef.current?.focus();
     }
@@ -187,14 +176,14 @@ const EmptyChatMessageInput = ({
 
   if (uploadFile) {
     return (
-      <div className='relative'>
-        <div className='flex flex-col items-center md:w-[28rem] md:h-[10.52rem] lg:w-[30rem] lg:h-[11.32rem] xl:w-[45rem] xl:h-[17rem] mt-[1.2rem] ml-[0] sm:ml-[6rem] rounded-[1.5rem]' style={borderStyle}>
-          <p className='lg:p-1 xl:p-5 font-[700] md:text-base lg:text-lg xl:text-xl'>Drag and Drop or upload your file here
-            <button type='button' onClick={handleUploadFileToggle} className='absolute right-4 font-normal text-[#E3E3E3] cursor-pointer'>
+      <div className='relative w-full flex justify-center'> {/* Ensure this panel is also centered and respects width constraints */}
+        <div className='flex flex-col items-center w-[calc(100%-10px)] md:w-[28rem] lg:w-[30rem] xl:w-[45rem] mt-[1.2rem] rounded-[1.5rem]' style={borderStyle}>
+          <p className='w-full text-center lg:p-1 xl:p-5 font-[700] md:text-base lg:text-lg xl:text-xl relative'>Drag and Drop or upload your file here
+            <button type='button' onClick={handleUploadFileToggle} className='absolute top-1/2 right-4 -translate-y-1/2 font-normal text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 cursor-pointer'>
               <span>x</span>
             </button>
           </p>
-          <hr className='border-[0.1px] md:w-[28rem] lg:w-[30rem] xl:w-[45rem] border-[#FF0049]' />
+          <hr className='border-[0.1px] w-full border-[#FF0049]' />
           <button type="button" onClick={() => fileInputRef.current?.click()} className='lg:mt-[0.3rem] xl:mt-[1rem]'>
             <CustomUploadIcon w={80} h={80} />
           </button>
@@ -210,97 +199,63 @@ const EmptyChatMessageInput = ({
 
   return (
     <>
-      <h2 className="text-[#000080] dark:text-blue-300 text-md sm:text-xl md:text-xl lg:text-2xl xl:text-3xl font-medium -mt-8">
-        {isImageModeActive ? "Describe an Image" : isAudioModeActive ? "Describe Audio" : "Discover and Do More with AI"}
+      <h2 className="text-[#000080] dark:text-blue-300 text-md sm:text-xl md:text-xl lg:text-2xl xl:text-3xl font-medium -mt-8 text-center md:text-left">
+        {isImageModeActive ? "Describe an Image" : isAudioModeActive ? "Describe Audio" : "Discover and Do More with ColomboAI MC1"}
       </h2>
-      <form onSubmit={handleSubmit} className="w-full">
-        <div className="flex flex-col gap-[1rem] sm:gap-[2rem] items-center w-full text-center">
-          <div style={borderStyle} className="relative flex flex-col bg-white dark:bg-slate-900 px-2 sm:px-5 pt-2 sm:pt-5 pb-2 rounded-lg items-center w-[19rem] sm:w-[30rem] md:w-[35rem] lg:w-[38rem]  xl:w-[48rem] border">
-            <TextareaAutosize
-              ref={inputRef}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              minRows={6}
-              maxRows={6}
-              className="bg-transparent p-1 placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 text-xs sm:text-sm self-start text-black dark:text-white resize-none focus:outline-none w-full max-h-24 lg:max-h-36 xl:max-h-48"
-              placeholder={placeholderText}
-            />
-            <div className="flex items-center justify-between w-full mt-1">
-              <div className="flex items-center space-x-1">
-                <button type="button" onClick={handleUploadFileToggle} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive}>
-                  <UploadCloud size={20} />
-                </button>
-                <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text Mode" : "Switch to Image Mode"} className={`p-2 rounded-md transition-colors ${isImageModeActive ? 'bg-blue-100 dark:bg-blue-700 text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400'} disabled:opacity-50`} disabled={isAudioModeActive}>
-                  <ImageIconLucide size={20} />
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAudioModeToggle}
-                  title={isAudioModeActive ? "Switch to Text/Image Mode" : "Switch to Audio Mode"}
-                  className={`p-2 rounded-full transition-colors disabled:opacity-50 ${
-                    isAudioModeActive
-                      ? 'bg-green-500 text-white' // Active: Green background, white icon
-                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' // Inactive
-                  }`}
-                  disabled={isImageModeActive} // Keep disabled if image mode is active
-                >
-                  <Waves size={20} />
-                </button>
-              </div>
-              <button
-                type="submit"
-                disabled={(isImageModeActive || isAudioModeActive ? !message.trim() : (!message.trim() && !file)) || isSubmittingImage || isSubmittingAudio || loading }
-                className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2 cursor-pointer"
-              >
-                {(isSubmittingImage && isImageModeActive) || (isSubmittingAudio && isAudioModeActive) ? (
-                  <svg className="animate-spin h-4 w-4 text-[#000080] dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  <ArrowRight className={(isImageModeActive || isAudioModeActive) ? "text-[#000080] dark:text-white" : "bg-background"} size={17} />
-                )}
+      <form onSubmit={handleSubmit} className="w-full flex flex-col items-center"> {/* Centering form content */}
+        <div
+          style={borderStyle}
+          className="relative flex flex-col bg-white dark:bg-slate-900 px-2 sm:px-4 pt-3 sm:pt-4 pb-2 rounded-lg items-center w-[calc(100%-10px)] md:w-auto md:min-w-[35rem] lg:min-w-[38rem] xl:min-w-[48rem] border"
+        >
+          <TextareaAutosize
+            ref={inputRef}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            minRows={6}
+            maxRows={8}
+            className="w-full bg-transparent p-1 placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 text-xs sm:text-sm self-start text-black dark:text-white resize-none focus:outline-none max-h-48 sm:max-h-36 md:max-h-48"
+            placeholder={placeholderText}
+          />
+          <div className="flex items-center justify-between w-full mt-2">
+            <div className="flex items-center space-x-1">
+              <button type="button" onClick={handleUploadFileToggle} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive}>
+                <Paperclip size={20} />
+              </button>
+              <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text/Audio Mode" : "Switch to Image Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isImageModeActive ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400'}`} disabled={isAudioModeActive}>
+                <ImageIconLucide size={20} />
+              </button>
+              <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive}>
+                <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : 'currentColor'} />
               </button>
             </div>
+            <button type="submit" disabled={(isImageModeActive || isAudioModeActive ? !message.trim() : (!message.trim() && !file)) || isSubmittingImage || isSubmittingAudio || loading } className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2">
+              {(isSubmittingImage && isImageModeActive) || (isSubmittingAudio && isAudioModeActive) ? (
+                <svg className="animate-spin h-4 w-4 text-[#000080] dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <ArrowRight className={(isImageModeActive || isAudioModeActive) ? "text-[#000080] dark:text-white" : "bg-background"} size={17} />
+              )}
+            </button>
           </div>
+        </div>
 
-          {isImageModeActive && showImageParamsPanel && (
-            <ImageGenerationPanel
-              imageNegativePrompt={imageNegativePrompt}
-              setImageNegativePrompt={setImageNegativePrompt}
-              imageModel={imageModel}
-              setImageModel={setImageModel}
-              imageSize={imageSize}
-              setImageSize={setImageSize}
-              imageGuidanceScale={imageGuidanceScale}
-              setImageGuidanceScale={setImageGuidanceScale}
-              defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || "flux"}
-            />
-          )}
-          {isAudioModeActive && showAudioParamsPanel && (
-            <AudioGenerationPanel
-              audioNegativePrompt={audioNegativePrompt}
-              setAudioNegativePrompt={setAudioNegativePrompt}
-              audioDuration={audioDuration}
-              setAudioDuration={setAudioDuration}
-              audioSeed={audioSeed}
-              setAudioSeed={setAudioSeed}
-              audioModel={audioModel}
-              setAudioModel={setAudioModel}
-              defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_AUDIO_DEFAULT_MODEL || "stable-audio-open-1.0"}
-            />
-          )}
-          {!(isImageModeActive || isAudioModeActive) && !uploadFile && (
-            <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] w-[19rem] sm:w-[600px] md:w-[600px] lg:w-[600px]   xl:w-[700px]">
+        <div className="w-[calc(100%-10px)] mx-auto md:w-auto md:min-w-[35rem] lg:min-w-[38rem] xl:min-w-[48rem]">
+            {(isImageModeActive && showImageParamsPanel) && ( <ImageGenerationPanel imageNegativePrompt={imageNegativePrompt} setImageNegativePrompt={setImageNegativePrompt} imageModel={imageModel} setImageModel={setImageModel} imageSize={imageSize} setImageSize={setImageSize} imageGuidanceScale={imageGuidanceScale} setImageGuidanceScale={setImageGuidanceScale} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || "flux"} /> )}
+            {(isAudioModeActive && showAudioParamsPanel) && ( <AudioGenerationPanel audioNegativePrompt={audioNegativePrompt} setAudioNegativePrompt={setAudioNegativePrompt} audioDuration={audioDuration} setAudioDuration={setAudioDuration} audioSeed={audioSeed} setAudioSeed={setAudioSeed} audioModel={audioModel} setAudioModel={setAudioModel} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_AUDIO_DEFAULT_MODEL || "stable-audio-open-1.0"}/> )}
+        </div>
+
+        {!(isImageModeActive || isAudioModeActive || uploadFile) && (
+             <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] mt-4 md:mt-2 w-[calc(100%-20px)] sm:w-auto md:max-w-xl lg:max-w-2xl text-center">
               Welcome to GenAI Search, your go-to tool for instant answers and web exploration!
               Simply type your question or topic of interest, and GenAI will provide
               you with accurate answers along with related links from the web.
               Whether you&apos;re seeking quick information or diving deeper
               into a topic, GenAI Search has you covered.
             </p>
-          )}
-        </div>
+        )}
       </form>
     </>
   );

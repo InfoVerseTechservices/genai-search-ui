@@ -78,7 +78,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'ColomboAI: GenAI Powerd by MC-1',
+  title: 'ColomboAI',
   description: 'ColomboAI',
 };
 
@@ -100,7 +100,7 @@ export default function RootLayout({
               <main className="flex-1 w-[4%] flex flex-col">
                 {/* <Sidebar>{children}</Sidebar> */}
 
-                <div className="md:hidden bg-white fixed w-full bottom-0 z-50 border-t-2 border-[#1E71F2] rounded-xl">
+                <div className="hidden bg-white fixed w-full bottom-0 z-50 border-t-2 border-[#1E71F2] rounded-xl"> {/* Changed to 'hidden' */}
                   <div className="shadow-[0px_2px_4px_0px_#0000001A]">
                     <div className="py-2 flex flex-wrap items-center justify-evenly">
                       <Link href="https://colomboai.com/genai-search">

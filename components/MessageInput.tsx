@@ -1,6 +1,6 @@
 // components/MessageInput.tsx
 import { cn } from '@/lib/utils';
-import { ArrowUp, Image as ImageIconLucide, UploadCloud, Waves } from 'lucide-react'; // Added Waves
+import { ArrowUp, Image as ImageIconLucide, Paperclip, AudioWaveform } from 'lucide-react'; // Changed UploadCloud to Paperclip
 import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import CopilotToggle from './MessageInputActions/Copilot';
@@ -212,8 +212,14 @@ const MessageInput = ({
       >
         <div className={cn("flex items-center", effectiveMode === 'multi' ? "w-full justify-between mb-2" : "mr-2")}>
           <div className="flex items-center space-x-1">
-            <button type="button" onClick={handleUploadFileClick} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive}>
-              <UploadCloud size={20} />
+            <button
+              type="button"
+              onClick={handleUploadFileClick} // This handler calls fileInputRef.current?.click()
+              title="Attach file"
+              className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50"
+              disabled={isImageModeActive || isAudioModeActive} // Existing disabled logic
+            >
+              <Paperclip size={20} />
             </button>
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
             <button
@@ -231,12 +237,12 @@ const MessageInput = ({
               title={isAudioModeActive ? "Switch to Text/Image Mode" : "Switch to Audio Mode"}
               className={`p-2 rounded-full transition-colors disabled:opacity-50 ${
                 isAudioModeActive
-                  ? 'bg-green-500 text-white' // Active: Green background, white icon
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' // Inactive
+                  ? 'bg-blue-500 text-white' // Active: Blue background, white icon
+                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400' // Inactive with blue hover
               }`}
-              disabled={isImageModeActive} // Keep disabled if image mode is active
+              disabled={isImageModeActive}
             >
-              <Waves size={20} />
+              <AudioWaveform size={20} />
             </button>
             {effectiveMode === 'single' && <CopilotToggle copilotEnabled={copilotEnabled} setCopilotEnabled={setCopilotEnabled} />}
           </div>

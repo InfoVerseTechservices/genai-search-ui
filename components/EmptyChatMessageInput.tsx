@@ -1,6 +1,6 @@
 // components/EmptyChatMessageInput.tsx
 // ... other imports ...
-import { ArrowRight, Image as ImageIconLucide, UploadCloud, Waves } from 'lucide-react'; // Added Waves
+import { ArrowRight, Image as ImageIconLucide, Paperclip, AudioWaveform } from 'lucide-react'; // Changed UploadCloud to Paperclip
 import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { UploadIcon as CustomUploadIcon } from './Icons';
@@ -228,8 +228,14 @@ const EmptyChatMessageInput = ({
             />
             <div className="flex items-center justify-between w-full mt-1">
               <div className="flex items-center space-x-1">
-                <button type="button" onClick={handleUploadFileToggle} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive}>
-                  <UploadCloud size={20} />
+                <button
+                  type="button"
+                  onClick={handleUploadFileToggle}
+                  title="Attach file"
+                  className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50"
+                  disabled={isImageModeActive || isAudioModeActive} // Existing disabled logic
+                >
+                  <Paperclip size={20} />
                 </button>
                 <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text Mode" : "Switch to Image Mode"} className={`p-2 rounded-md transition-colors ${isImageModeActive ? 'bg-blue-100 dark:bg-blue-700 text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400'} disabled:opacity-50`} disabled={isAudioModeActive}>
                   <ImageIconLucide size={20} />
@@ -240,12 +246,12 @@ const EmptyChatMessageInput = ({
                   title={isAudioModeActive ? "Switch to Text/Image Mode" : "Switch to Audio Mode"}
                   className={`p-2 rounded-full transition-colors disabled:opacity-50 ${
                     isAudioModeActive
-                      ? 'bg-green-500 text-white' // Active: Green background, white icon
-                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' // Inactive
+                      ? 'bg-blue-500 text-white' // Active: Blue background, white icon
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400' // Inactive with blue hover
                   }`}
-                  disabled={isImageModeActive} // Keep disabled if image mode is active
+                  disabled={isImageModeActive}
                 >
-                  <Waves size={20} />
+                  <AudioWaveform size={20} />
                 </button>
               </div>
               <button

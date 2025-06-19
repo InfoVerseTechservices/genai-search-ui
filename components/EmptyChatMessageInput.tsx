@@ -234,7 +234,17 @@ const EmptyChatMessageInput = ({
                 <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text Mode" : "Switch to Image Mode"} className={`p-2 rounded-md transition-colors ${isImageModeActive ? 'bg-blue-100 dark:bg-blue-700 text-blue-600 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400'} disabled:opacity-50`} disabled={isAudioModeActive}>
                   <ImageIconLucide size={20} />
                 </button>
-                <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text Mode" : "Switch to Audio Mode"} className={`p-2 rounded-md transition-colors ${isAudioModeActive ? 'bg-green-100 dark:bg-green-700 text-green-600 dark:text-green-300' : 'text-gray-500 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400'} disabled:opacity-50`} disabled={isImageModeActive}>
+                <button
+                  type="button"
+                  onClick={handleAudioModeToggle}
+                  title={isAudioModeActive ? "Switch to Text/Image Mode" : "Switch to Audio Mode"}
+                  className={`p-2 rounded-full transition-colors disabled:opacity-50 ${
+                    isAudioModeActive
+                      ? 'bg-green-500 text-white' // Active: Green background, white icon
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' // Inactive
+                  }`}
+                  disabled={isImageModeActive} // Keep disabled if image mode is active
+                >
                   <Waves size={20} />
                 </button>
               </div>

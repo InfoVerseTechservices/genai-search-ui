@@ -132,7 +132,6 @@ const MessageBox = ({
       <div className="relative group my-2">
         <SyntaxHighlighter language={language} style={base16AteliersulphurpoolLight} customStyle={{ margin: 0, padding: '1rem', borderRadius: '0.5rem' }} PreTag="div">
           {String(children).replace(/\n$/, '')}
-          {String(children).replace(/\n$/, '')}
         </SyntaxHighlighter>
         <button
           onClick={() => { navigator.clipboard.writeText(String(children)); setCopied(true); setTimeout(() => setCopied(false), 1000); }}
@@ -263,7 +262,7 @@ const MessageBox = ({
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkMath]}
                 rehypePlugins={[rehypeKatex]}
-                components={{ code: CodeBlock as React.ElementType }}
+                components={{ code: CodeBlock }}
                 className={cn('prose prose-p:leading-relaxed prose-pre:p-0', 'dark:prose-invert max-w-none break-words text-black dark:text-gray-200 text-sm md:text-base font-medium')}
               >
                 {parsedMessage}
@@ -305,7 +304,6 @@ const MessageBox = ({
         </div>
       )}
     </div>
-
   );
 };
 

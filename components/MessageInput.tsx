@@ -1,16 +1,14 @@
 // components/MessageInput.tsx
 import { cn } from '@/lib/utils';
-// Corrected import for CustomAudioWaveformIcon, Paperclip is already there
-import { ArrowUp, Image as ImageIconLucide, Paperclip, Video as VideoIconLucide } from 'lucide-react'; // Added VideoIconLucide
+import { ArrowUp, Image as ImageIconLucide, Paperclip, Video as VideoIconLucide } from 'lucide-react';
 import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import CopilotToggle from './MessageInputActions/Copilot';
 import ImageGenerationPanel from './ImageGenerationPanel';
 import AudioGenerationPanel from './AudioGenerationPanel';
-import CustomAudioWaveformIcon from './Icons/CustomAudioWaveformIcon'; // Correct import
-import VideoGenerationParametersPanel, { VideoGenParams as UIVideoGenParams } from './VideoGenerationParametersPanel'; // Added
+import CustomAudioWaveformIcon from './Icons/CustomAudioWaveformIcon';
+import VideoGenerationParametersPanel, { VideoGenParams as UIVideoGenParams } from './VideoGenerationParametersPanel';
 
-// Re-export for ChatWindow
 export type { UIVideoGenParams as VideoGenParams };
 
 interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
@@ -20,7 +18,7 @@ interface MessageInputProps {
   loading: boolean;
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
   onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
-  onVideoPromptSubmit: (params: UIVideoGenParams, videoPromptText: string) => void; // Added for video
+  onVideoPromptSubmit: (params: UIVideoGenParams, videoPromptText: string) => void;
 }
 
 const MessageInput = ({
@@ -28,7 +26,7 @@ const MessageInput = ({
   loading,
   onImagePromptSubmit,
   onAudioPromptSubmit,
-  onVideoPromptSubmit, // Added for video
+  onVideoPromptSubmit,
 }: MessageInputProps) => {
   const [copilotEnabled, setCopilotEnabled] = useState(false);
   const [message, setMessage] = useState('');
@@ -55,7 +53,6 @@ const MessageInput = ({
   const [audioSeed, setAudioSeed] = useState(0);
   const [isSubmittingAudio, setIsSubmittingAudio] = useState(false);
 
-  // Video Mode State - NEW
   const [isVideoModeActive, setIsVideoModeActive] = useState(false);
   const [showVideoParamsPanel, setShowVideoParamsPanel] = useState(false);
   const [videoNegativePrompt, setVideoNegativePrompt] = useState('');
@@ -71,17 +68,24 @@ const MessageInput = ({
   const [videoUpscaleAndRefine, setVideoUpscaleAndRefine] = useState<boolean>(false);
   const [isSubmittingVideo, setIsSubmittingVideo] = useState(false);
 
+  const [isMobileView, setIsMobileView] = useState(true); // Default to mobile for SSR
+
   useEffect(() => {
-    // Desktop: single/multi line mode based on content
-    // Mobile: will mostly be 'multi' due to new layout
-    if (typeof window !== 'undefined' && window.innerWidth >= 768) { // md breakpoint
-        if (textareaRows >= 2 && message && mode === 'single' && !isImageModeActive && !isAudioModeActive && !isVideoModeActive) { // Updated condition
+    const checkMobile = () => setIsMobileView(window.innerWidth < 768);
+    checkMobile(); // Initial check
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileView) { // Only apply desktop mode switching logic if not mobile view
+        if (textareaRows >= 2 && message && mode === 'single' && !isImageModeActive && !isAudioModeActive && !isVideoModeActive) {
             setMode('multi');
-        } else if (!message && !isImageModeActive && !isAudioModeActive && !isVideoModeActive && mode === 'multi') { // Updated condition
+        } else if (!message && !isImageModeActive && !isAudioModeActive && !isVideoModeActive && mode === 'multi') {
             setMode('single');
         }
     }
-  }, [textareaRows, mode, message, isImageModeActive, isAudioModeActive, isVideoModeActive]); // Added isVideoModeActive
+  }, [textareaRows, mode, message, isImageModeActive, isAudioModeActive, isVideoModeActive, isMobileView]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -110,16 +114,16 @@ const MessageInput = ({
    };
 
   const handleMainSendMessage = () => {
-    if (loading || isSubmittingImage || isSubmittingAudio) return;
+    if (loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo) return; // Added isSubmittingVideo
     if (message.trim().length > 0 || file) {
       sendMessage(message, file);
       setMessage('');
       setFile(null);
-      if (mode === 'multi' && !isImageModeActive && !isAudioModeActive && typeof window !== 'undefined' && window.innerWidth >= 768) setMode('single');
+      if (mode === 'multi' && !isImageModeActive && !isAudioModeActive && !isVideoModeActive && !isMobileView) setMode('single'); // Added !isVideoModeActive and !isMobileView
     }
   };
   const handleImageGenerationRequest = async () => {
-    if (loading || isSubmittingImage || isSubmittingAudio || !message.trim()) return;
+    if (loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || !message.trim()) return; // Added isSubmittingVideo
     setIsSubmittingImage(true);
     const params: ImageGenParams = {
       prompt: message,
@@ -133,7 +137,7 @@ const MessageInput = ({
     setIsSubmittingImage(false);
   };
   const handleAudioGenerationRequest = async () => {
-    if (loading || isSubmittingImage || isSubmittingAudio || !message.trim()) return;
+    if (loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || !message.trim()) return; // Added isSubmittingVideo
     setIsSubmittingAudio(true);
     const params: AudioGenParams = {
       prompt: message,
@@ -147,7 +151,7 @@ const MessageInput = ({
     setIsSubmittingAudio(false);
   };
 
-  const handleVideoGenerationRequest = async () => { // NEW
+  const handleVideoGenerationRequest = async () => {
     if (loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || !message.trim()) return;
     setIsSubmittingVideo(true);
     const params: UIVideoGenParams = {
@@ -176,7 +180,7 @@ const MessageInput = ({
     if (selectedFile) {
         setIsImageModeActive(false); setShowImageParamsPanel(false);
         setIsAudioModeActive(false); setShowAudioParamsPanel(false);
-        setIsVideoModeActive(false); setShowVideoParamsPanel(false); // NEW: Deactivate video mode
+        setIsVideoModeActive(false); setShowVideoParamsPanel(false);
     }
   };
   const handleUploadFileClick = () => { fileInputRef.current?.click(); };
@@ -188,7 +192,7 @@ const MessageInput = ({
     if (newImageModeState) {
       setFile(null);
       setIsAudioModeActive(false); setShowAudioParamsPanel(false);
-      setIsVideoModeActive(false); setShowVideoParamsPanel(false); // NEW
+      setIsVideoModeActive(false); setShowVideoParamsPanel(false);
       inputRef.current?.focus();
     }
   };
@@ -200,12 +204,12 @@ const MessageInput = ({
     if (newAudioModeState) {
       setFile(null);
       setIsImageModeActive(false); setShowImageParamsPanel(false);
-      setIsVideoModeActive(false); setShowVideoParamsPanel(false); // NEW
+      setIsVideoModeActive(false); setShowVideoParamsPanel(false);
       inputRef.current?.focus();
     }
   };
 
-  const handleVideoModeToggle = () => { // NEW
+  const handleVideoModeToggle = () => {
     const newVideoModeState = !isVideoModeActive;
     setIsVideoModeActive(newVideoModeState);
     setShowVideoParamsPanel(newVideoModeState);
@@ -217,13 +221,13 @@ const MessageInput = ({
     }
   };
 
-  const effectiveModeForDesktop = isImageModeActive || isAudioModeActive || isVideoModeActive ? 'multi' : mode; // Updated condition
+  const effectiveModeForDesktop = isImageModeActive || isAudioModeActive || isVideoModeActive ? 'multi' : mode;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isImageModeActive) handleImageGenerationRequest();
     else if (isAudioModeActive) handleAudioGenerationRequest();
-    else if (isVideoModeActive) handleVideoGenerationRequest(); // NEW
+    else if (isVideoModeActive) handleVideoGenerationRequest();
     else handleMainSendMessage();
    };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -231,7 +235,7 @@ const MessageInput = ({
       e.preventDefault();
       if (isImageModeActive) handleImageGenerationRequest();
       else if (isAudioModeActive) handleAudioGenerationRequest();
-      else if (isVideoModeActive) handleVideoGenerationRequest(); // NEW
+      else if (isVideoModeActive) handleVideoGenerationRequest();
       else handleMainSendMessage();
     }
    };
@@ -239,17 +243,18 @@ const MessageInput = ({
   let placeholderText = file ? `Attached: ${file.name}. Add a message...` : "Ask a follow-up";
   if (isImageModeActive) placeholderText = "Describe image to generate...";
   else if (isAudioModeActive) placeholderText = "Describe audio to generate...";
-  else if (isVideoModeActive) placeholderText = "Describe video to generate..."; // NEW
+  else if (isVideoModeActive) placeholderText = "Describe video to generate...";
 
   return (
     <div className="w-full px-[5px] md:px-4 pb-2 sticky bottom-0 bg-white dark:bg-slate-900">
       <form
         style={borderStyle}
         onSubmit={handleSubmit}
-        // MODIFIED className logic:
         className={cn(
-          'bg-white dark:bg-slate-800 p-2 md:p-3 flex flex-col items-center overflow-hidden border rounded-lg', // Base style: flex-col and rounded-lg for multi-line appearance
-          effectiveModeForDesktop === 'single' ? 'md:flex-row md:rounded-full' : '' // For md screens, if single mode, override to flex-row and rounded-full
+          'bg-white dark:bg-slate-800 p-2 md:p-3 flex items-center overflow-hidden border', // Common base classes
+          (effectiveModeForDesktop === 'multi' || isMobileView) ?
+            'flex-col rounded-lg' : // Multi-line desktop AND all mobile views
+            'md:flex-row md:rounded-full' // Single-line desktop
         )}
       >
         <TextareaAutosize
@@ -258,27 +263,25 @@ const MessageInput = ({
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           onHeightChange={(height, props) => {
-            if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+            if (typeof window !== 'undefined' && window.innerWidth >= 768) { // md breakpoint
                 setTextareaRows(Math.ceil(height / props.rowHeight));
             }
           }}
-          minRows={effectiveModeForDesktop === 'multi' ? 3 : 1} // Adjust minRows for multi-mode
-          className="w-full transition bg-transparent placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 placeholder:text-sm text-black dark:text-white text-sm resize-none focus:outline-none px-2 max-h-36 md:max-h-24 lg:max-h-36 xl:max-h-48 order-1" // order-1 ensures it's on top in flex-col
+          minRows={(effectiveModeForDesktop === 'multi' || isMobileView) ? 3 : 1} // Adjusted for mobile
+          className="w-full transition bg-transparent placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 placeholder:text-sm text-black dark:text-white text-sm resize-none focus:outline-none px-2 max-h-36 md:max-h-24 lg:max-h-36 xl:max-h-48 order-1"
           placeholder={placeholderText}
         />
 
-      {/* Bottom bar: icons and submit button */}
-      <div className={cn(
-        "flex items-center w-full mt-2 md:mt-0", // Common styles for the bar
-        `md:${effectiveModeForDesktop === 'multi' ? "justify-between" : "ml-2"}`, // In multi-mode, justify-between will space out left and right groups
-                                                                                // In single-mode, the whole bar gets a left margin (ml-2)
-        "order-2" // order-2 ensures it's below textarea in flex-col
-      )}>
-        {/* Left Group: Actionable Icons */}
-        <div className="flex items-center space-x-1"> {/* Removed flex-grow and md:flex-grow-0 for simplicity, parent justify-between handles spacing */}
-          <button type="button" onClick={handleUploadFileClick} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
-            <Paperclip size={20} />
-          </button>
+        <div className={cn(
+          "flex items-center w-full mt-2 md:mt-0",
+          (effectiveModeForDesktop === 'multi' || isMobileView) ? "justify-between" : "md:ml-2",
+          "order-2"
+        )}>
+          {/* Left Group: Actionable Icons */}
+          <div className="flex items-center space-x-1">
+            <button type="button" onClick={handleUploadFileClick} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
+              <Paperclip size={20} />
+            </button>
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
             <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text/Audio/Video Mode" : "Switch to Image Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isImageModeActive ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400'}`} disabled={isAudioModeActive || isVideoModeActive}>
               <ImageIconLucide size={20} />
@@ -286,43 +289,39 @@ const MessageInput = ({
             <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image/Video Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive || isVideoModeActive}>
               <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : 'currentColor'} />
             </button>
-            {/* NEW Video Mode Toggle Button */}
             <button type="button" onClick={handleVideoModeToggle} title={isVideoModeActive ? "Switch to Text/Image/Audio Mode" : "Switch to Video Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isVideoModeActive ? 'bg-red-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400'}`} disabled={isImageModeActive || isAudioModeActive}>
               <VideoIconLucide size={20} />
             </button>
-          {/* Copilot toggle: only shown in multi-line desktop mode */}
-          <div className={cn("hidden", `md:${effectiveModeForDesktop === 'multi' ? "flex items-center" : "hidden"}`)}>
-            <CopilotToggle copilotEnabled={copilotEnabled} setCopilotEnabled={setCopilotEnabled} />
+            <div className={cn("hidden", `md:${effectiveModeForDesktop === 'multi' && !isMobileView ? "flex items-center" : "hidden"}`)}>
+              <CopilotToggle copilotEnabled={copilotEnabled} setCopilotEnabled={setCopilotEnabled} />
+            </div>
+          </div>
+
+          {/* Right Group: Static Audio Icon (conditional) + Submit Button */}
+          <div className="flex items-center space-x-2">
+            <div className={cn("hidden", `md:${effectiveModeForDesktop === 'multi' && !isMobileView ? "flex items-center" : "hidden"}`)}>
+              <CustomAudioWaveformIcon size={20} color="currentColor" />
+            </div>
+            <button
+              type="submit"
+              disabled={loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || (isImageModeActive || isAudioModeActive || isVideoModeActive ? !message.trim() : (!message.trim() && !file))}
+              className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc79] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2 flex-shrink-0"
+            >
+              {(isSubmittingImage && isImageModeActive) || (isSubmittingAudio && isAudioModeActive) || (isSubmittingVideo && isVideoModeActive) ? (
+                 <svg className="animate-spin h-4 w-4 text-[#000080] dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                 </svg>
+              ) : (
+                <ArrowUp className={(isImageModeActive || isAudioModeActive || isVideoModeActive) ? "text-[#000080] dark:text-white" : "bg-background"} size={17} />
+              )}
+            </button>
           </div>
         </div>
 
-        {/* Right Group: Static Audio Icon (conditional) + Submit Button */}
-        <div className="flex items-center space-x-2"> {/* This div groups the static audio icon and submit button */}
-          {/* Static Audio Icon: only shown in multi-line desktop mode */}
-          <div className={cn("hidden", `md:${effectiveModeForDesktop === 'multi' ? "flex items-center" : "hidden"}`)}>
-            <CustomAudioWaveformIcon size={20} color="currentColor" /> {/* Static, non-functional. Relies on parent text color like other inactive icons. */}
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || (isImageModeActive || isAudioModeActive || isVideoModeActive ? !message.trim() : (!message.trim() && !file))}
-            className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc79] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2 flex-shrink-0"
-            // Removed md:ml-0 as spacing is handled by parent justify-between and space-x-2 in this new right group
-            // Removed ml-2 as that was for when it was a direct child in single-line. Now it's inside a flex group.
-          >
-            {(isSubmittingImage && isImageModeActive) || (isSubmittingAudio && isAudioModeActive) || (isSubmittingVideo && isVideoModeActive) ? (
-               <svg className="animate-spin h-4 w-4 text-[#000080] dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-               </svg>
-            ) : (
-              <ArrowUp className={(isImageModeActive || isAudioModeActive || isVideoModeActive) ? "text-[#000080] dark:text-white" : "bg-background"} size={17} />
-            )}
-          </button>
-        </div>
-
-        {/* Parameter Panels Container - Ensure this is correctly placed based on 'multi' or 'single' mode for desktop */}
-        <div className={cn("w-full pt-2 order-3", `md:${effectiveModeForDesktop === 'multi' ? 'block' : 'hidden'}`)}>
+        <div className={cn("w-full pt-2 order-3",
+            ((isImageModeActive && showImageParamsPanel) || (isAudioModeActive && showAudioParamsPanel) || (isVideoModeActive && showVideoParamsPanel)) && (effectiveModeForDesktop === 'multi' || isMobileView) ? 'block' : 'hidden'
+          )}>
             {(isImageModeActive && showImageParamsPanel) && (
                 <ImageGenerationPanel
               imageNegativePrompt={imageNegativePrompt} setImageNegativePrompt={setImageNegativePrompt}
@@ -341,7 +340,6 @@ const MessageInput = ({
                 defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_AUDIO_DEFAULT_MODEL || "stable-audio-open-1.0"}
                 />
             )}
-            {/* NEW Video Parameters Panel */}
             {(isVideoModeActive && showVideoParamsPanel) && (
                 <VideoGenerationParametersPanel
                     videoNegativePrompt={videoNegativePrompt} setVideoNegativePrompt={setVideoNegativePrompt}
@@ -359,7 +357,7 @@ const MessageInput = ({
             )}
         </div>
       </form>
-      {file && !isImageModeActive && !isAudioModeActive && !isVideoModeActive && ( // Updated condition
+      {file && !isImageModeActive && !isAudioModeActive && !isVideoModeActive && (
         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center md:text-left md:pl-10">
           Attached: {file.name} <button onClick={() => setFile(null)} className="text-red-500 ml-2">(Remove)</button>
         </div>

@@ -14,7 +14,7 @@ import {
   NewGenSearchIcon,
   HistoryIcon,
 } from './Icons';
-import { Image as ImageIconLucide } from 'lucide-react'; // Import Lucide icon
+import { Image as ImageIconLucide, Video as VideoIconLucide } from 'lucide-react'; // Import Lucide icons
 
 // USER PROFILE Context
 import { useUserProfile } from '@/app/context/user';
@@ -31,6 +31,11 @@ type IconComponent = FC<IconProps>;
 // Wrapper for Lucide icon to fit the existing IconComponent type
 const ImageGeneratorIcon: IconComponent = ({ w, h, fill }) => {
   return <ImageIconLucide width={w} height={h} color={fill} strokeWidth={1.5} />; // Adjusted strokeWidth
+};
+
+// Wrapper for Lucide video icon
+const VideoGeneratorIcon: IconComponent = ({ w, h, fill }) => {
+  return <VideoIconLucide width={w} height={h} color={fill} strokeWidth={1.5} />;
 };
 
 interface IconLinkProps {
@@ -168,6 +173,13 @@ const LeftSidebar: FC = () => {
             href="/image-generator"
             Icon={ImageGeneratorIcon}
             label="Image Gen"
+          />
+        </div>
+        <div className="flex flex-col items-center space-y-6 flex-grow">
+          <IconLink
+            href="/video-generator"
+            Icon={VideoGeneratorIcon}
+            label="Video Gen"
           />
         </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">

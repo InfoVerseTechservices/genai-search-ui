@@ -2,10 +2,11 @@
 'use client';
 
 import { Fragment, useEffect, useRef, useState } from 'react';
-import MessageInput from './MessageInput';
+import MessageInput, { VideoGenParams } from './MessageInput'; // Import VideoGenParams
 import { Message } from './ChatWindow'; // Assuming Message type is imported from ChatWindow
 import MessageBox from './MessageBox';
 import MessageBoxLoading from './MessageBoxLoading';
+
 
 // Define ImageGenParams and AudioGenParams if not globally available or imported
 interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
@@ -17,15 +18,17 @@ const Chat = ({
   sendMessage,
   onImagePromptSubmit,
   onAudioPromptSubmit,
+  onVideoPromptSubmit, // Add this prop
   messageAppeared,
   rewrite,
   editMessage,
   setMessages,
 }: {
   messages: Message[];
-  sendMessage: (message: string, file: File | null) => void;
+  sendMessage: (message: string, file?: File | null | undefined) => void;
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
   onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
+  onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void; // Add prop type
   loading: boolean;
   messageAppeared: boolean;
   rewrite: (messageId: string) => void;
@@ -100,6 +103,7 @@ const Chat = ({
             sendMessage={sendMessage}
             onImagePromptSubmit={onImagePromptSubmit}
             onAudioPromptSubmit={onAudioPromptSubmit}
+            onVideoPromptSubmit={onVideoPromptSubmit} // Pass the prop down
         />
       </div>
     </div>

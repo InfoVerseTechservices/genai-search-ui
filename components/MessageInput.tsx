@@ -254,9 +254,9 @@ const MessageInput = ({
         <TextareaAutosize
           ref={inputRef}
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          onHeightChange={(height, props) => {
+          onHeightChange={(height: number, props: { rowHeight: number }) => {
             // For desktop, update rows which might change mode
             if (typeof window !== 'undefined' && window.innerWidth >= 768) {
                 setTextareaRows(Math.ceil(height / props.rowHeight));

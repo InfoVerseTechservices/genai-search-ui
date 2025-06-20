@@ -1,13 +1,12 @@
 // components/EmptyChatMessageInput.tsx
-import { ArrowRight, Image as ImageIconLucide, Paperclip, Video as VideoIconLucide } from 'lucide-react'; // Added VideoIconLucide
 import CustomAudioWaveformIcon from './Icons/CustomAudioWaveformIcon';
-import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import { UploadIcon as CustomUploadIcon } from './Icons';
-import ImageGenerationPanel from './ImageGenerationPanel';
+import { Image as ImageIconLucide, Paperclip, ArrowRight, Video as VideoIconLucide } from 'lucide-react'; // Added VideoIconLucide from lucide-react
 import AudioGenerationPanel from './AudioGenerationPanel';
 import VideoGenerationParametersPanel, { VideoGenParams as UIVideoGenParams } from './VideoGenerationParametersPanel'; // Added VideoGenerationParametersPanel
-
+import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
+import ImageGenerationPanel from './ImageGenerationPanel';
+import { UploadIcon as CustomUploadIcon } from './Icons'; // Removed VideoIcon from here
 // Re-export or define VideoGenParams for the parent (ChatWindow) to use
 export type { UIVideoGenParams as VideoGenParams };
 
@@ -271,10 +270,11 @@ const EmptyChatMessageInput = ({
           style={borderStyle}
           className="relative flex flex-col bg-white dark:bg-slate-900 px-2 sm:px-4 pt-3 sm:pt-4 pb-2 rounded-lg items-center w-[calc(100%-10px)] md:w-auto md:min-w-[35rem] lg:min-w-[38rem] xl:min-w-[48rem] border"
         >
+
           <TextareaAutosize
             ref={inputRef}
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             minRows={6}
             maxRows={8}

@@ -1,5 +1,3 @@
-'use client'
-
 import type { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
 import { FunctionComponent as FC, useState } from 'react';
@@ -79,10 +77,10 @@ const montserrat = Montserrat({
   fallback: ['Arial', 'sans-serif'],
 });
 
-// export const metadata: Metadata = {
-//   title: 'ColomboAI',
-//   description: 'ColomboAI',
-// };
+export const metadata: Metadata = {
+  title: 'ColomboAI',
+  description: 'ColomboAI',
+};
 
 export default function RootLayout({
   children,

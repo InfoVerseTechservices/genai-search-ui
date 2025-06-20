@@ -5,7 +5,7 @@
 import React, { MutableRefObject, useEffect, useState } from 'react';
 import { Message } from './ChatWindow';
 import { cn } from '@/lib/utils';
-import { Edit, Image as ImageIconLucide, Waves as AudioIconLucide, BookCopy, Disc3, Volume2, StopCircle, Check, ClipboardList } from 'lucide-react';
+import { Edit, Image as ImageIconLucide, Waves as AudioIconLucide, Video as VideoIconLucide, BookCopy, Disc3, Volume2, StopCircle, Check, ClipboardList } from 'lucide-react'; // Added VideoIconLucide
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -224,6 +224,21 @@ const MessageBox = ({
         </div>
       )}
 
+      {/* NEW: User Video Prompt Message */}
+      {message.role === 'user' && message.type === 'video_prompt' && (
+        <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
+           <VideoIconLucide size={24} className="mr-2 mt-1 text-red-500 flex-shrink-0" /> {/* Video icon color */}
+          <div className="flex flex-col">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Video prompt:</span>
+            <h2 className="text-[#000080] dark:text-red-300 bg-[#FDD2D2] dark:bg-slate-700 self-start font-medium text-lg sm:text-xl max-w-max inline rounded-md whitespace-normal p-2">
+              {message.videoPromptText || message.content}
+            </h2>
+            {message.status === 'loading' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Generating video... (this may take a moment)</p>}
+            {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Video generation failed. {message.content && message.content.includes("Error: ") ? message.content.split("Error: ")[1] : message.content}</p>}
+          </div>
+        </div>
+      )}
+
       {/* Assistant Generated Image Message */}
       {message.role === 'assistant' && message.type === 'generated_image' && message.b64Json && (
         <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
@@ -259,6 +274,29 @@ const MessageBox = ({
             >
               Your browser does not support the audio element.
             </audio>
+            <ContextualActionsPlaceholder messageId={message.messageId} />
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Assistant Generated Video Message */}
+      {message.role === 'assistant' && message.type === 'generated_video' && message.b64JsonVideo && (
+        <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
+          <div className="flex flex-col space-y-2">
+             <div className="flex flex-row items-center space-x-2">
+                <VideoIconLucide className="text-black dark:text-white" size={20} />
+                <h3 className="text-black dark:text-white font-medium text-xl">Generated Video</h3>
+              </div>
+            {message.videoPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.videoPromptText}"</p>}
+            <video
+              controls
+              autoPlay // Consider adding 'muted' attribute: autoPlay muted
+              loop
+              src={`data:video/mp4;base64,${message.b64JsonVideo}`} // Assuming MP4 format
+              className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto shadow-md"
+            >
+              Your browser does not support the video tag.
+            </video>
             <ContextualActionsPlaceholder messageId={message.messageId} />
           </div>
         </div>

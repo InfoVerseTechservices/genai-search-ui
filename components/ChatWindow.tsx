@@ -18,6 +18,8 @@ import { NewGenSearchIcon, HistoryIcon } from './Icons';
 
 import { generateImage } from '@/lib/imageActions';
 import { generateAudio } from '@/lib/audioActions'; // Import new audio action
+import { generateVideo } from '@/lib/videoActions'; // Import video action
+import { VideoGenParams } from './MessageInput'; // Assuming MessageInput re-exports VideoGenParams
 
 // Define ImageGenParams (from previous subtasks or shared types)
 interface ImageGenParams {
@@ -45,11 +47,13 @@ export type Message = {
   role: 'user' | 'assistant';
   suggestions?: string[];
   sources?: Document[];
-  type?: 'text' | 'image_prompt' | 'generated_image' | 'audio_prompt' | 'generated_audio'; // Added audio types
+  type?: 'text' | 'image_prompt' | 'generated_image' | 'audio_prompt' | 'generated_audio' | 'video_prompt' | 'generated_video'; // Added video types
   imagePromptText?: string;
   audioPromptText?: string; // New: For the original audio prompt
+  videoPromptText?: string; // New: For the original video prompt
   b64Json?: string; // For image b64 data
   b64JsonAudio?: string; // New: For audio b64 data
+  b64JsonVideo?: string; // New: For video b64 data
   status?: 'loading' | 'completed' | 'error';
 };
 
@@ -203,8 +207,10 @@ const loadMessages = async (
       type: msg.type || metadata?.type || 'text',
       imagePromptText: msg.imagePromptText || metadata?.imagePromptText,
       audioPromptText: msg.audioPromptText || metadata?.audioPromptText, // Added
+      videoPromptText: msg.videoPromptText || metadata?.videoPromptText, // Added videoPromptText
       b64Json: msg.b64Json || metadata?.b64Json,
       b64JsonAudio: msg.b64JsonAudio || metadata?.b64JsonAudio, // Added
+      b64JsonVideo: msg.b64JsonVideo || metadata?.b64JsonVideo, // Added b64JsonVideo
       status: msg.status || metadata?.status,
     };
   }) as Message[];
@@ -239,6 +245,9 @@ const ChatWindow = ({ id }: { id?: string }) => {
   const [focusMode, setFocusMode] = useState('webSearch');
   const [isMessagesLoaded, setIsMessagesLoaded] = useState(false);
   const [notFound, setNotFound] = useState(false);
+
+  // General loading state for any generation (image, audio, video)
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) { router.push('/sign-in'); return; }
@@ -300,7 +309,9 @@ const ChatWindow = ({ id }: { id?: string }) => {
   };
 
   const handleImageGenerationRequest = async (params: ImageGenParams, imagePromptText: string) => {
-    if (!chatId) { toast.error("Chat ID missing."); return; } setLoading(true);
+    if (!chatId) { toast.error("Chat ID missing."); return; }
+    if (isGenerating) { toast.info("Another generation is in progress."); return; }
+    setIsGenerating(true);
     const userPromptMsgId = crypto.randomBytes(7).toString('hex');
     const assistantImgMsgId = crypto.randomBytes(7).toString('hex');
     setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating image for: "${imagePromptText}"`, role: 'user', type: 'image_prompt', imagePromptText, status: 'loading' }]);
@@ -314,11 +325,13 @@ const ChatWindow = ({ id }: { id?: string }) => {
     } catch (err: any) {
       toast.error(`Image generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed: "${imagePromptText}". Error: ${err.message}` } : m));
-    } finally { setLoading(false); }
+    } finally { setIsGenerating(false); }
   };
 
   const handleAudioGenerationRequest = async (params: AudioGenParams, audioPromptText: string) => {
-    if (!chatId) { toast.error("Chat ID missing for audio generation."); return; } setLoading(true);
+    if (!chatId) { toast.error("Chat ID missing for audio generation."); return; }
+    if (isGenerating) { toast.info("Another generation is in progress."); return; }
+    setIsGenerating(true);
     const userPromptMsgId = crypto.randomBytes(7).toString('hex');
     const assistantAudioMsgId = crypto.randomBytes(7).toString('hex');
     setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating audio for: "${audioPromptText}"`, role: 'user', type: 'audio_prompt', audioPromptText, status: 'loading' }]);
@@ -332,7 +345,64 @@ const ChatWindow = ({ id }: { id?: string }) => {
     } catch (err: any) {
       toast.error(`Audio generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed: "${audioPromptText}". Error: ${err.message}` } : m));
-    } finally { setLoading(false); }
+    } finally { setIsGenerating(false); }
+  };
+
+  // NEW: Handle Video Generation Request
+  const handleVideoGenerationRequest = async (params: VideoGenParams, videoPromptText: string) => {
+    if (!chatId) { toast.error("Chat ID missing for video generation."); return; }
+    if (isGenerating) { toast.info("Another generation is in progress."); return; }
+    setIsGenerating(true);
+    const userPromptMsgId = crypto.randomBytes(7).toString('hex');
+    const assistantVideoMsgId = crypto.randomBytes(7).toString('hex');
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        messageId: userPromptMsgId,
+        chatId,
+        createdAt: new Date(),
+        content: `Generating video for: "${videoPromptText}"`,
+        role: 'user',
+        type: 'video_prompt',
+        videoPromptText,
+        status: 'loading'
+      }
+    ]);
+
+    try {
+      const result = await generateVideo(params);
+
+      if (result.status === "processing") {
+         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'loading', content: `Processing video for: "${videoPromptText}"` } : m));
+         toast.info('Video is processing...');
+        // Note: isGenerating remains true if processing, expecting further updates.
+        // If generateVideo handles polling internally and this is the final "processing" status before timeout/error,
+        // then isGenerating should be set to false in finally.
+        // For now, assume processing means we are still waiting.
+        return; // Early exit if processing, to not hit finally block's setIsGenerating(false) yet
+      }
+
+      if (result.data?.[0]?.b64_json) {
+          setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Video prompt: "${videoPromptText}"` } : m));
+          setMessages((prev) => [...prev, { messageId: assistantVideoMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_video', b64JsonVideo: result.data[0].b64_json, videoPromptText }]);
+          toast.success('Video generated!');
+      } else if (result.status && result.status !== "processing") {
+           throw new Error(result.error || result.status || "Video data not found or generation failed.");
+      } else if (!result.status) {
+          throw new Error("Unknown error: No video data or status returned.");
+      }
+    } catch (err: any) {
+      toast.error(`Video generation failed: ${err.message}`);
+      setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed video prompt: "${videoPromptText}". Error: ${err.message}` } : m));
+    } finally {
+      // Only set isGenerating to false if not in a 'processing' state that requires further action.
+      // If we returned early due to "processing", this won't be hit.
+      const finalUserMessageState = messagesRef.current.find(m => m.messageId === userPromptMsgId);
+      if (finalUserMessageState?.status !== 'loading' || !finalUserMessageState.content.startsWith("Processing video for:")) {
+        setIsGenerating(false);
+      }
+    }
   };
 
   const rewrite = (messageId: string) => {
@@ -392,9 +462,10 @@ const ChatWindow = ({ id }: { id?: string }) => {
           <>
             <Navbar messages={messages} />
             <Chat
-              loading={loading} messages={messages} sendMessage={sendMessage}
+              loading={loading || isGenerating} messages={messages} sendMessage={sendMessage}
               onImagePromptSubmit={handleImageGenerationRequest}
-              onAudioPromptSubmit={handleAudioGenerationRequest} // New
+              onAudioPromptSubmit={handleAudioGenerationRequest}
+              onVideoPromptSubmit={handleVideoGenerationRequest} // Pass new handler
               messageAppeared={messageAppeared} rewrite={rewrite} editMessage={editMessage} setMessages={setMessages}
             />
           </>
@@ -402,8 +473,10 @@ const ChatWindow = ({ id }: { id?: string }) => {
           <EmptyChat
             sendMessage={sendMessage}
             onImagePromptSubmit={handleImageGenerationRequest}
-            onAudioPromptSubmit={handleAudioGenerationRequest} // New
+            onAudioPromptSubmit={handleAudioGenerationRequest}
+            onVideoPromptSubmit={handleVideoGenerationRequest} // Pass new handler
             focusMode={focusMode} setFocusMode={setFocusMode}
+            // isGenerating={isGenerating} // Pass isGenerating if EmptyChat needs to disable inputs
           />
         )}
       </div>

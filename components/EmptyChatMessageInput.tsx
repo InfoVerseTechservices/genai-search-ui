@@ -1,11 +1,15 @@
 // components/EmptyChatMessageInput.tsx
-import { ArrowRight, Image as ImageIconLucide, Paperclip } from 'lucide-react';
+import { ArrowRight, Image as ImageIconLucide, Paperclip, Video as VideoIconLucide } from 'lucide-react'; // Added VideoIconLucide
 import CustomAudioWaveformIcon from './Icons/CustomAudioWaveformIcon';
 import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { UploadIcon as CustomUploadIcon } from './Icons';
 import ImageGenerationPanel from './ImageGenerationPanel';
 import AudioGenerationPanel from './AudioGenerationPanel';
+import VideoGenerationParametersPanel, { VideoGenParams as UIVideoGenParams } from './VideoGenerationParametersPanel'; // Added VideoGenerationParametersPanel
+
+// Re-export or define VideoGenParams for the parent (ChatWindow) to use
+export type { UIVideoGenParams as VideoGenParams };
 
 interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
 export interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
@@ -15,6 +19,7 @@ interface EmptyChatMessageInputProps {
   setFocusMode: (mode: string) => void;
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
   onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
+  onVideoPromptSubmit: (params: UIVideoGenParams, videoPromptText: string) => void; // Added for video
 }
 
 const EmptyChatMessageInput = ({
@@ -23,6 +28,7 @@ const EmptyChatMessageInput = ({
   setFocusMode,
   onImagePromptSubmit,
   onAudioPromptSubmit,
+  onVideoPromptSubmit, // Added for video
 }: EmptyChatMessageInputProps) => {
   const [message, setMessage] = useState('');
   const [uploadFile, setUploadFile] = useState(false);
@@ -45,6 +51,22 @@ const EmptyChatMessageInput = ({
   const [audioDuration, setAudioDuration] = useState(10);
   const [audioSeed, setAudioSeed] = useState(0);
   const [isSubmittingAudio, setIsSubmittingAudio] = useState(false);
+
+  // Video Mode State - NEW
+  const [isVideoModeActive, setIsVideoModeActive] = useState(false);
+  const [showVideoParamsPanel, setShowVideoParamsPanel] = useState(false);
+  const [videoNegativePrompt, setVideoNegativePrompt] = useState('');
+  const [videoGuidanceScale, setVideoGuidanceScale] = useState<number>(7.5);
+  const [videoNumFrames, setVideoNumFrames] = useState<number>(65);
+  const [videoDuration, setVideoDuration] = useState<number>(1);
+  const [videoSeed, setVideoSeed] = useState<number>(0);
+  const [videoWidth, setVideoWidth] = useState<number>(768);
+  const [videoHeight, setVideoHeight] = useState<number>(512);
+  const [videoNumInferenceSteps, setVideoNumInferenceSteps] = useState<number>(50);
+  const [videoDecodeTimestep, setVideoDecodeTimestep] = useState<number>(0.03);
+  const [videoDecodeNoiseScale, setVideoDecodeNoiseScale] = useState<number>(0.025);
+  const [videoUpscaleAndRefine, setVideoUpscaleAndRefine] = useState<boolean>(false);
+  const [isSubmittingVideo, setIsSubmittingVideo] = useState(false);
 
   const loading = false;
 
@@ -110,6 +132,29 @@ const EmptyChatMessageInput = ({
     setIsSubmittingAudio(false);
   };
 
+  const handleVideoGenerationRequest = async () => {
+    if (!message.trim()) return;
+    setIsSubmittingVideo(true);
+    const params: UIVideoGenParams = {
+      prompt: message, // Prompt comes from the main message state
+      negative_prompt: videoNegativePrompt.trim() || undefined,
+      guidance_scale: videoGuidanceScale,
+      num_frames: videoNumFrames,
+      duration: videoDuration,
+      model: "ltx-video", // Fixed model
+      seed: videoSeed,
+      width: videoWidth,
+      height: videoHeight,
+      num_inference_steps: videoNumInferenceSteps,
+      decode_timestep: videoDecodeTimestep,
+      decode_noise_scale: videoDecodeNoiseScale,
+      upscale_and_refine: videoUpscaleAndRefine,
+    };
+    onVideoPromptSubmit(params, message);
+    setMessage(''); // Clear main prompt input after submission
+    setIsSubmittingVideo(false);
+  };
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
     setFile(selectedFile);
@@ -117,6 +162,7 @@ const EmptyChatMessageInput = ({
     if (selectedFile) { // If a file is selected, ensure other modes are off
         setIsImageModeActive(false); setShowImageParamsPanel(false);
         setIsAudioModeActive(false); setShowAudioParamsPanel(false);
+        setIsVideoModeActive(false); setShowVideoParamsPanel(false); // Deactivate video mode
     }
   };
 
@@ -126,6 +172,7 @@ const EmptyChatMessageInput = ({
     if (newUploadFileState) {
       setIsImageModeActive(false); setShowImageParamsPanel(false);
       setIsAudioModeActive(false); setShowAudioParamsPanel(false);
+      setIsVideoModeActive(false); setShowVideoParamsPanel(false); // Deactivate video mode
     } else { // If toggling off, and a file was selected, clear it
         if(fileInputRef.current) fileInputRef.current.value = ""; // Clear file input
         setFile(null);
@@ -139,6 +186,7 @@ const EmptyChatMessageInput = ({
     if (newImageModeState) {
       setUploadFile(false); setFile(null); if(fileInputRef.current) fileInputRef.current.value = "";
       setIsAudioModeActive(false); setShowAudioParamsPanel(false);
+      setIsVideoModeActive(false); setShowVideoParamsPanel(false); // Deactivate video mode
       inputRef.current?.focus();
     }
   };
@@ -150,6 +198,19 @@ const EmptyChatMessageInput = ({
     if (newAudioModeState) {
       setUploadFile(false); setFile(null); if(fileInputRef.current) fileInputRef.current.value = "";
       setIsImageModeActive(false); setShowImageParamsPanel(false);
+      setIsVideoModeActive(false); setShowVideoParamsPanel(false); // Deactivate video mode
+      inputRef.current?.focus();
+    }
+  };
+
+  const handleVideoModeToggle = () => { // NEW
+    const newVideoModeState = !isVideoModeActive;
+    setIsVideoModeActive(newVideoModeState);
+    setShowVideoParamsPanel(newVideoModeState);
+    if (newVideoModeState) {
+      setUploadFile(false); setFile(null); if(fileInputRef.current) fileInputRef.current.value = "";
+      setIsImageModeActive(false); setShowImageParamsPanel(false);
+      setIsAudioModeActive(false); setShowAudioParamsPanel(false);
       inputRef.current?.focus();
     }
   };
@@ -158,6 +219,7 @@ const EmptyChatMessageInput = ({
     e.preventDefault();
     if (isImageModeActive) handleImageGenerationRequest();
     else if (isAudioModeActive) handleAudioGenerationRequest();
+    else if (isVideoModeActive) handleVideoGenerationRequest(); // NEW
     else handleMainSendMessage();
   };
 
@@ -166,6 +228,7 @@ const EmptyChatMessageInput = ({
       e.preventDefault();
       if (isImageModeActive) handleImageGenerationRequest();
       else if (isAudioModeActive) handleAudioGenerationRequest();
+      else if (isVideoModeActive) handleVideoGenerationRequest(); // NEW
       else handleMainSendMessage();
     }
   };
@@ -173,6 +236,7 @@ const EmptyChatMessageInput = ({
   let placeholderText = "Ask Coco...";
   if (isImageModeActive) placeholderText = "Describe image to generate...";
   else if (isAudioModeActive) placeholderText = "Describe audio to generate...";
+  else if (isVideoModeActive) placeholderText = "Describe video to generate..."; // NEW
 
   if (uploadFile) {
     return (
@@ -200,7 +264,7 @@ const EmptyChatMessageInput = ({
   return (
     <>
       <h2 className="text-[#000080] dark:text-blue-300 text-md sm:text-xl md:text-xl lg:text-2xl xl:text-3xl font-medium -mt-8 text-center md:text-left">
-        {isImageModeActive ? "Describe an Image" : isAudioModeActive ? "Describe Audio" : "Discover and Do More with ColomboAI MC1"}
+        {isImageModeActive ? "Describe an Image" : isAudioModeActive ? "Describe Audio" : isVideoModeActive ? "Describe Video" : "Discover and Do More with ColomboAI MC1"}
       </h2>
       <form onSubmit={handleSubmit} className="w-full flex flex-col items-center"> {/* Centering form content */}
         <div
@@ -219,24 +283,28 @@ const EmptyChatMessageInput = ({
           />
           <div className="flex items-center justify-between w-full mt-2">
             <div className="flex items-center space-x-1">
-              <button type="button" onClick={handleUploadFileToggle} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive}>
+              <button type="button" onClick={handleUploadFileToggle} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
                 <Paperclip size={20} />
               </button>
-              <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text/Audio Mode" : "Switch to Image Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isImageModeActive ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400'}`} disabled={isAudioModeActive}>
+              <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text/Audio/Video Mode" : "Switch to Image Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isImageModeActive ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400'}`} disabled={isAudioModeActive || isVideoModeActive}>
                 <ImageIconLucide size={20} />
               </button>
-              <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive}>
-                <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : 'currentColor'} />
+              <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image/Video Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive || isVideoModeActive}>
+                <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'white' : 'currentColor')} />
+              </button>
+              {/* NEW Video Mode Toggle Button */}
+              <button type="button" onClick={handleVideoModeToggle} title={isVideoModeActive ? "Switch to Text/Image/Audio Mode" : "Switch to Video Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isVideoModeActive ? 'bg-red-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400'}`} disabled={isImageModeActive || isAudioModeActive}>
+                <VideoIconLucide size={20} />
               </button>
             </div>
-            <button type="submit" disabled={(isImageModeActive || isAudioModeActive ? !message.trim() : (!message.trim() && !file)) || isSubmittingImage || isSubmittingAudio || loading } className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2">
-              {(isSubmittingImage && isImageModeActive) || (isSubmittingAudio && isAudioModeActive) ? (
+            <button type="submit" disabled={(isImageModeActive || isAudioModeActive || isVideoModeActive ? !message.trim() : (!message.trim() && !file)) || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || loading } className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2">
+              {(isSubmittingImage && isImageModeActive) || (isSubmittingAudio && isAudioModeActive) || (isSubmittingVideo && isVideoModeActive) ? (
                 <svg className="animate-spin h-4 w-4 text-[#000080] dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               ) : (
-                <ArrowRight className={(isImageModeActive || isAudioModeActive) ? "text-[#000080] dark:text-white" : "bg-background"} size={17} />
+                <ArrowRight className={(isImageModeActive || isAudioModeActive || isVideoModeActive) ? "text-[#000080] dark:text-white" : "bg-background"} size={17} />
               )}
             </button>
           </div>
@@ -245,9 +313,25 @@ const EmptyChatMessageInput = ({
         <div className="w-[calc(100%-10px)] mx-auto md:w-auto md:min-w-[35rem] lg:min-w-[38rem] xl:min-w-[48rem]">
             {(isImageModeActive && showImageParamsPanel) && ( <ImageGenerationPanel imageNegativePrompt={imageNegativePrompt} setImageNegativePrompt={setImageNegativePrompt} imageModel={imageModel} setImageModel={setImageModel} imageSize={imageSize} setImageSize={setImageSize} imageGuidanceScale={imageGuidanceScale} setImageGuidanceScale={setImageGuidanceScale} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || "flux"} /> )}
             {(isAudioModeActive && showAudioParamsPanel) && ( <AudioGenerationPanel audioNegativePrompt={audioNegativePrompt} setAudioNegativePrompt={setAudioNegativePrompt} audioDuration={audioDuration} setAudioDuration={setAudioDuration} audioSeed={audioSeed} setAudioSeed={setAudioSeed} audioModel={audioModel} setAudioModel={setAudioModel} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_AUDIO_DEFAULT_MODEL || "stable-audio-open-1.0"}/> )}
+            {/* NEW Video Parameters Panel */}
+            {(isVideoModeActive && showVideoParamsPanel) && (
+              <VideoGenerationParametersPanel
+                videoNegativePrompt={videoNegativePrompt} setVideoNegativePrompt={setVideoNegativePrompt}
+                videoGuidanceScale={videoGuidanceScale} setVideoGuidanceScale={setVideoGuidanceScale}
+                videoNumFrames={videoNumFrames} setVideoNumFrames={setVideoNumFrames}
+                videoDuration={videoDuration} setVideoDuration={setVideoDuration}
+                videoSeed={videoSeed} setVideoSeed={setVideoSeed}
+                videoWidth={videoWidth} setVideoWidth={setVideoWidth}
+                videoHeight={videoHeight} setVideoHeight={setVideoHeight}
+                videoNumInferenceSteps={videoNumInferenceSteps} setVideoNumInferenceSteps={setVideoNumInferenceSteps}
+                videoDecodeTimestep={videoDecodeTimestep} setVideoDecodeTimestep={setVideoDecodeTimestep}
+                videoDecodeNoiseScale={videoDecodeNoiseScale} setVideoDecodeNoiseScale={setVideoDecodeNoiseScale}
+                videoUpscaleAndRefine={videoUpscaleAndRefine} setVideoUpscaleAndRefine={setVideoUpscaleAndRefine}
+              />
+            )}
         </div>
 
-        {!(isImageModeActive || isAudioModeActive || uploadFile) && (
+        {!(isImageModeActive || isAudioModeActive || isVideoModeActive || uploadFile) && ( // Updated condition
              <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] mt-4 md:mt-2 w-[calc(100%-20px)] sm:w-auto md:max-w-xl lg:max-w-2xl text-center">
               Welcome to GenAI Search, your go-to tool for instant answers and web exploration!
               Simply type your question or topic of interest, and GenAI will provide

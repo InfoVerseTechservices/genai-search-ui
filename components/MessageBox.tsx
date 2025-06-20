@@ -242,16 +242,18 @@ const MessageBox = ({
       {/* Assistant Generated Image Message */}
       {message.role === 'assistant' && message.type === 'generated_image' && message.b64Json && (
         <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-          <div className="flex flex-col space-y-2">
-             <div className="flex flex-row items-center space-x-2">
-                <ImageIconLucide className="text-black dark:text-white" size={20} />
-                <h3 className="text-black dark:text-white font-medium text-xl">Generated Image</h3>
-              </div>
+          <div className="flex flex-col space-y-2"> {/* Main wrapper */}
+            {/* Standardized Header */}
+            <div className="flex flex-row items-center space-x-2">
+              <ImageIconLucide className="text-black dark:text-white" size={20} />
+              <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Image</h3>
+            </div>
+            {/* Existing Content */}
             {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.imagePromptText}"</p>}
             <img
               src={`data:image/png;base64,${message.b64Json}`}
               alt={message.imagePromptText || "Generated image"}
-              className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto"
+              className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto shadow-md" // Added shadow-md for consistency
             />
             <ContextualActionsPlaceholder messageId={message.messageId} />
           </div>
@@ -261,16 +263,18 @@ const MessageBox = ({
       {/* Assistant Generated Audio Message */}
       {message.role === 'assistant' && message.type === 'generated_audio' && message.b64JsonAudio && (
         <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-          <div className="flex flex-col space-y-2">
-             <div className="flex flex-row items-center space-x-2">
-                <AudioIconLucide className="text-black dark:text-white" size={20} />
-                <h3 className="text-black dark:text-white font-medium text-xl">Generated Audio</h3>
-              </div>
+          <div className="flex flex-col space-y-2"> {/* Main wrapper */}
+            {/* Standardized Header */}
+            <div className="flex flex-row items-center space-x-2">
+              <AudioIconLucide className="text-black dark:text-white" size={20} />
+              <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Audio</h3>
+            </div>
+            {/* Existing Content */}
             {message.audioPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.audioPromptText}"</p>}
             <audio
               controls
-              src={`data:audio/mpeg;base64,${message.b64JsonAudio}`}
-              className="rounded-lg border dark:border-gray-600 w-full max-w-md"
+              src={`data:audio/mpeg;base64,${message.b64JsonAudio}`} // Assuming mpeg, adjust if different (e.g., audio/wav, audio/ogg)
+              className="rounded-lg border dark:border-gray-600 w-full max-w-md shadow-md" // Added shadow-md
             >
               Your browser does not support the audio element.
             </audio>
@@ -279,20 +283,23 @@ const MessageBox = ({
         </div>
       )}
 
-      {/* NEW: Assistant Generated Video Message */}
+      {/* Assistant Generated Video Message */}
       {message.role === 'assistant' && message.type === 'generated_video' && message.b64JsonVideo && (
         <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-          <div className="flex flex-col space-y-2">
-             <div className="flex flex-row items-center space-x-2">
-                <VideoIconLucide className="text-black dark:text-white" size={20} />
-                <h3 className="text-black dark:text-white font-medium text-xl">Generated Video</h3>
-              </div>
+          <div className="flex flex-col space-y-2"> {/* Main wrapper */}
+            {/* Standardized Header */}
+            <div className="flex flex-row items-center space-x-2">
+              <VideoIconLucide className="text-black dark:text-white" size={20} />
+              <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Video</h3>
+            </div>
+            {/* Existing Content */}
             {message.videoPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.videoPromptText}"</p>}
             <video
               controls
-              autoPlay // Consider adding 'muted' attribute: autoPlay muted
+              autoPlay
+              muted // Added muted for better autoplay experience
               loop
-              src={`data:video/mp4;base64,${message.b64JsonVideo}`} // Assuming MP4 format
+              src={`data:video/mp4;base64,${message.b64JsonVideo}`}
               className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto shadow-md"
             >
               Your browser does not support the video tag.
@@ -310,7 +317,7 @@ const MessageBox = ({
               <div className="flex flex-col space-y-2">
                  <div className="flex flex-row items-center space-x-2">
                   <BookCopy className="text-black dark:text-white" size={20} />
-                  <h3 className="text-black dark:text-white font-medium text-xl">Sources</h3>
+                  <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Sources</h3>
                 </div>
                 <MessageSources sources={message.sources} />
               </div>
@@ -318,7 +325,7 @@ const MessageBox = ({
             <div className="flex flex-col space-y-2">
               <div className="flex flex-row items-center space-x-2">
                 <Disc3 className={cn('text-black dark:text-white', isLast && loading ? 'animate-spin' : 'animate-none')} size={20} />
-                <h3 className="text-black dark:text-white font-medium text-xl">Answer</h3>
+                <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Answer</h3>
               </div>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkMath]}

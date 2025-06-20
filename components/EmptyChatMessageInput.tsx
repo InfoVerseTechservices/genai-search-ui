@@ -1,12 +1,13 @@
 // components/EmptyChatMessageInput.tsx
+import { ArrowRight, Image as ImageIconLucide, Paperclip, Video as VideoIconLucide } from 'lucide-react'; // Added VideoIconLucide
 import CustomAudioWaveformIcon from './Icons/CustomAudioWaveformIcon';
+import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import { Image as ImageIconLucide, Paperclip, ArrowRight, Video as VideoIconLucide } from 'lucide-react'; // Added VideoIconLucide from lucide-react
+import { UploadIcon as CustomUploadIcon } from './Icons';
+import ImageGenerationPanel from './ImageGenerationPanel';
 import AudioGenerationPanel from './AudioGenerationPanel';
 import VideoGenerationParametersPanel, { VideoGenParams as UIVideoGenParams } from './VideoGenerationParametersPanel'; // Added VideoGenerationParametersPanel
-import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
-import ImageGenerationPanel from './ImageGenerationPanel';
-import { UploadIcon as CustomUploadIcon } from './Icons'; // Removed VideoIcon from here
+
 // Re-export or define VideoGenParams for the parent (ChatWindow) to use
 export type { UIVideoGenParams as VideoGenParams };
 
@@ -270,11 +271,10 @@ const EmptyChatMessageInput = ({
           style={borderStyle}
           className="relative flex flex-col bg-white dark:bg-slate-900 px-2 sm:px-4 pt-3 sm:pt-4 pb-2 rounded-lg items-center w-[calc(100%-10px)] md:w-auto md:min-w-[35rem] lg:min-w-[38rem] xl:min-w-[48rem] border"
         >
-
           <TextareaAutosize
             ref={inputRef}
             value={message}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
+            onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             minRows={6}
             maxRows={8}
@@ -290,7 +290,7 @@ const EmptyChatMessageInput = ({
                 <ImageIconLucide size={20} />
               </button>
               <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image/Video Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive || isVideoModeActive}>
-                <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'white' : 'currentColor')} />
+                <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : 'currentColor'} />
               </button>
               {/* NEW Video Mode Toggle Button */}
               <button type="button" onClick={handleVideoModeToggle} title={isVideoModeActive ? "Switch to Text/Image/Audio Mode" : "Switch to Video Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isVideoModeActive ? 'bg-red-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400'}`} disabled={isImageModeActive || isAudioModeActive}>
@@ -331,7 +331,7 @@ const EmptyChatMessageInput = ({
             )}
         </div>
 
-        {/* {!(isImageModeActive || isAudioModeActive || isVideoModeActive || uploadFile) && ( // Updated condition
+        {!(isImageModeActive || isAudioModeActive || isVideoModeActive || uploadFile) && ( // Updated condition
              <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] mt-4 md:mt-2 w-[calc(100%-20px)] sm:w-auto md:max-w-xl lg:max-w-2xl text-center">
               Welcome to GenAI Search, your go-to tool for instant answers and web exploration!
               Simply type your question or topic of interest, and GenAI will provide
@@ -339,7 +339,7 @@ const EmptyChatMessageInput = ({
               Whether you&apos;re seeking quick information or diving deeper
               into a topic, GenAI Search has you covered.
             </p>
-        )} */}
+        )}
       </form>
     </>
   );

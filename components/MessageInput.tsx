@@ -254,9 +254,9 @@ const MessageInput = ({
         <TextareaAutosize
           ref={inputRef}
           value={message}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
+          onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          onHeightChange={(height: number, props: { rowHeight: number }) => {
+          onHeightChange={(height, props) => {
             // For desktop, update rows which might change mode
             if (typeof window !== 'undefined' && window.innerWidth >= 768) {
                 setTextareaRows(Math.ceil(height / props.rowHeight));
@@ -281,7 +281,7 @@ const MessageInput = ({
               <ImageIconLucide size={20} />
             </button>
             <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image/Video Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive || isVideoModeActive}>
-              <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'white' : 'currentColor')} />
+              <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : 'currentColor'} />
             </button>
             {/* NEW Video Mode Toggle Button */}
             <button type="button" onClick={handleVideoModeToggle} title={isVideoModeActive ? "Switch to Text/Image/Audio Mode" : "Switch to Video Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isVideoModeActive ? 'bg-red-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400'}`} disabled={isImageModeActive || isAudioModeActive}>

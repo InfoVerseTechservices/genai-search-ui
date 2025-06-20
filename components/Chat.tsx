@@ -7,7 +7,6 @@ import { Message } from './ChatWindow'; // Assuming Message type is imported fro
 import MessageBox from './MessageBox';
 import MessageBoxLoading from './MessageBoxLoading';
 
-
 // Define ImageGenParams and AudioGenParams if not globally available or imported
 interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
 interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
@@ -18,17 +17,17 @@ const Chat = ({
   sendMessage,
   onImagePromptSubmit,
   onAudioPromptSubmit,
-  onVideoPromptSubmit, // Add this prop
+  onVideoPromptSubmit, // Added prop
   messageAppeared,
   rewrite,
   editMessage,
   setMessages,
 }: {
   messages: Message[];
-  sendMessage: (message: string, file?: File | null | undefined) => void;
+  sendMessage: (message: string, file: File | null) => void;
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
   onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
-  onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void; // Add prop type
+  onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void; // Added prop type
   loading: boolean;
   messageAppeared: boolean;
   rewrite: (messageId: string) => void;
@@ -103,7 +102,7 @@ const Chat = ({
             sendMessage={sendMessage}
             onImagePromptSubmit={onImagePromptSubmit}
             onAudioPromptSubmit={onAudioPromptSubmit}
-            onVideoPromptSubmit={onVideoPromptSubmit} // Pass the prop down
+            onVideoPromptSubmit={onVideoPromptSubmit} // Pass down the prop
         />
       </div>
     </div>

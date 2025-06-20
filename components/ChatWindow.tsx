@@ -163,7 +163,6 @@ const useSocket = (
         const sendPing = () => {
           if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify({ type: 'ping' }));
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             heartbeatTimeoutId = setTimeout(() => socket.close(), heartbeatInterval - 7000);
           }
         };
@@ -322,19 +321,11 @@ const ChatWindow = ({ id }: { id?: string }) => {
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Image prompt: "${imagePromptText}"` } : m));
         setMessages((prev) => [...prev, { messageId: assistantImgMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_image', b64Json: result.data[0].b64_json, imagePromptText }]);
         toast.success('Image generated!');
-      } else { 
-        throw new Error(
-          typeof result.error === 'string' 
- ? result.error
-            : (typeof result.error === 'object' && result.error !== null 
- ? result.error.message || "No image data."
- : "No image data.")
-        ); 
-      }
+      } else { throw new Error(result.error || "No image data."); }
     } catch (err: any) {
       toast.error(`Image generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed: "${imagePromptText}". Error: ${err.message}` } : m));
-    } finally { setIsGenerating(false); } // Ensure isGenerating is reset
+    } finally { setIsGenerating(false); }
   };
 
   const handleAudioGenerationRequest = async (params: AudioGenParams, audioPromptText: string) => {

@@ -2,7 +2,6 @@ import SideBottomAdComponent from './Ads/SideAdBottom';
 import SideTopAdComponent from './Ads/SideAdTop';
 import EmptyChatMessageInput from './EmptyChatMessageInput';
 
-// Assuming VideoGenParams is defined or imported elsewhere if needed directly in EmptyChat
 // Define ImageGenParams if not globally available or imported
 interface ImageGenParams {
   prompt: string;
@@ -21,26 +20,16 @@ interface AudioGenParams {
   model?: string;
 }
 
-// Define VideoGenParams if not globally available or imported
-interface VideoGenParams {
-  prompt: string;
-  negative_prompt?: string;
-  guidance_scale?: number;
-  num_frames?: number;
-  duration?: number;
-}
 const EmptyChat = ({
   sendMessage,
   onImagePromptSubmit,
-  onAudioPromptSubmit,
-  onVideoPromptSubmit, // Add this
+  onAudioPromptSubmit, // Add this
   focusMode,
   setFocusMode,
 }: {
   sendMessage: (message: string, file: File | null) => void;
-  onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void; // Add this prop definition
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
-  onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
+  onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void; // Add this
   focusMode: string;
   setFocusMode: (mode: string) => void;
 }) => {
@@ -50,7 +39,6 @@ const EmptyChat = ({
       <div className="flex-grow  xl:mr-[0px] pr-[2rem] sm:pr-[5rem]">
         <div className="relative">
           <div className="flex flex-col items-center justify-center min-h-screen w-full mx-auto p-2 space-y-4 sm:space-y-8">
-            {/* Pass the onVideoPromptSubmit prop down */}
 
             <EmptyChatMessageInput
               sendMessage={sendMessage}
@@ -58,7 +46,6 @@ const EmptyChat = ({
               setFocusMode={setFocusMode}
               onImagePromptSubmit={onImagePromptSubmit}
               onAudioPromptSubmit={onAudioPromptSubmit} // Pass it down
-              onVideoPromptSubmit={onVideoPromptSubmit} // Pass the video prop down
             />
           </div>
         </div>

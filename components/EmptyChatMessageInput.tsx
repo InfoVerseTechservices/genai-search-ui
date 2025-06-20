@@ -269,7 +269,7 @@ const EmptyChatMessageInput = ({
           <button type="button" onClick={() => fileInputRef.current?.click()} className='lg:mt-[0.3rem] xl:mt-[1rem]'>
             <CustomUploadIcon w={80} h={80} />
           </button>
-          <button style={{ background: 'linear-gradient(180deg, #6237FF, #258EFF)', color: 'white', border: 'none', borderRadius: '15px', cursor: 'pointer', fontWeight: 'normal' }} className='mt-[0.3rem] xl:mt-[0.5rem] md:text-[0.8rem] lg:text-[0.8rem] xl:text-[1rem] md:px-[1.25rem] md:py-[0.3rem] lg:px-[1.25rem] lg:py-[0.3rem] xl:px-[1.75rem] xl:py-[0.4rem]' onClick={() => fileInputRef.current?.click()}>
+          <button style={{ background: 'linear-gradient(180deg, #6237FF, #258EFF)', color: 'white', border: 'none', borderRadius: '15px', cursor: 'pointer', fontWeight: 'normal' }} className='mt-[0.3rem] xl:mt-[0.5rem] md:text-[0.8rem] lg:text-[0.8rem] xl:text-[1rem] md:px-[0.25rem] md:py-[0.3rem] lg:px-[0.25rem] lg:py-[0.3rem] xl:px-[1.75rem] xl:py-[0.4rem]' onClick={() => fileInputRef.current?.click()}>
             UPLOAD
           </button>
           <p className='text-[#8B8B8B] md:mt-[0.75rem] lg:mt-[0.5rem] xl:mt-[1.75rem] md:text-xs lg:text-sm'>Max ??mb only</p>

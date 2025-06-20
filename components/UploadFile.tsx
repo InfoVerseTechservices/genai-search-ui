@@ -82,7 +82,7 @@ const InputBar: React.FC<InputBarProps> = ({ sendMessage, setUploadedFile, uploa
               cursor: 'pointer',
               fontWeight: 'normal',
             }}
-            className='mt-[0.3rem] xl:mt-[0.5rem] md:text-[0.8rem] lg:text-[0.8rem] xl:text-[1rem] md:px-[1.25rem] md:py-[0.3rem] lg:px-[1.25rem] lg:py-[0.3rem] xl:px-[1.75rem] xl:py-[0.4rem]'
+            className='mt-[0.3rem] xl:mt-[0.5rem] md:text-[0.8rem] lg:text-[0.8rem] xl:text-[1rem] md:px-[0.25rem] md:py-[0.3rem] lg:px-[0.25rem] lg:py-[0.3rem] xl:px-[1.75rem] xl:py-[0.4rem]'
             onClick={() => fileInputRef.current?.click()}
           >
             UPLOAD

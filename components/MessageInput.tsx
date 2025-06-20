@@ -257,25 +257,27 @@ const MessageInput = ({
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           onHeightChange={(height, props) => {
-            // For desktop, update rows which might change mode
             if (typeof window !== 'undefined' && window.innerWidth >= 768) {
                 setTextareaRows(Math.ceil(height / props.rowHeight));
             }
           }}
-          minRows={3}
-          className="w-full transition bg-transparent placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 placeholder:text-sm text-black dark:text-white text-sm resize-none focus:outline-none px-2 max-h-36 md:max-h-24 lg:max-h-36 xl:max-h-48 order-1"
+          minRows={effectiveModeForDesktop === 'multi' ? 3 : 1} // Adjust minRows for multi-mode
+          className="w-full transition bg-transparent placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 placeholder:text-sm text-black dark:text-white text-sm resize-none focus:outline-none px-2 max-h-36 md:max-h-24 lg:max-h-36 xl:max-h-48 order-1" // order-1 ensures it's on top in flex-col
           placeholder={placeholderText}
         />
 
-        <div className={cn(
-          "flex items-center w-full mt-2 md:mt-0",
-          `md:${effectiveModeForDesktop === 'multi' ? "justify-between" : "ml-2"}`,
-          "order-2"
-        )}>
-          <div className="flex items-center space-x-1 flex-grow md:flex-grow-0">
-            <button type="button" onClick={handleUploadFileClick} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
-              <Paperclip size={20} />
-            </button>
+      {/* Bottom bar: icons and submit button */}
+      <div className={cn(
+        "flex items-center w-full mt-2 md:mt-0", // Common styles for the bar
+        `md:${effectiveModeForDesktop === 'multi' ? "justify-between" : "ml-2"}`, // In multi-mode, justify-between will space out left and right groups
+                                                                                // In single-mode, the whole bar gets a left margin (ml-2)
+        "order-2" // order-2 ensures it's below textarea in flex-col
+      )}>
+        {/* Left Group: Actionable Icons */}
+        <div className="flex items-center space-x-1"> {/* Removed flex-grow and md:flex-grow-0 for simplicity, parent justify-between handles spacing */}
+          <button type="button" onClick={handleUploadFileClick} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
+            <Paperclip size={20} />
+          </button>
             <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
             <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text/Audio/Video Mode" : "Switch to Image Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isImageModeActive ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400'}`} disabled={isAudioModeActive || isVideoModeActive}>
               <ImageIconLucide size={20} />
@@ -287,17 +289,27 @@ const MessageInput = ({
             <button type="button" onClick={handleVideoModeToggle} title={isVideoModeActive ? "Switch to Text/Image/Audio Mode" : "Switch to Video Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isVideoModeActive ? 'bg-red-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400'}`} disabled={isImageModeActive || isAudioModeActive}>
               <VideoIconLucide size={20} />
             </button>
-             <div className={cn("hidden", `md:${effectiveModeForDesktop === 'multi' ? "flex" : "hidden"}`)}>
-                <CopilotToggle copilotEnabled={copilotEnabled} setCopilotEnabled={setCopilotEnabled} />
-            </div>
+          {/* Copilot toggle: only shown in multi-line desktop mode */}
+          <div className={cn("hidden", `md:${effectiveModeForDesktop === 'multi' ? "flex items-center" : "hidden"}`)}>
+            <CopilotToggle copilotEnabled={copilotEnabled} setCopilotEnabled={setCopilotEnabled} />
+          </div>
+        </div>
+
+        {/* Right Group: Static Audio Icon (conditional) + Submit Button */}
+        <div className="flex items-center space-x-2"> {/* This div groups the static audio icon and submit button */}
+          {/* Static Audio Icon: only shown in multi-line desktop mode */}
+          <div className={cn("hidden", `md:${effectiveModeForDesktop === 'multi' ? "flex items-center" : "hidden"}`)}>
+            <CustomAudioWaveformIcon size={20} color="currentColor" /> {/* Static, non-functional. Relies on parent text color like other inactive icons. */}
           </div>
 
           <button
             type="submit"
             disabled={loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || (isImageModeActive || isAudioModeActive || isVideoModeActive ? !message.trim() : (!message.trim() && !file))}
-            className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc79] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2 ml-2 md:ml-0 flex-shrink-0"
+            className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc79] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2 flex-shrink-0"
+            // Removed md:ml-0 as spacing is handled by parent justify-between and space-x-2 in this new right group
+            // Removed ml-2 as that was for when it was a direct child in single-line. Now it's inside a flex group.
           >
-            {(isSubmittingImage && isImageModeActive) || (isSubmittingAudio && isAudioModeActive) || (isSubmittingVideo && isVideoModeActive) ? ( // Updated condition
+            {(isSubmittingImage && isImageModeActive) || (isSubmittingAudio && isAudioModeActive) || (isSubmittingVideo && isVideoModeActive) ? (
                <svg className="animate-spin h-4 w-4 text-[#000080] dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

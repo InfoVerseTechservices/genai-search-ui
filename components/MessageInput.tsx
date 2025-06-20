@@ -278,7 +278,7 @@ const MessageInput = ({
           "order-2"
         )}>
           {/* Left Group: Actionable Icons */}
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1 flex-shrink-0"> {/* MODIFIED: Added flex-shrink-0 */}
             <button type="button" onClick={handleUploadFileClick} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
               <Paperclip size={20} />
             </button>

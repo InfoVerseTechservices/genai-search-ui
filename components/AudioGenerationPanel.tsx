@@ -27,7 +27,7 @@ const AudioGenerationPanel: React.FC<AudioGenerationPanelProps> = ({
   defaultModelName,
 }) => {
   return (
-    <div className="mt-2 p-3 border-t dark:border-gray-700 bg-white dark:bg-slate-800 rounded-b-lg shadow-md text-left w-full">
+    <div className="text-left w-full"> {/* Simplified classes */}
       <h3 className="text-sm font-medium mb-2 text-gray-700 dark:text-gray-200">Audio Parameters</h3>
       <div className="space-y-2">
         <textarea

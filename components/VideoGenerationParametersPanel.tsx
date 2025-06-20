@@ -62,7 +62,7 @@ const VideoGenerationParametersPanel: React.FC<VideoGenerationParametersPanelPro
   const MODEL_NAME = "ltx-video"; // Fixed model as per requirements
 
   return (
-    <div className="mt-2 p-3 border-t dark:border-gray-700 bg-white dark:bg-slate-800 rounded-b-lg shadow-md text-left w-full">
+    <div className="text-left w-full"> {/* Simplified classes */}
       <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-200">Video Parameters</h3>
       <div className="space-y-3">
         <textarea

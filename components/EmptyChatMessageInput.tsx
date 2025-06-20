@@ -1,5 +1,5 @@
 // components/EmptyChatMessageInput.tsx
-import { ArrowRight, Image as ImageIconLucide, Paperclip, Video as VideoIconLucide } from 'lucide-react';
+import { ArrowRight, Image as ImageIconLucide, Paperclip, Video as VideoIconLucide, SlidersHorizontal as SlidersHorizontalIcon } from 'lucide-react'; // Added SlidersHorizontalIcon
 import CustomAudioWaveformIcon from './Icons/CustomAudioWaveformIcon';
 import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
@@ -7,6 +7,7 @@ import { UploadIcon as CustomUploadIcon } from './Icons';
 import ImageGenerationPanel from './ImageGenerationPanel';
 import AudioGenerationPanel from './AudioGenerationPanel';
 import VideoGenerationParametersPanel, { VideoGenParams as UIVideoGenParams } from './VideoGenerationParametersPanel';
+import GenericModal from './GenericModal'; // Import GenericModal
 
 export type { UIVideoGenParams as VideoGenParams };
 export interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
@@ -37,7 +38,7 @@ const EmptyChatMessageInput = ({
 
   // Image Mode State
   const [isImageModeActive, setIsImageModeActive] = useState(false);
-  const [showImageParamsPanel, setShowImageParamsPanel] = useState(false);
+  const [isImageParamsModalOpen, setIsImageParamsModalOpen] = useState(false); // NEW
   const [imageNegativePrompt, setImageNegativePrompt] = useState('');
   const [imageModel, setImageModel] = useState(process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || '');
   const [imageSize, setImageSize] = useState('512x512');
@@ -46,7 +47,7 @@ const EmptyChatMessageInput = ({
 
   // Audio Mode State
   const [isAudioModeActive, setIsAudioModeActive] = useState(false);
-  const [showAudioParamsPanel, setShowAudioParamsPanel] = useState(false);
+  const [isAudioParamsModalOpen, setIsAudioParamsModalOpen] = useState(false); // NEW
   const [audioNegativePrompt, setAudioNegativePrompt] = useState('Low quality.');
   const [audioModel, setAudioModel] = useState(process.env.NEXT_PUBLIC_COLOMBO_AUDIO_DEFAULT_MODEL || 'stable-audio-open-1.0');
   const [audioDuration, setAudioDuration] = useState(10);
@@ -55,7 +56,7 @@ const EmptyChatMessageInput = ({
 
   // Video Mode State
   const [isVideoModeActive, setIsVideoModeActive] = useState(false);
-  const [showVideoParamsPanel, setShowVideoParamsPanel] = useState(false);
+  const [isVideoParamsModalOpen, setIsVideoParamsModalOpen] = useState(false); // NEW
   const [videoNegativePrompt, setVideoNegativePrompt] = useState('');
   const [videoGuidanceScale, setVideoGuidanceScale] = useState<number>(7.5);
   const [videoNumFrames, setVideoNumFrames] = useState<number>(65);
@@ -119,9 +120,7 @@ const EmptyChatMessageInput = ({
     onImagePromptSubmit(params, message);
     setMessage('');
     setIsSubmittingImage(false);
-    if (isImageModeActive) {
-      setShowImageParamsPanel(true);
-    }
+    // Panel is modal, no need to manage showImageParamsPanel here
   };
 
   const handleAudioGenerationRequest = async () => {
@@ -137,9 +136,7 @@ const EmptyChatMessageInput = ({
     onAudioPromptSubmit(params, message);
     setMessage('');
     setIsSubmittingAudio(false);
-    if (isAudioModeActive) {
-      setShowAudioParamsPanel(true);
-    }
+    // Panel is modal
   };
 
   const handleVideoGenerationRequest = async () => {
@@ -163,9 +160,7 @@ const EmptyChatMessageInput = ({
     onVideoPromptSubmit(params, message);
     setMessage('');
     setIsSubmittingVideo(false);
-    if (isVideoModeActive) {
-      setShowVideoParamsPanel(true);
-    }
+    // Panel is modal
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -173,9 +168,9 @@ const EmptyChatMessageInput = ({
     setFile(selectedFile);
     setUploadFile(false);
     if (selectedFile) {
-        setIsImageModeActive(false); setShowImageParamsPanel(false);
-        setIsAudioModeActive(false); setShowAudioParamsPanel(false);
-        setIsVideoModeActive(false); setShowVideoParamsPanel(false);
+        setIsImageModeActive(false); setIsImageParamsModalOpen(false);
+        setIsAudioModeActive(false); setIsAudioParamsModalOpen(false);
+        setIsVideoModeActive(false); setIsVideoParamsModalOpen(false);
     }
   };
 
@@ -183,9 +178,9 @@ const EmptyChatMessageInput = ({
     const newUploadFileState = !uploadFile;
     setUploadFile(newUploadFileState);
     if (newUploadFileState) {
-      setIsImageModeActive(false); setShowImageParamsPanel(false);
-      setIsAudioModeActive(false); setShowAudioParamsPanel(false);
-      setIsVideoModeActive(false); setShowVideoParamsPanel(false);
+      setIsImageModeActive(false); setIsImageParamsModalOpen(false);
+      setIsAudioModeActive(false); setIsAudioParamsModalOpen(false);
+      setIsVideoModeActive(false); setIsVideoParamsModalOpen(false);
     } else {
         if(fileInputRef.current) fileInputRef.current.value = "";
         setFile(null);
@@ -195,37 +190,46 @@ const EmptyChatMessageInput = ({
   const handleImageModeToggle = () => {
     const newImageModeState = !isImageModeActive;
     setIsImageModeActive(newImageModeState);
-    setShowImageParamsPanel(newImageModeState);
     if (newImageModeState) {
       setUploadFile(false); setFile(null); if(fileInputRef.current) fileInputRef.current.value = "";
-      setIsAudioModeActive(false); setShowAudioParamsPanel(false);
-      setIsVideoModeActive(false); setShowVideoParamsPanel(false);
+      setIsAudioModeActive(false); setIsAudioParamsModalOpen(false);
+      setIsVideoModeActive(false); setIsVideoParamsModalOpen(false);
       inputRef.current?.focus();
+    } else {
+      setIsImageParamsModalOpen(false);
     }
   };
 
   const handleAudioModeToggle = () => {
     const newAudioModeState = !isAudioModeActive;
     setIsAudioModeActive(newAudioModeState);
-    setShowAudioParamsPanel(newAudioModeState);
     if (newAudioModeState) {
       setUploadFile(false); setFile(null); if(fileInputRef.current) fileInputRef.current.value = "";
-      setIsImageModeActive(false); setShowImageParamsPanel(false);
-      setIsVideoModeActive(false); setShowVideoParamsPanel(false);
+      setIsImageModeActive(false); setIsImageParamsModalOpen(false);
+      setIsVideoModeActive(false); setIsVideoParamsModalOpen(false);
       inputRef.current?.focus();
+    } else {
+      setIsAudioParamsModalOpen(false);
     }
   };
 
   const handleVideoModeToggle = () => {
     const newVideoModeState = !isVideoModeActive;
     setIsVideoModeActive(newVideoModeState);
-    setShowVideoParamsPanel(newVideoModeState);
     if (newVideoModeState) {
       setUploadFile(false); setFile(null); if(fileInputRef.current) fileInputRef.current.value = "";
-      setIsImageModeActive(false); setShowImageParamsPanel(false);
-      setIsAudioModeActive(false); setShowAudioParamsPanel(false);
+      setIsImageModeActive(false); setIsImageParamsModalOpen(false);
+      setIsAudioModeActive(false); setIsAudioParamsModalOpen(false);
       inputRef.current?.focus();
+    } else {
+      setIsVideoParamsModalOpen(false);
     }
+  };
+
+  const openActiveParamsModal = () => {
+    if (isImageModeActive) setIsImageParamsModalOpen(true);
+    else if (isAudioModeActive) setIsAudioParamsModalOpen(true);
+    else if (isVideoModeActive) setIsVideoParamsModalOpen(true);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -255,7 +259,6 @@ const EmptyChatMessageInput = ({
   if (uploadFile) {
     return (
       <div className='relative w-full flex justify-center'>
-        {/* MODIFIED: Use w-full for upload panel container */}
         <div className='flex flex-col items-center w-full mt-[1.2rem] rounded-[1.5rem]' style={borderStyle}>
           <p className='w-full text-center lg:p-1 xl:p-5 font-[700] md:text-base lg:text-lg xl:text-xl relative'>Drag and Drop or upload your file here
             <button type='button' onClick={handleUploadFileToggle} className='absolute top-1/2 right-4 -translate-y-1/2 font-normal text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 cursor-pointer'>
@@ -277,83 +280,116 @@ const EmptyChatMessageInput = ({
    }
 
   return (
-    // MODIFIED: Form is w-full
-    <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
-      {/* MODIFIED: Bordered div is w-full, min-w-* classes removed */}
-      <div
-        style={borderStyle}
-        className="relative flex flex-col bg-white dark:bg-slate-900 px-2 sm:px-4 pt-3 sm:pt-4 pb-2 rounded-lg items-center w-full border"
-      >
-        <TextareaAutosize
-          ref={inputRef}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          minRows={6}
-          maxRows={8}
-          className="w-full bg-transparent p-1 placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 text-xs sm:text-sm self-start text-black dark:text-white resize-none focus:outline-none max-h-48 sm:max-h-36 md:max-h-48"
-          placeholder={placeholderText}
-        />
-        <div className="flex items-center justify-between w-full mt-2"> {/* This is already w-full implicitly by being a direct child of flex-col */}
-          <div className="flex items-center space-x-1 flex-shrink-0">
-            <button type="button" onClick={handleUploadFileToggle} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
-              <Paperclip size={20} />
-            </button>
-            <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text/Audio/Video Mode" : "Switch to Image Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isImageModeActive ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400'}`} disabled={isAudioModeActive || isVideoModeActive}>
-              <ImageIconLucide size={20} />
-            </button>
-            <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image/Video Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive || isVideoModeActive}>
-              <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : 'currentColor'} />
-            </button>
-            <button type="button" onClick={handleVideoModeToggle} title={isVideoModeActive ? "Switch to Text/Image/Audio Mode" : "Switch to Video Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isVideoModeActive ? 'bg-red-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400'}`} disabled={isImageModeActive || isAudioModeActive}>
-              <VideoIconLucide size={20} />
+    <>
+      <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
+        <div
+          style={borderStyle}
+          className="relative flex flex-col bg-white dark:bg-slate-900 px-2 sm:px-4 pt-3 sm:pt-4 pb-2 rounded-lg items-center w-full border"
+        >
+          <TextareaAutosize
+            ref={inputRef}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            minRows={6}
+            maxRows={8}
+            className="w-full bg-transparent p-1 placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 text-xs sm:text-sm self-start text-black dark:text-white resize-none focus:outline-none max-h-48 sm:max-h-36 md:max-h-48"
+            placeholder={placeholderText}
+          />
+          <div className="flex items-center justify-between w-full mt-2">
+            <div className="flex items-center space-x-1 flex-shrink-0">
+              <button type="button" onClick={handleUploadFileToggle} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
+                <Paperclip size={20} />
+              </button>
+              <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text/Audio/Video Mode" : "Switch to Image Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isImageModeActive ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400'}`} disabled={isAudioModeActive || isVideoModeActive}>
+                <ImageIconLucide size={20} />
+              </button>
+              <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image/Video Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive || isVideoModeActive}>
+                <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : 'currentColor'} />
+              </button>
+              <button type="button" onClick={handleVideoModeToggle} title={isVideoModeActive ? "Switch to Text/Image/Audio Mode" : "Switch to Video Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isVideoModeActive ? 'bg-red-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400'}`} disabled={isImageModeActive || isAudioModeActive}>
+                <VideoIconLucide size={20} />
+              </button>
+              {(isImageModeActive || isAudioModeActive || isVideoModeActive) && (
+                <button
+                  type="button"
+                  onClick={openActiveParamsModal}
+                  title="Edit Parameters"
+                  className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
+                >
+                  <SlidersHorizontalIcon size={20} />
+                </button>
+              )}
+            </div>
+            <button type="submit" disabled={(isImageModeActive || isAudioModeActive || isVideoModeActive ? !message.trim() : (!message.trim() && !file)) || isSubmittingImage || isSubmittingAudio || isSubmittingVideo } className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2">
+              {(isImageModeActive && isSubmittingImage) || (isAudioModeActive && isSubmittingAudio) || (isVideoModeActive && isSubmittingVideo) ? (
+                <svg className="animate-spin h-4 w-4 text-[#000080] dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <ArrowRight className={(isImageModeActive || isAudioModeActive || isVideoModeActive) ? "text-[#000080] dark:text-white" : "bg-background"} size={17} />
+              )}
             </button>
           </div>
-          <button type="submit" disabled={(isImageModeActive || isAudioModeActive || isVideoModeActive ? !message.trim() : (!message.trim() && !file)) || isSubmittingImage || isSubmittingAudio || isSubmittingVideo } className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2">
-            {(isImageModeActive && isSubmittingImage) || (isAudioModeActive && isSubmittingAudio) || (isVideoModeActive && isSubmittingVideo) ? (
-              <svg className="animate-spin h-4 w-4 text-[#000080] dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            ) : (
-              <ArrowRight className={(isImageModeActive || isAudioModeActive || isVideoModeActive) ? "text-[#000080] dark:text-white" : "bg-background"} size={17} />
-            )}
-          </button>
         </div>
-      </div>
 
-      {/* MODIFIED: Parameter panels container is w-full, min-w-* and mx-auto removed */}
-      <div className="w-full">
-          {(isImageModeActive && showImageParamsPanel) && ( <ImageGenerationPanel imageNegativePrompt={imageNegativePrompt} setImageNegativePrompt={setImageNegativePrompt} imageModel={imageModel} setImageModel={setImageModel} imageSize={imageSize} setImageSize={setImageSize} imageGuidanceScale={imageGuidanceScale} setImageGuidanceScale={setImageGuidanceScale} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || "flux"} /> )}
-          {(isAudioModeActive && showAudioParamsPanel) && ( <AudioGenerationPanel audioNegativePrompt={audioNegativePrompt} setAudioNegativePrompt={setAudioNegativePrompt} audioDuration={audioDuration} setAudioDuration={setAudioDuration} audioSeed={audioSeed} setAudioSeed={setAudioSeed} audioModel={audioModel} setAudioModel={setAudioModel} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_AUDIO_DEFAULT_MODEL || "stable-audio-open-1.0"}/> )}
-          {(isVideoModeActive && showVideoParamsPanel) && (
-            <VideoGenerationParametersPanel
-              videoNegativePrompt={videoNegativePrompt} setVideoNegativePrompt={setVideoNegativePrompt}
-              videoGuidanceScale={videoGuidanceScale} setVideoGuidanceScale={setVideoGuidanceScale}
-              videoNumFrames={videoNumFrames} setVideoNumFrames={setVideoNumFrames}
-              videoDuration={videoDuration} setVideoDuration={setVideoDuration}
-              videoSeed={videoSeed} setVideoSeed={setVideoSeed}
-              videoWidth={videoWidth} setVideoWidth={setVideoWidth}
-              videoHeight={videoHeight} setVideoHeight={setVideoHeight}
-              videoNumInferenceSteps={videoNumInferenceSteps} setVideoNumInferenceSteps={setVideoNumInferenceSteps}
-              videoDecodeTimestep={videoDecodeTimestep} setVideoDecodeTimestep={setVideoDecodeTimestep}
-              videoDecodeNoiseScale={videoDecodeNoiseScale} setVideoDecodeNoiseScale={setVideoDecodeNoiseScale}
-              videoUpscaleAndRefine={videoUpscaleAndRefine} setVideoUpscaleAndRefine={setVideoUpscaleAndRefine}
-            />
-          )}
-      </div>
+        {/* Parameter panels are now modals, this container is no longer needed for inline display */}
+        {/* <div className="w-full">
+        </div> */}
 
-      {/* MODIFIED: Welcome message is w-full and text-center */}
-      {!(isImageModeActive || isAudioModeActive || isVideoModeActive || uploadFile) && (
-           <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] mt-4 md:mt-2 w-full text-center">
-            Welcome to GenAI Search, your go-to tool for instant answers and web exploration!
-            Simply type your question or topic of interest, and GenAI will provide
-            you with accurate answers along with related links from the web.
-            Whether you&apos;re seeking quick information or diving deeper
-            into a topic, GenAI Search has you covered.
-          </p>
+        {!(isImageModeActive || isAudioModeActive || isVideoModeActive || uploadFile) && (
+             <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] mt-4 md:mt-2 w-full text-center">
+              Welcome to GenAI Search, your go-to tool for instant answers and web exploration!
+              Simply type your question or topic of interest, and GenAI will provide
+              you with accurate answers along with related links from the web.
+              Whether you&apos;re seeking quick information or diving deeper
+              into a topic, GenAI Search has you covered.
+            </p>
+        )}
+      </form>
+
+      {/* Modals for Parameters */}
+      {isImageModeActive && (
+        <GenericModal isOpen={isImageParamsModalOpen} onClose={() => setIsImageParamsModalOpen(false)} title="Image Generation Settings" size="lg">
+          <ImageGenerationPanel
+            imageNegativePrompt={imageNegativePrompt} setImageNegativePrompt={setImageNegativePrompt}
+            imageModel={imageModel} setImageModel={setImageModel}
+            imageSize={imageSize} setImageSize={setImageSize}
+            imageGuidanceScale={imageGuidanceScale} setImageGuidanceScale={setImageGuidanceScale}
+            defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || "flux"}
+          />
+        </GenericModal>
       )}
-    </form>
+      {isAudioModeActive && (
+        <GenericModal isOpen={isAudioParamsModalOpen} onClose={() => setIsAudioParamsModalOpen(false)} title="Audio Generation Settings" size="lg">
+          <AudioGenerationPanel
+            audioNegativePrompt={audioNegativePrompt} setAudioNegativePrompt={setAudioNegativePrompt}
+            audioDuration={audioDuration} setAudioDuration={setAudioDuration}
+            audioSeed={audioSeed} setAudioSeed={setAudioSeed}
+            audioModel={audioModel} setAudioModel={setAudioModel}
+            defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_AUDIO_DEFAULT_MODEL || "stable-audio-open-1.0"}
+          />
+        </GenericModal>
+      )}
+      {isVideoModeActive && (
+        <GenericModal isOpen={isVideoParamsModalOpen} onClose={() => setIsVideoParamsModalOpen(false)} title="Video Generation Settings" size="xl">
+          <VideoGenerationParametersPanel
+            videoNegativePrompt={videoNegativePrompt} setVideoNegativePrompt={setVideoNegativePrompt}
+            videoGuidanceScale={videoGuidanceScale} setVideoGuidanceScale={setVideoGuidanceScale}
+            videoNumFrames={videoNumFrames} setVideoNumFrames={setVideoNumFrames}
+            videoDuration={videoDuration} setVideoDuration={setVideoDuration}
+            videoSeed={videoSeed} setVideoSeed={setVideoSeed}
+            videoWidth={videoWidth} setVideoWidth={setVideoWidth}
+            videoHeight={videoHeight} setVideoHeight={setVideoHeight}
+            videoNumInferenceSteps={videoNumInferenceSteps} setVideoNumInferenceSteps={setVideoNumInferenceSteps}
+            videoDecodeTimestep={videoDecodeTimestep} setVideoDecodeTimestep={setVideoDecodeTimestep}
+            videoDecodeNoiseScale={videoDecodeNoiseScale} setVideoDecodeNoiseScale={setVideoDecodeNoiseScale}
+            videoUpscaleAndRefine={videoUpscaleAndRefine} setVideoUpscaleAndRefine={setVideoUpscaleAndRefine}
+          />
+        </GenericModal>
+      )}
+    </>
   );
 };
 export default EmptyChatMessageInput;

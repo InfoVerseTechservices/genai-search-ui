@@ -5,6 +5,7 @@ import Logo from '../public/ColomboAI-logo.svg';
 import Link from 'next/link';
 import { ArrowLeft } from './Icons'; // Assuming ArrowLeft is from your Icons.tsx
 import { useRouter } from 'next/navigation';
+import { NewGenSearchIcon, HistoryIcon } from './Icons';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -34,6 +35,23 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           {/* Centered Logo */}
           <div className="flex-grow flex justify-center">
             <Image src={Logo} alt="ColomboAI" className="w-[8rem] sm:w-[9rem]" />
+          </div>
+
+          <div className="absolute top-3 right-2 z-[999] md:hidden"> {/* Added md:hidden */}
+            <div className="flex space-x-4 mt-3">
+              <button onClick={(e) => {
+                // Potentially also reset focusMode or other chat-specific states
+              }}>
+                <div className="flex flex-col items-center">
+                  <div className="w-6 h-6 mb-1"> <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} /> </div>
+                </div>
+              </button>
+              <Link href="/library/">
+                <div className="flex flex-col items-center">
+                  <div className="w-8 sm:w-6 h-6 mb-1"> <HistoryIcon w={24} h={24} fill={'#8E8E93'} /> </div>
+                </div>
+              </Link>
+            </div>
           </div>
 
           {/* Placeholder for potential right-side icons */}

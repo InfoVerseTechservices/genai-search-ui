@@ -441,7 +441,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
       <div className="">
         <div className="absolute top-3 right-2 z-[999] md:hidden"> {/* Added md:hidden */}
           <div className="flex space-x-4 mt-3">
-            <button onClick={(e) => {
+            {/* <button onClick={(e) => {
               setMessages([]);
               setChatId(crypto.randomBytes(20).toString('hex'));
               setNewChatCreated(true);
@@ -451,12 +451,12 @@ const ChatWindow = ({ id }: { id?: string }) => {
               <div className="flex flex-col items-center">
                 <div className="w-6 h-6 mb-1"> <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} /> </div>
               </div>
-            </button>
-            <Link href="/library/">
+            </button> */}
+            {/* <Link href="/library/">
               <div className="flex flex-col items-center">
                 <div className="w-8 sm:w-6 h-6 mb-1"> <HistoryIcon w={24} h={24} fill={'#8E8E93'} /> </div>
               </div>
-            </Link>
+            </Link> */}
           </div>
         </div>
         {messages.length > 0 ? (

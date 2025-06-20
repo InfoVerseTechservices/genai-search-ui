@@ -331,7 +331,7 @@ const EmptyChatMessageInput = ({
             )}
         </div>
 
-        {!(isImageModeActive || isAudioModeActive || isVideoModeActive || uploadFile) && ( // Updated condition
+        {/* {!(isImageModeActive || isAudioModeActive || isVideoModeActive || uploadFile) && ( // Updated condition
              <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] mt-4 md:mt-2 w-[calc(100%-20px)] sm:w-auto md:max-w-xl lg:max-w-2xl text-center">
               Welcome to GenAI Search, your go-to tool for instant answers and web exploration!
               Simply type your question or topic of interest, and GenAI will provide
@@ -339,7 +339,7 @@ const EmptyChatMessageInput = ({
               Whether you&apos;re seeking quick information or diving deeper
               into a topic, GenAI Search has you covered.
             </p>
-        )}
+        )} */}
       </form>
     </>
   );

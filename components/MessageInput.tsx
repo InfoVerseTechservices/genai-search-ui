@@ -15,7 +15,7 @@ interface ImageGenParams { prompt: string; negative_prompt?: string; model?: str
 interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
 interface MessageInputProps {
   sendMessage: (message: string, file: File | null) => void;
-  loading: boolean;
+  loading: boolean; // General loading from ChatWindow (e.g., for WS text messages)
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
   onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
   onVideoPromptSubmit: (params: UIVideoGenParams, videoPromptText: string) => void;
@@ -37,6 +37,7 @@ const MessageInput = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
+  // Image states
   const [isImageModeActive, setIsImageModeActive] = useState(false);
   const [showImageParamsPanel, setShowImageParamsPanel] = useState(false);
   const [imageNegativePrompt, setImageNegativePrompt] = useState('');
@@ -45,6 +46,7 @@ const MessageInput = ({
   const [imageGuidanceScale, setImageGuidanceScale] = useState(7.5);
   const [isSubmittingImage, setIsSubmittingImage] = useState(false);
 
+  // Audio states
   const [isAudioModeActive, setIsAudioModeActive] = useState(false);
   const [showAudioParamsPanel, setShowAudioParamsPanel] = useState(false);
   const [audioNegativePrompt, setAudioNegativePrompt] = useState('Low quality.');
@@ -53,6 +55,7 @@ const MessageInput = ({
   const [audioSeed, setAudioSeed] = useState(0);
   const [isSubmittingAudio, setIsSubmittingAudio] = useState(false);
 
+  // Video states
   const [isVideoModeActive, setIsVideoModeActive] = useState(false);
   const [showVideoParamsPanel, setShowVideoParamsPanel] = useState(false);
   const [videoNegativePrompt, setVideoNegativePrompt] = useState('');
@@ -68,17 +71,17 @@ const MessageInput = ({
   const [videoUpscaleAndRefine, setVideoUpscaleAndRefine] = useState<boolean>(false);
   const [isSubmittingVideo, setIsSubmittingVideo] = useState(false);
 
-  const [isMobileView, setIsMobileView] = useState(true); // Default to mobile for SSR
+  const [isMobileView, setIsMobileView] = useState(true);
 
   useEffect(() => {
     const checkMobile = () => setIsMobileView(window.innerWidth < 768);
-    checkMobile(); // Initial check
+    checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   useEffect(() => {
-    if (!isMobileView) { // Only apply desktop mode switching logic if not mobile view
+    if (!isMobileView) {
         if (textareaRows >= 2 && message && mode === 'single' && !isImageModeActive && !isAudioModeActive && !isVideoModeActive) {
             setMode('multi');
         } else if (!message && !isImageModeActive && !isAudioModeActive && !isVideoModeActive && mode === 'multi') {
@@ -103,8 +106,7 @@ const MessageInput = ({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
-
+   }, []);
   const borderStyle = {
     border: '0.5px solid transparent',
     backgroundClip: 'padding-box',
@@ -114,16 +116,23 @@ const MessageInput = ({
    };
 
   const handleMainSendMessage = () => {
-    if (loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo) return; // Added isSubmittingVideo
+    if (isImageModeActive || isAudioModeActive || isVideoModeActive) {
+        console.warn("Send message called while a generation mode is active. This should be handled by specific generation handlers.");
+        return;
+    }
+    if (loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo) return;
     if (message.trim().length > 0 || file) {
       sendMessage(message, file);
       setMessage('');
       setFile(null);
-      if (mode === 'multi' && !isImageModeActive && !isAudioModeActive && !isVideoModeActive && !isMobileView) setMode('single'); // Added !isVideoModeActive and !isMobileView
+      if (!isMobileView && mode === 'multi') {
+        setMode('single');
+      }
     }
   };
+
   const handleImageGenerationRequest = async () => {
-    if (loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || !message.trim()) return; // Added isSubmittingVideo
+    if (loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || !message.trim()) return;
     setIsSubmittingImage(true);
     const params: ImageGenParams = {
       prompt: message,
@@ -135,9 +144,13 @@ const MessageInput = ({
     onImagePromptSubmit(params, message);
     setMessage('');
     setIsSubmittingImage(false);
+    if (isImageModeActive) {
+      setShowImageParamsPanel(true);
+    }
   };
+
   const handleAudioGenerationRequest = async () => {
-    if (loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || !message.trim()) return; // Added isSubmittingVideo
+    if (loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || !message.trim()) return;
     setIsSubmittingAudio(true);
     const params: AudioGenParams = {
       prompt: message,
@@ -149,6 +162,9 @@ const MessageInput = ({
     onAudioPromptSubmit(params, message);
     setMessage('');
     setIsSubmittingAudio(false);
+    if (isAudioModeActive) {
+      setShowAudioParamsPanel(true);
+    }
   };
 
   const handleVideoGenerationRequest = async () => {
@@ -172,6 +188,9 @@ const MessageInput = ({
     onVideoPromptSubmit(params, message);
     setMessage('');
     setIsSubmittingVideo(false);
+    if (isVideoModeActive) {
+      setShowVideoParamsPanel(true);
+    }
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -221,7 +240,7 @@ const MessageInput = ({
     }
   };
 
-  const effectiveModeForDesktop = isImageModeActive || isAudioModeActive || isVideoModeActive ? 'multi' : mode;
+  const effectiveModeForDesktop = (isImageModeActive || isAudioModeActive || isVideoModeActive) ? 'multi' : mode;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -251,10 +270,10 @@ const MessageInput = ({
         style={borderStyle}
         onSubmit={handleSubmit}
         className={cn(
-          'bg-white dark:bg-slate-800 p-2 md:p-3 flex items-center overflow-hidden border', // Common base classes
+          'bg-white dark:bg-slate-800 p-2 md:p-3 flex items-center overflow-hidden border',
           (effectiveModeForDesktop === 'multi' || isMobileView) ?
-            'flex-col rounded-lg' : // Multi-line desktop AND all mobile views
-            'md:flex-row md:rounded-full' // Single-line desktop
+            'flex-col rounded-lg' :
+            'md:flex-row md:rounded-full'
         )}
       >
         <TextareaAutosize
@@ -263,22 +282,22 @@ const MessageInput = ({
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           onHeightChange={(height, props) => {
-            if (typeof window !== 'undefined' && window.innerWidth >= 768) { // md breakpoint
+            if (!isMobileView) {
                 setTextareaRows(Math.ceil(height / props.rowHeight));
             }
           }}
-          minRows={(effectiveModeForDesktop === 'multi' || isMobileView) ? 3 : 1} // Adjusted for mobile
+          minRows={(effectiveModeForDesktop === 'multi' || isMobileView) ? 3 : 1}
           className="w-full transition bg-transparent placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 placeholder:text-sm text-black dark:text-white text-sm resize-none focus:outline-none px-2 max-h-36 md:max-h-24 lg:max-h-36 xl:max-h-48 order-1"
           placeholder={placeholderText}
         />
 
         <div className={cn(
-          "flex items-center w-full mt-2 md:mt-0",
-          (effectiveModeForDesktop === 'multi' || isMobileView) ? "justify-between" : "md:ml-2",
+          "flex items-center w-full mt-2",
+          (effectiveModeForDesktop === 'multi' || isMobileView) ? "justify-between" : "md:ml-2 md:mt-0",
           "order-2"
         )}>
           {/* Left Group: Actionable Icons */}
-          <div className="flex items-center space-x-1 flex-shrink-0"> {/* MODIFIED: Added flex-shrink-0 */}
+          <div className="flex items-center space-x-1 flex-shrink-0">
             <button type="button" onClick={handleUploadFileClick} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
               <Paperclip size={20} />
             </button>
@@ -307,7 +326,7 @@ const MessageInput = ({
               disabled={loading || isSubmittingImage || isSubmittingAudio || isSubmittingVideo || (isImageModeActive || isAudioModeActive || isVideoModeActive ? !message.trim() : (!message.trim() && !file))}
               className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc79] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2 flex-shrink-0"
             >
-              {(isSubmittingImage && isImageModeActive) || (isSubmittingAudio && isAudioModeActive) || (isSubmittingVideo && isVideoModeActive) ? (
+              {(isImageModeActive && isSubmittingImage) || (isAudioModeActive && isSubmittingAudio) || (isVideoModeActive && isSubmittingVideo) ? ( // Corrected spinner logic
                  <svg className="animate-spin h-4 w-4 text-[#000080] dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

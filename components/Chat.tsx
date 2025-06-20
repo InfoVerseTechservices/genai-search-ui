@@ -1,15 +1,16 @@
 // components/Chat.tsx
 'use client';
 
-import { Fragment, useEffect, useRef, useState } from 'react';
-import MessageInput, { VideoGenParams } from './MessageInput'; // Import VideoGenParams
-import { Message } from './ChatWindow'; // Assuming Message type is imported from ChatWindow
+import { Fragment, useEffect, useRef } from 'react'; // Removed useState
+import MessageInput, { VideoGenParams, ImageGenParams, AudioGenParams } from './MessageInput'; // Assuming types are exported
+import { Message } from './ChatWindow';
 import MessageBox from './MessageBox';
 import MessageBoxLoading from './MessageBoxLoading';
 
-// Define ImageGenParams and AudioGenParams if not globally available or imported
-interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
-interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
+// Ensure these prop types are complete as expected by MessageInput and ChatWindow
+// interface ImageGenParams { /* ... */ } (defined in MessageInput)
+// interface AudioGenParams { /* ... */ } (defined in MessageInput)
+// interface VideoGenParams { /* ... */ } (defined in MessageInput)
 
 const Chat = ({
   loading,
@@ -17,7 +18,7 @@ const Chat = ({
   sendMessage,
   onImagePromptSubmit,
   onAudioPromptSubmit,
-  onVideoPromptSubmit, // Added prop
+  onVideoPromptSubmit,
   messageAppeared,
   rewrite,
   editMessage,
@@ -27,74 +28,59 @@ const Chat = ({
   sendMessage: (message: string, file: File | null) => void;
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
   onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
-  onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void; // Added prop type
+  onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void;
   loading: boolean;
   messageAppeared: boolean;
   rewrite: (messageId: string) => void;
   editMessage: (messageId: string, newContent: string) => void;
   setMessages: (messages: Message[]) => void;
 }) => {
-  // const [dividerWidth, setDividerWidth] = useState(0);
   const dividerRef = useRef<HTMLDivElement | null>(null);
   const messageEnd = useRef<HTMLDivElement | null>(null);
 
-  // useEffect(() => {
-  //   const updateDividerWidth = () => {
-  //     if (dividerRef.current) {
-  //       setDividerWidth(dividerRef.current.scrollWidth);
-  //     } else {
-  //       // Fallback for mobile if dividerRef might not exist or be relevant
-  //       // Or, ensure ChatWindow's main container provides a ref for width if needed
-  //       // For now, relying on MessageInput's own full-width handling for mobile via className
-  //     }
-  //   };
-
-  //   updateDividerWidth();
-  //   window.addEventListener('resize', updateDividerWidth);
-  //   return () => {
-  //     window.removeEventListener('resize', updateDividerWidth);
-  //   };
-  // }, []); // Removed dividerRef from deps, as it might not be stable or always present
-
   useEffect(() => {
     messageEnd.current?.scrollIntoView({ behavior: 'smooth' });
-    // Title setting logic can remain if needed
   }, [messages]);
 
-  return (
-    <div className="flex flex-col space-y-6 pt-8 pb-44 lg:pb-32 sm:mx-4 md:ml-[8rem]">
-      {messages.map((msg, i) => {
-        const isLast = i === messages.length - 1;
-        return (
-          <Fragment key={msg.messageId}>
-            <MessageBox
-              key={i} // Consider using msg.messageId if truly unique and stable for key
-              message={msg}
-              callAd = {i==messages.length-1} // Ensure callAd logic is sound
-              messageIndex={i}
-              history={messages}
-              loading={loading}
-              dividerRef={isLast ? dividerRef : undefined}
-              isLast={isLast}
-              rewrite={rewrite}
-              sendMessage={sendMessage}
-              editMessage={editMessage}
-              setMessages={setMessages}
-            />
-            {!isLast && msg.role === 'assistant' && (
-              <div className="h-px w-full bg-light-secondary dark:bg-dark-secondary" />
-            )}
-          </Fragment>
-        );
-      })}
-      {loading && !messageAppeared && <MessageBoxLoading />}
-      <div ref={messageEnd} className="h-0" />
+  const messageListPaddingBottom = 'pb-24 md:pb-28';
 
-      {/* MODIFIED Container for MessageInput */}
-      <div
-        className="fixed bottom-0 left-0 right-0 px-2 pb-2 md:px-4 md:pb-4 lg:pb-6 flex justify-center z-40" // Added some padding for different screen sizes
-      >
-        <div className="w-full md:max-w-2xl lg:max-w-3xl xl:max-w-4xl"> {/* Max width container */}
+  return (
+    <div className="flex flex-col h-full w-full">
+
+      {/* Messages list area - scrollable */}
+      <div className={`flex-grow overflow-y-auto space-y-6 pt-8 ${messageListPaddingBottom} px-2 sm:px-4 md:px-6`}>
+        {messages.map((msg, i) => {
+          const isLast = i === messages.length - 1;
+          return (
+            <Fragment key={msg.messageId}>
+              <MessageBox
+                key={msg.messageId}
+                message={msg}
+                callAd = {i === messages.length - 1}
+                messageIndex={i}
+                history={messages}
+                loading={loading}
+                dividerRef={isLast ? dividerRef : undefined}
+                isLast={isLast}
+                rewrite={rewrite}
+                sendMessage={sendMessage}
+                editMessage={editMessage}
+                setMessages={setMessages}
+              />
+              {!isLast && msg.role === 'assistant' && (
+                <div className="h-px w-full bg-light-secondary dark:bg-dark-secondary" />
+              )}
+            </Fragment>
+          );
+        })}
+        {loading && messages.length > 0 && messages[messages.length -1].role === 'user' && <MessageBoxLoading />}
+        <div ref={messageEnd} className="h-0" />
+      </div>
+
+      {/* Sticky Input Area Wrapper */}
+      <div className="sticky bottom-0 w-full bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-gray-700 py-2 md:py-3 z-10">
+        {/* Centering and max-width container for the input itself */}
+        <div className="w-full max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-2 md:px-0">
           <MessageInput
               loading={loading}
               sendMessage={sendMessage}

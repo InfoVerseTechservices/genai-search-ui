@@ -1,17 +1,14 @@
 // components/EmptyChat.tsx
 import SideBottomAdComponent from './Ads/SideAdBottom';
 import SideTopAdComponent from './Ads/SideAdTop';
-import EmptyChatMessageInput, { VideoGenParams, ImageGenParams as EmptyImageGenParams, AudioGenParams as EmptyAudioGenParams } from './EmptyChatMessageInput';
+// Assuming types are correctly imported/exported by EmptyChatMessageInput or a shared types file
+import EmptyChatMessageInput, { VideoGenParams, ImageGenParams, AudioGenParams } from './EmptyChatMessageInput';
 
-// Re-export or ensure types are consistently defined
-export type { EmptyImageGenParams as ImageGenParams };
-export type { EmptyAudioGenParams as AudioGenParams };
-// VideoGenParams is already being re-exported by EmptyChatMessageInput
 
 interface EmptyChatProps {
   sendMessage: (message: string, file: File | null) => void;
-  onImagePromptSubmit: (params: EmptyImageGenParams, imagePromptText: string) => void;
-  onAudioPromptSubmit: (params: EmptyAudioGenParams, audioPromptText: string) => void;
+  onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
+  onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
   onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void;
   focusMode: string;
   setFocusMode: (mode: string) => void;
@@ -25,40 +22,39 @@ const EmptyChat = ({
   focusMode,
   setFocusMode,
 }: EmptyChatProps) => {
+
+  const titleText = "Discover and Do More with ColomboAI MC1";
+
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    // This root div should fill the allocated central column space.
+    // items-center will center the content if the content is narrower than the column (e.g. max-w-5xl for input)
+    <div className="flex flex-col h-full w-full items-center">
 
-      {/* Main content area (can be empty or have other content for the "empty" state) */}
-      <div className="flex-grow flex flex-col p-4 items-center justify-center">
-        {/* This area is intentionally kept minimal as EmptyChatMessageInput contains the main H2 title */}
-        {/* You could add a logo here if desired, above the fixed input area. */}
+      {/* Title Area: Centered, takes up available vertical space pushing input to bottom */}
+      <div className="flex-grow flex items-center justify-center p-4 text-center">
+        <h2 className="text-[#000080] dark:text-blue-300 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium">
+          {titleText}
+        </h2>
       </div>
 
-      {/* Ads sidebar */}
-      <div className='w-[400px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-[2rem] h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden flex-shrink-0'>
-        <div className="w-[400px] h-[250px] cursor-pointer">
-          <SideTopAdComponent divid='top-emptychat' />
-        </div>
-        <div className="w-[400px] h-[600px] cursor-pointer">
-          <SideBottomAdComponent divid='bottom-emptychat' />
-        </div>
-      </div>
-
-      {/* Fixed Input Area Wrapper */}
-      <div
-        className="fixed bottom-0 left-0 right-0 flex justify-center z-40 px-1 pb-1 md:px-4 md:pb-2 lg:pb-3 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-gray-700"
-      >
-        <div className="w-full md:max-w-2xl lg:max-w-3xl xl:max-w-4xl"> {/* Max width container */}
-          <EmptyChatMessageInput
+      {/* Input Area Container: At the bottom of this flex-col, horizontally centered with padding */}
+      {/* This div handles the max-width and padding for the input area itself. */}
+      <div className="w-full max-w-5xl mx-auto px-5 pb-4">
+         <EmptyChatMessageInput
             sendMessage={sendMessage}
             focusMode={focusMode}
             setFocusMode={setFocusMode}
             onImagePromptSubmit={onImagePromptSubmit}
             onAudioPromptSubmit={onAudioPromptSubmit}
             onVideoPromptSubmit={onVideoPromptSubmit}
-          />
-        </div>
+            // EmptyChatMessageInput no longer renders its own H2
+         />
       </div>
+
+      {/* Ad sidebar is removed. It should be a sibling to the component that renders EmptyChat if a
+          three-column layout (LeftSidebar | EmptyChat-Content | AdSidebar) is desired at the page level.
+          EmptyChat is now only responsible for its own content within the column it's given.
+      */}
     </div>
   );
 };

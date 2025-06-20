@@ -34,27 +34,27 @@ const Chat = ({
   editMessage: (messageId: string, newContent: string) => void;
   setMessages: (messages: Message[]) => void;
 }) => {
-  const [dividerWidth, setDividerWidth] = useState(0);
+  // const [dividerWidth, setDividerWidth] = useState(0);
   const dividerRef = useRef<HTMLDivElement | null>(null);
   const messageEnd = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const updateDividerWidth = () => {
-      if (dividerRef.current) {
-        setDividerWidth(dividerRef.current.scrollWidth);
-      } else {
-        // Fallback for mobile if dividerRef might not exist or be relevant
-        // Or, ensure ChatWindow's main container provides a ref for width if needed
-        // For now, relying on MessageInput's own full-width handling for mobile via className
-      }
-    };
+  // useEffect(() => {
+  //   const updateDividerWidth = () => {
+  //     if (dividerRef.current) {
+  //       setDividerWidth(dividerRef.current.scrollWidth);
+  //     } else {
+  //       // Fallback for mobile if dividerRef might not exist or be relevant
+  //       // Or, ensure ChatWindow's main container provides a ref for width if needed
+  //       // For now, relying on MessageInput's own full-width handling for mobile via className
+  //     }
+  //   };
 
-    updateDividerWidth();
-    window.addEventListener('resize', updateDividerWidth);
-    return () => {
-      window.removeEventListener('resize', updateDividerWidth);
-    };
-  }, []); // Removed dividerRef from deps, as it might not be stable or always present
+  //   updateDividerWidth();
+  //   window.addEventListener('resize', updateDividerWidth);
+  //   return () => {
+  //     window.removeEventListener('resize', updateDividerWidth);
+  //   };
+  // }, []); // Removed dividerRef from deps, as it might not be stable or always present
 
   useEffect(() => {
     messageEnd.current?.scrollIntoView({ behavior: 'smooth' });
@@ -90,20 +90,19 @@ const Chat = ({
       {loading && !messageAppeared && <MessageBoxLoading />}
       <div ref={messageEnd} className="h-0" />
 
-      {/* Container for MessageInput */}
+      {/* MODIFIED Container for MessageInput */}
       <div
-        className="fixed bottom-0 left-0 right-0 md:left-auto md:bottom-10 z-40 w-full md:w-auto" // Full width on mobile, auto on desktop
-        // On desktop, width is controlled by `dividerWidth` via style prop.
-        // On mobile, `w-full` takes precedence.
-        style={typeof window !== 'undefined' && window.innerWidth >= 768 ? { width: dividerWidth ? `${dividerWidth}px` : 'auto' } : {}}
+        className="fixed bottom-0 left-0 right-0 px-2 pb-2 md:px-4 md:pb-4 lg:pb-6 flex justify-center z-40" // Added some padding for different screen sizes
       >
-        <MessageInput
-            loading={loading}
-            sendMessage={sendMessage}
-            onImagePromptSubmit={onImagePromptSubmit}
-            onAudioPromptSubmit={onAudioPromptSubmit}
-            onVideoPromptSubmit={onVideoPromptSubmit} // Pass down the prop
-        />
+        <div className="w-full md:max-w-2xl lg:max-w-3xl xl:max-w-4xl"> {/* Max width container */}
+          <MessageInput
+              loading={loading}
+              sendMessage={sendMessage}
+              onImagePromptSubmit={onImagePromptSubmit}
+              onAudioPromptSubmit={onAudioPromptSubmit}
+              onVideoPromptSubmit={onVideoPromptSubmit}
+          />
+        </div>
       </div>
     </div>
   );

@@ -24,51 +24,79 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Ensure the base URL doesn't have a trailing slash, then append the endpoint
     const targetUrl = `${apiBaseUrl.replace(/\/$/, '')}/videos/generations`;
 
-    // Log the request being sent to Colombo AI for debugging purposes
     // console.log('Forwarding video generation request to Colombo AI:', {
     //   url: targetUrl,
     //   method: 'POST',
-    //   body: body, // The body already contains all necessary parameters from videoActions.ts
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Accept': 'application/json',
+    //     'Authorization': `Bearer ${apiKey}`,
+    //   },
+    //   body: JSON.stringify(body),
     // });
 
     const colomboAIResponse = await fetch(targetUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        'Accept': 'application/json', // Important: We still accept JSON
         'Authorization': `Bearer ${apiKey}`,
       },
-      body: JSON.stringify(body), // Forward the client's validated and structured request body
+      body: JSON.stringify(body),
     });
 
-    const responseData = await colomboAIResponse.json();
+    const responseText = await colomboAIResponse.text(); // Get response as text first
+    let responseData;
 
-    // Log the response received from Colombo AI
-    // console.log('Received response from Colombo AI:', {
-    //   status: colomboAIResponse.status,
-    //   data: responseData,
-    // });
+    // console.log('Received raw response text from Colombo AI:', responseText);
+    // console.log('Colombo AI Response Status:', colomboAIResponse.status);
+
 
     if (!colomboAIResponse.ok) {
-      console.error('ColomboAI Video API Error:', responseData);
-      // Forward the error structure from Colombo AI if available, otherwise a generic message
+      console.error(`ColomboAI Video API Error (Status: ${colomboAIResponse.status}): ${responseText}`);
+      // Try to parse as JSON, it might contain structured error details
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (e) {
+        // If parsing error text as JSON fails, use the raw text as the error message
+        return NextResponse.json(
+          {
+            error: `Failed to generate video. Upstream API returned non-JSON error: ${responseText.substring(0, 500)}`, // Limit length
+            status: colomboAIResponse.status
+          },
+          { status: colomboAIResponse.status }
+        );
+      }
+      // If it was parseable JSON, use that
       return NextResponse.json(
         {
           error: responseData.error || responseData.detail || 'Failed to generate video from upstream API.',
-          status: responseData.status // Include status from Colombo if available
+          status_code: responseData.status_code || responseData.status || colomboAIResponse.status, // Include status from Colombo if available
+          raw_error: responseText.substring(0, 500) // For client-side debugging if needed
         },
         { status: colomboAIResponse.status }
       );
     }
 
-    // Forward the successful response (could be "processing" or actual video data)
+    // If response.ok is true, we expect valid JSON
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (e) {
+      console.error(`ColomboAI Video API (Status: ${colomboAIResponse.status}) returned OK but non-JSON response: ${responseText}`);
+      return NextResponse.json(
+        { error: `Upstream API returned OK but with invalid JSON response: ${responseText.substring(0,500)}` },
+        { status: 502 } // Bad Gateway, as upstream sent something unexpected
+      );
+    }
+
+    // console.log('Successfully parsed response from Colombo AI:', responseData);
     return NextResponse.json(responseData, { status: colomboAIResponse.status });
 
   } catch (error: any) {
     console.error('Error in video proxy API route:', error);
+    // This catches network errors for the fetch call itself, or other unexpected errors
     return NextResponse.json(
       { error: error.message || 'An internal server error occurred in video proxy.' },
       { status: 500 }

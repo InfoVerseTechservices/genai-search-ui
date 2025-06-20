@@ -375,9 +375,13 @@ const RelatedImages: React.FC<RelatedImagesProps> = ({
     <>
       {images && images.length > 0 && (
         <a href={images[0].url} target="_blank" rel="noopener noreferrer">
-          <img
+          
+          
+          <Image
             src={images[0].img_src}
             alt={images[0].title}
+            width={351}
+            height={197} // Adjust height to maintain aspect ratio
             className="h-full w-[351px] aspect-video object-cover rounded-lg hover:scale-[1.02] cursor-pointer"
           />
         </a>

@@ -280,7 +280,7 @@ const EmptyChatMessageInput = ({
    }
 
   return (
-    <>
+    <div className="w-full">
       <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
         <div
           style={borderStyle}
@@ -334,62 +334,38 @@ const EmptyChatMessageInput = ({
           </div>
         </div>
 
-        {/* Parameter panels are now modals, this container is no longer needed for inline display */}
-        {/* <div className="w-full">
-        </div> */}
+        {/* MODIFIED: Parameter panels container is w-full, min-w-* and mx-auto removed */}
+        <div className="w-full">
+            {(isImageModeActive && isImageParamsModalOpen) && ( <ImageGenerationPanel imageNegativePrompt={imageNegativePrompt} setImageNegativePrompt={setImageNegativePrompt} imageModel={imageModel} setImageModel={setImageModel} imageSize={imageSize} setImageSize={setImageSize} imageGuidanceScale={imageGuidanceScale} setImageGuidanceScale={setImageGuidanceScale} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || "flux"} /> )}
+            {(isAudioModeActive && isAudioParamsModalOpen) && ( <AudioGenerationPanel audioNegativePrompt={audioNegativePrompt} setAudioNegativePrompt={setAudioNegativePrompt} audioDuration={audioDuration} setAudioDuration={setAudioDuration} audioSeed={audioSeed} setAudioSeed={setAudioSeed} audioModel={audioModel} setAudioModel={setAudioModel} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_AUDIO_DEFAULT_MODEL || "stable-audio-open-1.0"}/> )}
+            {(isVideoModeActive && isVideoParamsModalOpen) && (
+              <VideoGenerationParametersPanel
+                videoNegativePrompt={videoNegativePrompt} setVideoNegativePrompt={setVideoNegativePrompt}
+                videoGuidanceScale={videoGuidanceScale} setVideoGuidanceScale={setVideoGuidanceScale}
+                videoNumFrames={videoNumFrames} setVideoNumFrames={setVideoNumFrames}
+                videoDuration={videoDuration} setVideoDuration={setVideoDuration}
+                videoSeed={videoSeed} setVideoSeed={setVideoSeed}
+                videoWidth={videoWidth} setVideoWidth={setVideoWidth}
+                videoHeight={videoHeight} setVideoHeight={videoHeight}
+                videoNumInferenceSteps={videoNumInferenceSteps} setVideoNumInferenceSteps={setVideoNumInferenceSteps}
+                videoDecodeTimestep={videoDecodeTimestep} setVideoDecodeTimestep={setVideoDecodeTimestep}
+                videoDecodeNoiseScale={videoDecodeNoiseScale} setVideoDecodeNoiseScale={setVideoDecodeNoiseScale}
+                videoUpscaleAndRefine={videoUpscaleAndRefine} setVideoUpscaleAndRefine={setVideoUpscaleAndRefine}
+              />
+            )}
+        </div>
 
-        {!(isImageModeActive || isAudioModeActive || isVideoModeActive || uploadFile) && (
-             <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] mt-4 md:mt-2 w-full text-center">
-              Welcome to GenAI Search, your go-to tool for instant answers and web exploration!
-              Simply type your question or topic of interest, and GenAI will provide
-              you with accurate answers along with related links from the web.
-              Whether you&apos;re seeking quick information or diving deeper
-              into a topic, GenAI Search has you covered.
-            </p>
-        )}
+          {/* {!(isImageModeActive || isAudioModeActive || isVideoModeActive || uploadFile) && ( // Updated condition
+               <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] mt-4 md:mt-2 w-[calc(100%-20px)] sm:w-auto md:max-w-xl lg:max-w-2xl text-center">
+                Welcome to GenAI Search, your go-to tool for instant answers and web exploration!
+                Simply type your question or topic of interest, and GenAI will provide
+                you with accurate answers along with related links from the web.
+                Whether you&apos;re seeking quick information or diving deeper
+                into a topic, GenAI Search has you covered.
+              </p>
+          )} */}
       </form>
-
-      {/* Modals for Parameters */}
-      {isImageModeActive && (
-        <GenericModal isOpen={isImageParamsModalOpen} onClose={() => setIsImageParamsModalOpen(false)} title="Image Generation Settings" size="lg">
-          <ImageGenerationPanel
-            imageNegativePrompt={imageNegativePrompt} setImageNegativePrompt={setImageNegativePrompt}
-            imageModel={imageModel} setImageModel={setImageModel}
-            imageSize={imageSize} setImageSize={setImageSize}
-            imageGuidanceScale={imageGuidanceScale} setImageGuidanceScale={setImageGuidanceScale}
-            defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || "flux"}
-          />
-        </GenericModal>
-      )}
-      {isAudioModeActive && (
-        <GenericModal isOpen={isAudioParamsModalOpen} onClose={() => setIsAudioParamsModalOpen(false)} title="Audio Generation Settings" size="lg">
-          <AudioGenerationPanel
-            audioNegativePrompt={audioNegativePrompt} setAudioNegativePrompt={setAudioNegativePrompt}
-            audioDuration={audioDuration} setAudioDuration={setAudioDuration}
-            audioSeed={audioSeed} setAudioSeed={setAudioSeed}
-            audioModel={audioModel} setAudioModel={setAudioModel}
-            defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_AUDIO_DEFAULT_MODEL || "stable-audio-open-1.0"}
-          />
-        </GenericModal>
-      )}
-      {isVideoModeActive && (
-        <GenericModal isOpen={isVideoParamsModalOpen} onClose={() => setIsVideoParamsModalOpen(false)} title="Video Generation Settings" size="xl">
-          <VideoGenerationParametersPanel
-            videoNegativePrompt={videoNegativePrompt} setVideoNegativePrompt={setVideoNegativePrompt}
-            videoGuidanceScale={videoGuidanceScale} setVideoGuidanceScale={setVideoGuidanceScale}
-            videoNumFrames={videoNumFrames} setVideoNumFrames={setVideoNumFrames}
-            videoDuration={videoDuration} setVideoDuration={setVideoDuration}
-            videoSeed={videoSeed} setVideoSeed={setVideoSeed}
-            videoWidth={videoWidth} setVideoWidth={setVideoWidth}
-            videoHeight={videoHeight} setVideoHeight={setVideoHeight}
-            videoNumInferenceSteps={videoNumInferenceSteps} setVideoNumInferenceSteps={setVideoNumInferenceSteps}
-            videoDecodeTimestep={videoDecodeTimestep} setVideoDecodeTimestep={setVideoDecodeTimestep}
-            videoDecodeNoiseScale={videoDecodeNoiseScale} setVideoDecodeNoiseScale={setVideoDecodeNoiseScale}
-            videoUpscaleAndRefine={videoUpscaleAndRefine} setVideoUpscaleAndRefine={setVideoUpscaleAndRefine}
-          />
-        </GenericModal>
-      )}
-    </>
+    </div>
   );
 };
 export default EmptyChatMessageInput;

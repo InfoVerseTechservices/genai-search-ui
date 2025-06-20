@@ -163,6 +163,7 @@ const useSocket = (
         const sendPing = () => {
           if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify({ type: 'ping' }));
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             heartbeatTimeoutId = setTimeout(() => socket.close(), heartbeatInterval - 7000);
           }
         };

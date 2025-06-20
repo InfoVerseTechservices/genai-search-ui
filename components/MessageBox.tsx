@@ -330,7 +330,7 @@ const MessageBox = ({
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkMath]}
                 rehypePlugins={[rehypeKatex]}
-                components={{ code: CodeBlock }}
+                components={{ code: CodeBlock as any }}
                 className={cn('prose prose-p:leading-relaxed prose-pre:p-0', 'dark:prose-invert max-w-none break-words text-black dark:text-gray-200 text-sm md:text-base font-medium')}
               >
                 {parsedMessage}

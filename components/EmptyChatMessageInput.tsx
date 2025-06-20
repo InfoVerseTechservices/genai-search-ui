@@ -255,7 +255,8 @@ const EmptyChatMessageInput = ({
   if (uploadFile) {
     return (
       <div className='relative w-full flex justify-center'>
-        <div className='flex flex-col items-center w-[calc(100%-10px)] md:w-[28rem] lg:w-[30rem] xl:w-[45rem] mt-[1.2rem] rounded-[1.5rem]' style={borderStyle}>
+        {/* MODIFIED: Use w-full for upload panel container */}
+        <div className='flex flex-col items-center w-full mt-[1.2rem] rounded-[1.5rem]' style={borderStyle}>
           <p className='w-full text-center lg:p-1 xl:p-5 font-[700] md:text-base lg:text-lg xl:text-xl relative'>Drag and Drop or upload your file here
             <button type='button' onClick={handleUploadFileToggle} className='absolute top-1/2 right-4 -translate-y-1/2 font-normal text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 cursor-pointer'>
               <span>x</span>
@@ -276,84 +277,83 @@ const EmptyChatMessageInput = ({
    }
 
   return (
-    <>
-      <h2 className="text-[#000080] dark:text-blue-300 text-md sm:text-xl md:text-xl lg:text-2xl xl:text-3xl font-medium -mt-8 text-center md:text-left">
-        {isImageModeActive ? "Describe an Image" : isAudioModeActive ? "Describe Audio" : isVideoModeActive ? "Describe Video" : "Discover and Do More with ColomboAI MC1"}
-      </h2>
-      <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
-        <div
-          style={borderStyle}
-          className="relative flex flex-col bg-white dark:bg-slate-900 px-2 sm:px-4 pt-3 sm:pt-4 pb-2 rounded-lg items-center w-[calc(100%-10px)] md:w-auto md:min-w-[35rem] lg:min-w-[38rem] xl:min-w-[48rem] border"
-        >
-          <TextareaAutosize
-            ref={inputRef}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            minRows={6}
-            maxRows={8}
-            className="w-full bg-transparent p-1 placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 text-xs sm:text-sm self-start text-black dark:text-white resize-none focus:outline-none max-h-48 sm:max-h-36 md:max-h-48"
-            placeholder={placeholderText}
-          />
-          <div className="flex items-center justify-between w-full mt-2">
-            <div className="flex items-center space-x-1 flex-shrink-0">
-              <button type="button" onClick={handleUploadFileToggle} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
-                <Paperclip size={20} />
-              </button>
-              <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text/Audio/Video Mode" : "Switch to Image Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isImageModeActive ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400'}`} disabled={isAudioModeActive || isVideoModeActive}>
-                <ImageIconLucide size={20} />
-              </button>
-              <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image/Video Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive || isVideoModeActive}>
-                <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : 'currentColor'} />
-              </button>
-              <button type="button" onClick={handleVideoModeToggle} title={isVideoModeActive ? "Switch to Text/Image/Audio Mode" : "Switch to Video Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isVideoModeActive ? 'bg-red-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400'}`} disabled={isImageModeActive || isAudioModeActive}>
-                <VideoIconLucide size={20} />
-              </button>
-            </div>
-            <button type="submit" disabled={(isImageModeActive || isAudioModeActive || isVideoModeActive ? !message.trim() : (!message.trim() && !file)) || isSubmittingImage || isSubmittingAudio || isSubmittingVideo } className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2">
-              {(isImageModeActive && isSubmittingImage) || (isAudioModeActive && isSubmittingAudio) || (isVideoModeActive && isSubmittingVideo) ? (
-                <svg className="animate-spin h-4 w-4 text-[#000080] dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              ) : (
-                <ArrowRight className={(isImageModeActive || isAudioModeActive || isVideoModeActive) ? "text-[#000080] dark:text-white" : "bg-background"} size={17} />
-              )}
+    // MODIFIED: Form is w-full
+    <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
+      {/* MODIFIED: Bordered div is w-full, min-w-* classes removed */}
+      <div
+        style={borderStyle}
+        className="relative flex flex-col bg-white dark:bg-slate-900 px-2 sm:px-4 pt-3 sm:pt-4 pb-2 rounded-lg items-center w-full border"
+      >
+        <TextareaAutosize
+          ref={inputRef}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
+          minRows={6}
+          maxRows={8}
+          className="w-full bg-transparent p-1 placeholder:text-[#ACACAC] dark:placeholder:text-gray-500 text-xs sm:text-sm self-start text-black dark:text-white resize-none focus:outline-none max-h-48 sm:max-h-36 md:max-h-48"
+          placeholder={placeholderText}
+        />
+        <div className="flex items-center justify-between w-full mt-2"> {/* This is already w-full implicitly by being a direct child of flex-col */}
+          <div className="flex items-center space-x-1 flex-shrink-0">
+            <button type="button" onClick={handleUploadFileToggle} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
+              <Paperclip size={20} />
+            </button>
+            <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text/Audio/Video Mode" : "Switch to Image Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isImageModeActive ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400'}`} disabled={isAudioModeActive || isVideoModeActive}>
+              <ImageIconLucide size={20} />
+            </button>
+            <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image/Video Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive || isVideoModeActive}>
+              <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : 'currentColor'} />
+            </button>
+            <button type="button" onClick={handleVideoModeToggle} title={isVideoModeActive ? "Switch to Text/Image/Audio Mode" : "Switch to Video Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isVideoModeActive ? 'bg-red-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400'}`} disabled={isImageModeActive || isAudioModeActive}>
+              <VideoIconLucide size={20} />
             </button>
           </div>
-        </div>
-
-        <div className="w-[calc(100%-10px)] mx-auto md:w-auto md:min-w-[35rem] lg:min-w-[38rem] xl:min-w-[48rem]">
-            {(isImageModeActive && showImageParamsPanel) && ( <ImageGenerationPanel imageNegativePrompt={imageNegativePrompt} setImageNegativePrompt={setImageNegativePrompt} imageModel={imageModel} setImageModel={setImageModel} imageSize={imageSize} setImageSize={setImageSize} imageGuidanceScale={imageGuidanceScale} setImageGuidanceScale={setImageGuidanceScale} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || "flux"} /> )}
-            {(isAudioModeActive && showAudioParamsPanel) && ( <AudioGenerationPanel audioNegativePrompt={audioNegativePrompt} setAudioNegativePrompt={setAudioNegativePrompt} audioDuration={audioDuration} setAudioDuration={setAudioDuration} audioSeed={audioSeed} setAudioSeed={setAudioSeed} audioModel={audioModel} setAudioModel={setAudioModel} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_AUDIO_DEFAULT_MODEL || "stable-audio-open-1.0"}/> )}
-            {(isVideoModeActive && showVideoParamsPanel) && (
-              <VideoGenerationParametersPanel
-                videoNegativePrompt={videoNegativePrompt} setVideoNegativePrompt={setVideoNegativePrompt}
-                videoGuidanceScale={videoGuidanceScale} setVideoGuidanceScale={setVideoGuidanceScale}
-                videoNumFrames={videoNumFrames} setVideoNumFrames={setVideoNumFrames}
-                videoDuration={videoDuration} setVideoDuration={setVideoDuration}
-                videoSeed={videoSeed} setVideoSeed={setVideoSeed}
-                videoWidth={videoWidth} setVideoWidth={setVideoWidth}
-                videoHeight={videoHeight} setVideoHeight={setVideoHeight}
-                videoNumInferenceSteps={videoNumInferenceSteps} setVideoNumInferenceSteps={setVideoNumInferenceSteps}
-                videoDecodeTimestep={videoDecodeTimestep} setVideoDecodeTimestep={setVideoDecodeTimestep}
-                videoDecodeNoiseScale={videoDecodeNoiseScale} setVideoDecodeNoiseScale={setVideoDecodeNoiseScale}
-                videoUpscaleAndRefine={videoUpscaleAndRefine} setVideoUpscaleAndRefine={setVideoUpscaleAndRefine}
-              />
+          <button type="submit" disabled={(isImageModeActive || isAudioModeActive || isVideoModeActive ? !message.trim() : (!message.trim() && !file)) || isSubmittingImage || isSubmittingAudio || isSubmittingVideo } className="bg-[#D2E3FD] dark:bg-blue-600 text-[#000080] dark:text-white disabled:text-black/50 dark:disabled:text-white/50 disabled:bg-[#e0e0dc] dark:disabled:bg-gray-700 hover:bg-opacity-85 transition duration-100 rounded-full p-2">
+            {(isImageModeActive && isSubmittingImage) || (isAudioModeActive && isSubmittingAudio) || (isVideoModeActive && isSubmittingVideo) ? (
+              <svg className="animate-spin h-4 w-4 text-[#000080] dark:text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <ArrowRight className={(isImageModeActive || isAudioModeActive || isVideoModeActive) ? "text-[#000080] dark:text-white" : "bg-background"} size={17} />
             )}
+          </button>
         </div>
+      </div>
 
-        {!(isImageModeActive || isAudioModeActive || isVideoModeActive || uploadFile) && (
-             <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] mt-4 md:mt-2 w-[calc(100%-20px)] sm:w-auto md:max-w-xl lg:max-w-2xl text-center">
-              Welcome to GenAI Search, your go-to tool for instant answers and web exploration!
-              Simply type your question or topic of interest, and GenAI will provide
-              you with accurate answers along with related links from the web.
-              Whether you&apos;re seeking quick information or diving deeper
-              into a topic, GenAI Search has you covered.
-            </p>
-        )}
-      </form>
-    </>
+      {/* MODIFIED: Parameter panels container is w-full, min-w-* and mx-auto removed */}
+      <div className="w-full">
+          {(isImageModeActive && showImageParamsPanel) && ( <ImageGenerationPanel imageNegativePrompt={imageNegativePrompt} setImageNegativePrompt={setImageNegativePrompt} imageModel={imageModel} setImageModel={setImageModel} imageSize={imageSize} setImageSize={setImageSize} imageGuidanceScale={imageGuidanceScale} setImageGuidanceScale={setImageGuidanceScale} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_DEFAULT_MODEL || "flux"} /> )}
+          {(isAudioModeActive && showAudioParamsPanel) && ( <AudioGenerationPanel audioNegativePrompt={audioNegativePrompt} setAudioNegativePrompt={setAudioNegativePrompt} audioDuration={audioDuration} setAudioDuration={setAudioDuration} audioSeed={audioSeed} setAudioSeed={setAudioSeed} audioModel={audioModel} setAudioModel={setAudioModel} defaultModelName={process.env.NEXT_PUBLIC_COLOMBO_AUDIO_DEFAULT_MODEL || "stable-audio-open-1.0"}/> )}
+          {(isVideoModeActive && showVideoParamsPanel) && (
+            <VideoGenerationParametersPanel
+              videoNegativePrompt={videoNegativePrompt} setVideoNegativePrompt={setVideoNegativePrompt}
+              videoGuidanceScale={videoGuidanceScale} setVideoGuidanceScale={setVideoGuidanceScale}
+              videoNumFrames={videoNumFrames} setVideoNumFrames={setVideoNumFrames}
+              videoDuration={videoDuration} setVideoDuration={setVideoDuration}
+              videoSeed={videoSeed} setVideoSeed={setVideoSeed}
+              videoWidth={videoWidth} setVideoWidth={setVideoWidth}
+              videoHeight={videoHeight} setVideoHeight={setVideoHeight}
+              videoNumInferenceSteps={videoNumInferenceSteps} setVideoNumInferenceSteps={setVideoNumInferenceSteps}
+              videoDecodeTimestep={videoDecodeTimestep} setVideoDecodeTimestep={setVideoDecodeTimestep}
+              videoDecodeNoiseScale={videoDecodeNoiseScale} setVideoDecodeNoiseScale={setVideoDecodeNoiseScale}
+              videoUpscaleAndRefine={videoUpscaleAndRefine} setVideoUpscaleAndRefine={setVideoUpscaleAndRefine}
+            />
+          )}
+      </div>
+
+      {/* MODIFIED: Welcome message is w-full and text-center */}
+      {!(isImageModeActive || isAudioModeActive || isVideoModeActive || uploadFile) && (
+           <p className="text-[#ACACAC] text-[12px] sm:text-[14px] md:text-sm lg:text-sm xl:text-[16px] mt-4 md:mt-2 w-full text-center">
+            Welcome to GenAI Search, your go-to tool for instant answers and web exploration!
+            Simply type your question or topic of interest, and GenAI will provide
+            you with accurate answers along with related links from the web.
+            Whether you&apos;re seeking quick information or diving deeper
+            into a topic, GenAI Search has you covered.
+          </p>
+      )}
+    </form>
   );
 };
 export default EmptyChatMessageInput;

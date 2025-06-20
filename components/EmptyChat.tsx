@@ -1,61 +1,62 @@
+// components/EmptyChat.tsx
 import SideBottomAdComponent from './Ads/SideAdBottom';
 import SideTopAdComponent from './Ads/SideAdTop';
-import EmptyChatMessageInput from './EmptyChatMessageInput';
+import EmptyChatMessageInput, { VideoGenParams, ImageGenParams as EmptyImageGenParams, AudioGenParams as EmptyAudioGenParams } from './EmptyChatMessageInput';
 
-// Define ImageGenParams if not globally available or imported
-interface ImageGenParams {
-  prompt: string;
-  negative_prompt?: string;
-  model?: string;
-  size?: string;
-  guidance_scale?: number;
-}
+// Re-export or ensure types are consistently defined
+export type { EmptyImageGenParams as ImageGenParams };
+export type { EmptyAudioGenParams as AudioGenParams };
+// VideoGenParams is already being re-exported by EmptyChatMessageInput
 
-// Define AudioGenParams if not globally available or imported
-interface AudioGenParams {
-  prompt: string;
-  negative_prompt?: string;
-  duration_seconds?: number;
-  seed?: number;
-  model?: string;
+interface EmptyChatProps {
+  sendMessage: (message: string, file: File | null) => void;
+  onImagePromptSubmit: (params: EmptyImageGenParams, imagePromptText: string) => void;
+  onAudioPromptSubmit: (params: EmptyAudioGenParams, audioPromptText: string) => void;
+  onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void;
+  focusMode: string;
+  setFocusMode: (mode: string) => void;
 }
 
 const EmptyChat = ({
   sendMessage,
   onImagePromptSubmit,
-  onAudioPromptSubmit, // Add this
+  onAudioPromptSubmit,
+  onVideoPromptSubmit,
   focusMode,
   setFocusMode,
-}: {
-  sendMessage: (message: string, file: File | null) => void;
-  onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
-  onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void; // Add this
-  focusMode: string;
-  setFocusMode: (mode: string) => void;
-}) => {
+}: EmptyChatProps) => {
   return (
+    <div className="flex h-screen w-full overflow-hidden">
 
-    <div className="flex h-full w-full">
-      <div className="flex-grow  xl:mr-[0px] pr-[2rem] sm:pr-[5rem]">
-        <div className="relative">
-          <div className="flex flex-col items-center justify-center min-h-screen w-full mx-auto p-2 space-y-4 sm:space-y-8">
-
-            <EmptyChatMessageInput
-              sendMessage={sendMessage}
-              focusMode={focusMode}
-              setFocusMode={setFocusMode}
-              onImagePromptSubmit={onImagePromptSubmit}
-              onAudioPromptSubmit={onAudioPromptSubmit} // Pass it down
-            />
-          </div>
-        </div>
+      {/* Main content area (can be empty or have other content for the "empty" state) */}
+      <div className="flex-grow flex flex-col p-4 items-center justify-center">
+        {/* This area is intentionally kept minimal as EmptyChatMessageInput contains the main H2 title */}
+        {/* You could add a logo here if desired, above the fixed input area. */}
       </div>
-      <div className='w-[400px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-[2rem] h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden'>
-        <div className="w-[400px] h-[250px]  cursor-pointer">
+
+      {/* Ads sidebar */}
+      <div className='w-[400px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-[2rem] h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden flex-shrink-0'>
+        <div className="w-[400px] h-[250px] cursor-pointer">
           <SideTopAdComponent divid='top-emptychat' />
         </div>
         <div className="w-[400px] h-[600px] cursor-pointer">
           <SideBottomAdComponent divid='bottom-emptychat' />
+        </div>
+      </div>
+
+      {/* Fixed Input Area Wrapper */}
+      <div
+        className="fixed bottom-0 left-0 right-0 flex justify-center z-40 px-1 pb-1 md:px-4 md:pb-2 lg:pb-3 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-gray-700"
+      >
+        <div className="w-full md:max-w-2xl lg:max-w-3xl xl:max-w-4xl"> {/* Max width container */}
+          <EmptyChatMessageInput
+            sendMessage={sendMessage}
+            focusMode={focusMode}
+            setFocusMode={setFocusMode}
+            onImagePromptSubmit={onImagePromptSubmit}
+            onAudioPromptSubmit={onAudioPromptSubmit}
+            onVideoPromptSubmit={onVideoPromptSubmit}
+          />
         </div>
       </div>
     </div>

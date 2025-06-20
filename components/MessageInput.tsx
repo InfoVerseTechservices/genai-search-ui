@@ -103,6 +103,7 @@ const MessageInput = ({
         inputRef.current?.focus();
       }
     };
+    
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
@@ -296,40 +297,34 @@ const MessageInput = ({
             placeholder={placeholderText}
           />
 
-          <div className={cn(
-            "flex items-center w-full mt-2",
-            (effectiveModeForDesktop === 'multi' || isMobileView) ? "justify-between" : "md:ml-2 md:mt-0",
-            "order-2"
-          )}>
-            {/* Left Group: Actionable Icons */}
-            <div className="flex items-center space-x-1 flex-shrink-0">
-              <button type="button" onClick={handleUploadFileClick} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
-                <Paperclip size={20} />
-              </button>
-              <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-              <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text/Audio/Video Mode" : "Switch to Image Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isImageModeActive ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400'}`} disabled={isAudioModeActive || isVideoModeActive}>
-                <ImageIconLucide size={20} />
-              </button>
-              <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image/Video Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive || isVideoModeActive}>
-                <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : 'currentColor'} />
-              </button>
-              <button type="button" onClick={handleVideoModeToggle} title={isVideoModeActive ? "Switch to Text/Image/Audio Mode" : "Switch to Video Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isVideoModeActive ? 'bg-red-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400'}`} disabled={isImageModeActive || isAudioModeActive}>
-                <VideoIconLucide size={20} />
-              </button>
-              {(isImageModeActive || isAudioModeActive || isVideoModeActive) && (
-                <button
-                  type="button"
-                  onClick={openActiveParamsModal}
-                  title="Edit Parameters"
-                  className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full"
-                >
-                  <SlidersHorizontalIcon size={20} />
-                </button>
-              )}
-              <div className={cn("hidden", `md:${effectiveModeForDesktop === 'multi' && !isMobileView ? "flex items-center" : "hidden"}`)}>
-                <CopilotToggle copilotEnabled={copilotEnabled} setCopilotEnabled={setCopilotEnabled} />
-              </div>
+      {/* Bottom bar: icons and submit button */}
+      <div className={cn(
+        "flex items-center w-full mt-2 md:mt-0", // Common styles for the bar
+        `md:${effectiveModeForDesktop === 'multi' ? "justify-between" : "ml-2"}`, // In multi-mode, justify-between will space out left and right groups
+                                                                                // In single-mode, the whole bar gets a left margin (ml-2)
+        "order-2" // order-2 ensures it's below textarea in flex-col
+      )}>
+        {/* Content of the div */}
+
+        {/* Left Group: Actionable Icons */}
+        <div className="flex items-center space-x-1"> {/* Removed flex-grow and md:flex-grow-0 for simplicity, parent justify-between handles spacing */}
+          <button type="button" onClick={handleUploadFileClick} title="Attach file" className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 disabled:opacity-50" disabled={isImageModeActive || isAudioModeActive || isVideoModeActive}>
+            <Paperclip size={20} />
+          </button>
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+            <button type="button" onClick={handleImageModeToggle} title={isImageModeActive ? "Switch to Text/Audio/Video Mode" : "Switch to Image Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isImageModeActive ? 'bg-blue-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400'}`} disabled={isAudioModeActive || isVideoModeActive}>
+              <ImageIconLucide size={20} />
+            </button>
+            <button type="button" onClick={handleAudioModeToggle} title={isAudioModeActive ? "Switch to Text/Image/Video Mode" : "Switch to Audio Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isAudioModeActive ? 'bg-purple-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-purple-500 dark:hover:text-purple-400'}`} disabled={isImageModeActive || isVideoModeActive}>
+              <CustomAudioWaveformIcon size={20} color={isAudioModeActive ? 'white' : 'currentColor'} />
+            </button>
+            <button type="button" onClick={handleVideoModeToggle} title={isVideoModeActive ? "Switch to Text/Image/Audio Mode" : "Switch to Video Mode"} className={`p-2 rounded-full transition-colors disabled:opacity-50 flex items-center justify-center ${isVideoModeActive ? 'bg-red-500 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 dark:hover:text-red-400'}`} disabled={isImageModeActive || isAudioModeActive}>
+              <VideoIconLucide size={20} />
+            </button>
+            <div className={cn("hidden", `md:${effectiveModeForDesktop === 'multi' && !isMobileView ? "flex items-center" : "hidden"}`)}>
+              <CopilotToggle copilotEnabled={copilotEnabled} setCopilotEnabled={setCopilotEnabled} />
             </div>
+          </div>
 
             {/* Right Group: Static Audio Icon (conditional) + Submit Button */}
             <div className="flex items-center space-x-2">

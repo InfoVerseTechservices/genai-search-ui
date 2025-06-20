@@ -246,9 +246,10 @@ const MessageInput = ({
       <form
         style={borderStyle}
         onSubmit={handleSubmit}
+        // MODIFIED className logic:
         className={cn(
-          'bg-white dark:bg-slate-800 p-2 md:p-3 flex flex-col md:flex-row items-center overflow-hidden border rounded-lg',
-          `md:${effectiveModeForDesktop === 'multi' ? 'flex-col rounded-lg' : 'flex-row rounded-full'}`
+          'bg-white dark:bg-slate-800 p-2 md:p-3 flex flex-col items-center overflow-hidden border rounded-lg', // Base style: flex-col and rounded-lg for multi-line appearance
+          effectiveModeForDesktop === 'single' ? 'md:flex-row md:rounded-full' : '' // For md screens, if single mode, override to flex-row and rounded-full
         )}
       >
         <TextareaAutosize

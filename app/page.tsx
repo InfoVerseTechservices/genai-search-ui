@@ -5,7 +5,7 @@ import Logo from "../public/ColomboAI-logo.svg"
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'ColomboAI',
+  title: 'ColomboAI : Power of MC1 AI Model',
   //description: 'Chat with the internet, chat with Perplexica.',
 };
 

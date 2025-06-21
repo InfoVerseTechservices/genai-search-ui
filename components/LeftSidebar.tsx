@@ -168,7 +168,7 @@ const LeftSidebar: FC = () => {
             label="New Chat"
           />
         </div>
-        <div className="flex flex-col items-center space-y-6 flex-grow">
+        {/* <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
             href="/image-generator"
             Icon={ImageGeneratorIcon}
@@ -181,7 +181,7 @@ const LeftSidebar: FC = () => {
             Icon={VideoGeneratorIcon}
             label="Video Gen"
           />
-        </div>
+        </div> */}
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
             href="https://colomboai.com/genai-search/library/"

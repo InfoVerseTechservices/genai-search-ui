@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
 import { FunctionComponent as FC, useState } from 'react';
 import './globals.css';
-import { cn } from '@/lib/utils';
-import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils'; // Keep this import
 import Sidebar from '@/components/Sidebar';
 import GenAIImage from '../public/images/icons/sidebar/genai-pen.svg';
 import VibesImage from '../public/images/icons/sidebar/vibes-icon.svg';
@@ -23,49 +22,11 @@ import {
   SearchIcon,
   ShopIcon,
   VibesIcon,
-} from '@/components/Icons';
+} from '@/components/Icons'; // Keep this import
 import ThemeProvider from '@/components/theme/Provider';
 import NewSidebar from '@/components/NewSidebar';
 import Link from 'next/link';
 import Image from 'next/image';
-// CONTEXT
-
-interface IconProps {
-  w: number;
-  h: number;
-  fill: string;
-}
-
-type IconComponent = FC<IconProps>;
-
-interface IconLinkProps {
-  href: string;
-  Icon: IconComponent;
-  label: string;
-}
-
-const IconLink: FC<IconLinkProps> = ({ href, Icon, label }) => {
-  const pathname = usePathname();
-  const isActive = pathname === href;
-
-  return (
-    <Link href={href}>
-      <div className="flex flex-col items-center">
-        <div className="w-6 h-6 mb-1">
-          <Icon w={24} h={24} fill={isActive ? '#1E71F2' : '#8E8E93'} />
-        </div>
-        <p
-          className={`
-          ${isActive ? 'text-[#1E71F2]' : 'text-[#8E8E93]'}
-          text-center text-[10px]
-        `}
-        >
-          {label}
-        </p>
-      </div>
-    </Link>
-  );
-};
 import UserProfileContextProvider from '@/app/context/user';
 import ProfilePicture from '@/components/LeftSidebar/ProfilePicture';
 import ProfileLoader from '@/components/ProfileLoader';
@@ -80,6 +41,7 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: 'ColomboAI : Power of MC1 AI Model',
   description: 'ColomboAI',
+
 };
 
 export default function RootLayout({

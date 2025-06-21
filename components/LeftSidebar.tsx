@@ -81,13 +81,13 @@ const LeftSidebar: FC = () => {
     //   return;
     // }
 
-    if (isLoggedIn) {
+    if (isLoggedIn && userDetails) {
       setUsername(userDetails.name || 'Name Here');
       setProfilePic(userDetails.profile_picture || undefined);
     }
 
     // setProfilePic(localStorage.getItem('profilePic') || undefined);
-  }, [isLoggedIn, userDetails.name, userDetails.profile_picture]);
+  }, [isLoggedIn, userDetails]);
 
   const handleSignOut = () => {
     localStorage.removeItem('profilePic');

@@ -91,7 +91,7 @@ const Share: React.FC<ShareProps> = ({ message, chatId, messageId }) => {
     };
 
     fetchChatId();
-  }, []);
+  }, [chatId, messageId]);
   const SharePopup = (message: string): void => {
 
     setViewPopup(!viewPopup)

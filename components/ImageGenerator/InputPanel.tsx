@@ -48,7 +48,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
         clearInterval(intervalId);
       }
     };
-  }, [isLoading]);
+  }, [isLoading, intervalId]);
 
   const handleGenerateClick = async () => {
     if (!prompt.trim()) {

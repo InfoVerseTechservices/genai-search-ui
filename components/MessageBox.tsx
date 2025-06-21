@@ -249,7 +249,7 @@ const MessageBox = ({
               <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Image</h3>
             </div>
             {/* Existing Content */}
-            {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.imagePromptText}"</p>}
+            {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.imagePromptText}&quot;</p>}
             <img
               src={`data:image/png;base64,${message.b64Json}`}
               alt={message.imagePromptText || "Generated image"}
@@ -270,7 +270,7 @@ const MessageBox = ({
               <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Audio</h3>
             </div>
             {/* Existing Content */}
-            {message.audioPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.audioPromptText}"</p>}
+            {message.audioPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.audioPromptText}&quot;</p>}
             <audio
               controls
               src={`data:audio/mpeg;base64,${message.b64JsonAudio}`} // Assuming mpeg, adjust if different (e.g., audio/wav, audio/ogg)
@@ -293,7 +293,7 @@ const MessageBox = ({
               <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Video</h3>
             </div>
             {/* Existing Content */}
-            {message.videoPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.videoPromptText}"</p>}
+            {message.videoPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.videoPromptText}&quot;</p>}
             <video
               controls
               autoPlay

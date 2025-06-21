@@ -311,6 +311,7 @@ const RelatedImages: React.FC<RelatedImagesProps> = ({
   const [images, setImages] = useState<Image[]>([]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     // Function to fetch chat messages and images
     const fetchChatAndImages = async () => {
       try {
@@ -367,7 +368,7 @@ const RelatedImages: React.FC<RelatedImagesProps> = ({
       // Ensure there is a query before fetching
       fetchChatAndImages();
     }
-  }, []); // Dependency on chatId and query to refetch when they change
+  }, [chat_history, query]);
 
   return (
     // <div className="flex flex-col items-center md:gap-1 md:mr-[6.3rem] lg:gap-1.5 xl:gap-2.5 hide-scrollbar overflow-y-auto">
@@ -375,9 +376,8 @@ const RelatedImages: React.FC<RelatedImagesProps> = ({
     <>
       {images && images.length > 0 && (
         <a href={images[0].url} target="_blank" rel="noopener noreferrer">
-          
-          
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={images[0].img_src}
             alt={images[0].title}
             width={351}

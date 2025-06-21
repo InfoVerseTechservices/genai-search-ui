@@ -346,7 +346,7 @@ const EmptyChatMessageInput = ({
                 videoDuration={videoDuration} setVideoDuration={setVideoDuration}
                 videoSeed={videoSeed} setVideoSeed={setVideoSeed}
                 videoWidth={videoWidth} setVideoWidth={setVideoWidth}
-                videoHeight={videoHeight} setVideoHeight={videoHeight}
+                videoHeight={videoHeight} setVideoHeight={(value) => setVideoHeight(value)}
                 videoNumInferenceSteps={videoNumInferenceSteps} setVideoNumInferenceSteps={setVideoNumInferenceSteps}
                 videoDecodeTimestep={videoDecodeTimestep} setVideoDecodeTimestep={setVideoDecodeTimestep}
                 videoDecodeNoiseScale={videoDecodeNoiseScale} setVideoDecodeNoiseScale={setVideoDecodeNoiseScale}

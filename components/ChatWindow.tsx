@@ -9,7 +9,7 @@ import crypto from 'crypto';
 import { toast } from 'sonner';
 import { useSearchParams } from 'next/navigation';
 import { getSuggestions } from '@/lib/actions';
-import Error from 'next/error';
+import NextError from 'next/error';
 import { getCookie } from '@/components/LeftSidebar/cookies';
 import { useUserProfile } from '@/app/context/user';
 import { useRouter } from 'next/navigation';
@@ -318,9 +318,10 @@ const ChatWindow = ({ id }: { id?: string }) => {
     setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating image for: "${imagePromptText}"`, role: 'user', type: 'image_prompt', imagePromptText, status: 'loading' }]);
     try {
       const result = await generateImage(params);
-      if (result.data?.[0]?.b64_json) {
+      if (result.data && result.data[0]?.b64_json) {
+        const b64Json = result.data[0].b64_json;
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Image prompt: "${imagePromptText}"` } : m));
-        setMessages((prev) => [...prev, { messageId: assistantImgMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_image', b64Json: result.data[0].b64_json, imagePromptText }]);
+        setMessages((prev) => [...prev, { messageId: assistantImgMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_image', b64Json, imagePromptText }]);
         toast.success('Image generated!');
       } else { throw new Error(result.error || "No image data."); }
     } catch (err: any) {
@@ -338,9 +339,10 @@ const ChatWindow = ({ id }: { id?: string }) => {
     setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating audio for: "${audioPromptText}"`, role: 'user', type: 'audio_prompt', audioPromptText, status: 'loading' }]);
     try {
       const result = await generateAudio(params);
-      if (result.data?.[0]?.b64_json) {
+      if (result.data && result.data[0]?.b64_json) {
+        const b64JsonAudio = result.data[0].b64_json;
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Audio prompt: "${audioPromptText}"` } : m));
-        setMessages((prev) => [...prev, { messageId: assistantAudioMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_audio', b64JsonAudio: result.data[0].b64_json, audioPromptText }]);
+        setMessages((prev) => [...prev, { messageId: assistantAudioMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_audio', b64JsonAudio, audioPromptText }]);
         toast.success('Audio generated!');
       } else { throw new Error(result.error || "No audio data."); }
     } catch (err: any) {
@@ -372,7 +374,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
     ]);
 
     try {
-      const result = await generateVideo(params);
+      const result = await generateVideo({ ...params, model: "ltx-video" });
 
       if (result.status === "processing") {
          setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'loading', content: `Processing video for: "${videoPromptText}"` } : m));
@@ -384,9 +386,10 @@ const ChatWindow = ({ id }: { id?: string }) => {
         return; // Early exit if processing, to not hit finally block's setIsGenerating(false) yet
       }
 
-      if (result.data?.[0]?.b64_json) {
+      if (result.data && result.data[0]?.b64_json) {
+          const b64JsonVideo = result.data[0].b64_json;
           setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Video prompt: "${videoPromptText}"` } : m));
-          setMessages((prev) => [...prev, { messageId: assistantVideoMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_video', b64JsonVideo: result.data[0].b64_json, videoPromptText }]);
+          setMessages((prev) => [...prev, { messageId: assistantVideoMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_video', b64JsonVideo, videoPromptText }]);
           toast.success('Video generated!');
       } else if (result.status && result.status !== "processing") {
            throw new Error(result.error || result.status || "Video data not found or generation failed.");
@@ -437,7 +440,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
   if (hasError) { return <div className="flex flex-col items-center justify-center min-h-screen"><p className="text-black/70 text-sm">Connection error. Try again.</p></div>; }
 
   return isReady ? (
-    notFound ? ( <Error statusCode={404} /> ) : (
+    notFound ? ( <NextError statusCode={404} /> ) : (
       <div className="">
         <div className="absolute top-3 right-2 z-[999] md:hidden"> {/* Added md:hidden */}
           <div className="flex space-x-4 mt-3">

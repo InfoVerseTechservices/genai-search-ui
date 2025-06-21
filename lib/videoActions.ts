@@ -1,7 +1,7 @@
 // lib/videoActions.ts
 
 // Interface for video generation parameters, based on the API documentation
-interface VideoGenerationParams {
+export interface VideoGenerationParams {
   prompt: string;
   negative_prompt?: string;
   guidance_scale?: number;
@@ -26,7 +26,7 @@ interface VideoResponseData {
 // Interface for the API response structure
 // This matches the sample response provided, including "processing" status
 interface VideoGenerationApiResponse {
-  id?: string; // Present in the final response, might not be in "processing"
+  id: string; // Present in the final response, might not be in "processing"
   object?: string; // e.g., "video.generation"
   created?: number;
   model?: string; // e.g., "wan" (though we send "ltx-video")

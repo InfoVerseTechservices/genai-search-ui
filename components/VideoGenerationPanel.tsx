@@ -1,22 +1,24 @@
 // components/VideoGenerationPanel.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { generateVideo } from '@/lib/videoActions'; // This will be created in a future step
+import React, { useEffect, useState } from 'react';
+import { generateVideo, VideoGenerationParams } from '@/lib/videoActions'; // This will be created in a future step
 
 // Interface for the expected video data in the response from the page
 interface VideoResponseData {
   b64_json?: string;
 }
 
-// Interface for the successful video generation API response (full structure)
-interface VideoGenerationSuccessResponse {
-  id: string;
-  object: string;
-  created: number;
-  model: string;
-  data: VideoResponseData[];
+// Interface for the successful video generation API response (full structure) - Adjusted to match VideoGenerationApiResponse.
+// The 'id' property is now explicitly 'string' as it's expected to always be present in a successful response.
+export interface VideoGenerationSuccessResponse {
+  id: string; 
+  object?: string;
+  created?: number;
+  model?: string;
+  data?: VideoResponseData[];
   status?: string; // To handle "processing" or other statuses
+  error?: string; // To handle errors from the API
 }
 
 interface VideoGenerationPanelProps {
@@ -73,7 +75,7 @@ const VideoGenerationPanel: React.FC<VideoGenerationPanelProps> = ({
         clearInterval(intervalId);
       }
     };
-  }, [isLoading]);
+  }, [isLoading, intervalId]);
 
   const handleGenerateClick = async () => {
     if (!prompt.trim()) {
@@ -84,13 +86,13 @@ const VideoGenerationPanel: React.FC<VideoGenerationPanelProps> = ({
     onGenerationStart(prompt); // Notify page that generation is starting
 
     try {
-      const params = {
+      const params: VideoGenerationParams = {
         prompt,
         negative_prompt: negativePrompt,
         guidance_scale: guidanceScale,
         num_frames: numFrames,
         duration,
-        model: MODEL_NAME, // Fixed model
+        model: MODEL_NAME,
         seed,
         width,
         height,

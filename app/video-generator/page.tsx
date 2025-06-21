@@ -13,11 +13,11 @@ interface VideoResponseData {
 
 // Interface for the successful video generation API response
 interface VideoGenerationSuccessResponse {
-  id: string;
-  object: string;
-  created: number;
-  model: string;
-  data: VideoResponseData[];
+  id: string; // id is expected to be present in all responses from the API
+  object?: string;
+  created?: number;
+  model?: string;
+  data?: VideoResponseData[];
   status?: string; // To store status like "processing"
 }
 

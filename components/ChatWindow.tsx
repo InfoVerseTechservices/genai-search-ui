@@ -17,15 +17,21 @@ import Link from 'next/link';
 import { NewGenSearchIcon, HistoryIcon } from './Icons';
 
 import { generateImage } from '@/lib/imageActions';
-import { generateAudio } from '@/lib/audioActions';
+import { generateAudio, type AudioGenerationResponse } from '@/lib/audioActions'; // NEW: Import for AI Chat
 import { generateVideo } from '@/lib/videoActions';
-import { streamChatCompletion, AIChatParams, ChatMessage as AIChatAPIMessage } from '@/lib/chatActions'; // NEW: Import for AI Chat
+import { streamChatCompletion, type ChatMessage as AIChatAPIMessage } from '@/lib/chatActions'; // NEW: Import for AI Chat
 
 // Assuming ImageGenParams, AudioGenParams, VideoGenParams are correctly defined or imported
 // For AIChatParams, it's imported above.
 export interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
 export interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
 export interface VideoGenParams { prompt: string; negative_prompt?: string; guidance_scale?: number; num_frames?: number; duration?: number; model?: string; seed?: number; width?: number; height?: number; num_inference_steps?: number; decode_timestep?: number; decode_noise_scale?: number; upscale_and_refine?: boolean; }
+export type AIChatParams = {
+  model: string;
+  temperature: number;
+  top_p: number;
+  number_of_tokens: number;
+};
 
 
 export type Message = {
@@ -53,7 +59,7 @@ const useSocket = (
 ) => {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const heartbeatInterval = 30000;
-  let heartbeatTimeoutId: any;
+  const heartbeatTimeoutId = useRef<any>(null);
 
   useEffect(() => {
     if (!ws) {
@@ -142,7 +148,7 @@ const useSocket = (
         wsInstance.onclose = () => { clearTimeout(timeoutId); stopHeartbeat(); };
         wsInstance.addEventListener('message', (e) => {
           const data = JSON.parse(e.data);
-          if (data.type === 'pong') clearTimeout(heartbeatTimeoutId);
+          if (data.type === 'pong') clearTimeout(heartbeatTimeoutId.current);
           else if (data.type === 'error') toast.error(data.data);
         });
         setWs(wsInstance);
@@ -152,7 +158,7 @@ const useSocket = (
         const sendPing = () => {
           if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify({ type: 'ping' }));
-            heartbeatTimeoutId = setTimeout(() => socket.close(), heartbeatInterval - 7000);
+            heartbeatTimeoutId.current = setTimeout(() => socket.close(), heartbeatInterval - 7000);
           }
         };
         sendPing(); // Initial ping
@@ -161,7 +167,7 @@ const useSocket = (
       };
 
       const stopHeartbeat = () => {
-        clearTimeout(heartbeatTimeoutId);
+        clearTimeout(heartbeatTimeoutId.current);
         if (ws && (ws as any).heartbeatIntervalId) {
             clearInterval((ws as any).heartbeatIntervalId);
         }
@@ -312,6 +318,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
         toast.success('Image generated!');
       } else { throw new Error(result.error || "No image data returned from API."); }
     } catch (err: any) {
+    } catch (err: any) {
       toast.error(`Image generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed image prompt: "${imagePromptText}". Error: ${err.message}` } : m));
     } finally { setIsGenerating(false); }
@@ -323,14 +330,14 @@ const ChatWindow = ({ id }: { id?: string }) => {
     setIsGenerating(true);
     const userPromptMsgId = crypto.randomBytes(7).toString('hex');
     const assistantAudioMsgId = crypto.randomBytes(7).toString('hex');
-    setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating audio for: "${audioPromptText}"`, role: 'user', type: 'audio_prompt', audioPromptText, status: 'loading' }]);
-    try {
-      const result = await generateAudio(params);
+ setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId: chatId!, createdAt: new Date(), content: `Generating audio for: "${audioPromptText}"`, role: 'user', type: 'audio_prompt', audioPromptText, status: 'loading' }]);
+    try { // Argument of type '{ messageId: string; chatId: string | undefined; createdAt: Date; content: string; role: "user"; type: "audio_prompt"; audioPromptText: string; status: "loading"; }' is not assignable to parameter of type 'SetStateAction<Message[]>'.
+      const result: AudioGenerationResponse = await generateAudio(params);
       if (result.data?.[0]?.b64_json) {
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Audio prompt: "${audioPromptText}"` } : m));
         setMessages((prev) => [...prev, { messageId: assistantAudioMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_audio', b64JsonAudio: result.data[0].b64_json, audioPromptText }]);
         toast.success('Audio generated!');
-      } else { throw new Error(result.error || "No audio data returned from API."); }
+      } else { throw new Error(result.error || 'No audio data returned from API.'); }
     } catch (err: any) {
       toast.error(`Audio generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed audio prompt: "${audioPromptText}". Error: ${err.message}` } : m));
@@ -345,12 +352,12 @@ const ChatWindow = ({ id }: { id?: string }) => {
     const assistantVideoMsgId = crypto.randomBytes(7).toString('hex');
 
     setMessages((prev) => [
-      ...prev,
-      { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating video for: "${videoPromptText}"`, role: 'user', type: 'video_prompt', videoPromptText, status: 'loading' }
-    ]);
+ ...prev,
+      { messageId: userPromptMsgId, chatId: chatId!, createdAt: new Date(), content: `Generating video for: "${videoPromptText}"`, role: 'user', type: 'video_prompt', videoPromptText, status: 'loading' },
+ ]);
 
     try {
-      const result = await generateVideo(params);
+      const result: any = await generateVideo(params); // Use 'any' if type is not available
       if (result.status === "processing") {
          setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'loading', content: `Processing video for: "${videoPromptText}"` } : m));
          toast.info('Video is processing...');
@@ -365,8 +372,8 @@ const ChatWindow = ({ id }: { id?: string }) => {
       } else if (result.status && result.status !== "processing") {
            throw new Error(result.error || result.status || "Video data not found or generation failed.");
       } else if (!result.status) {
-          throw new Error("Unknown error: No video data or status returned.");
-      }
+          throw new globalThis.Error("Unknown error: No video data or status returned.");
+ }
     } catch (err: any) {
       toast.error(`Video generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed video prompt: "${videoPromptText}". Error: ${err.message}` } : m));
@@ -565,20 +572,3 @@ const ChatWindow = ({ id }: { id?: string }) => {
 };
 
 export default ChatWindow;
-
-```
-This subtask will modify `components/ChatWindow.tsx`:
-- Import `streamChatCompletion`, `AIChatParams`, `AIChatAPIMessage`.
-- Implement `handleAIChatRequest` to:
-    - Set `isGenerating` state.
-    - Add user prompt and initial assistant placeholder message.
-    - Call `streamChatCompletion`, including historical text messages and the new prompt in `apiMessages`.
-    - Process the stream using `TextDecoder`, parsing `data: ` prefixed JSON chunks.
-    - Update assistant message content in real-time and status to 'completed' or 'error'.
-    - Add the completed interaction to `chatHistory` for future API calls.
-- Pass `handleAIChatRequest` as `onAIChatSubmit` to `Chat` and `EmptyChat`.
-- Refine `isGenerating` and `loading` checks in other submission handlers.
-- Update `rewrite` function to call `handleAIChatRequest` for re-submitting a prompt.
-- Update initial message handling (`useEffect` for `initialMessage`) to use `handleAIChatRequest`.
-- The WebSocket `sendMessage` is kept for now but might be deprecated if AI Chat becomes the primary text interaction.
-This is a significant update to shift text-based chat to the new streaming API.

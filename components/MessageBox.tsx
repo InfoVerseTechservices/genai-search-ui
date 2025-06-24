@@ -5,7 +5,7 @@
 import React, { MutableRefObject, useEffect, useState } from 'react';
 import { Message } from './ChatWindow';
 import { cn } from '@/lib/utils';
-import { Edit, Image as ImageIconLucide, Waves as AudioIconLucide, Video as VideoIconLucide, BookCopy, Disc3, Volume2, StopCircle, Check, ClipboardList } from 'lucide-react'; // Added VideoIconLucide
+import { Edit, Image as ImageIconLucide, Waves as AudioIconLucide, Video as VideoIconLucide, BookCopy, Disc3, Volume2, StopCircle, Check, ClipboardList } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -27,7 +27,7 @@ import RelatedImages from './GetOneImage';
 // Define ContextualActionsPlaceholder component
 const ContextualActionsPlaceholder: React.FC<{ messageId: string }> = ({ messageId }) => {
   const handleRegenerate = () => console.log("Regenerate clicked for:", messageId);
-  const handleFollowUp = () => console.log("More like this clicked for:", messageId); // Changed log message for clarity
+  const handleFollowUp = () => console.log("More like this clicked for:", messageId);
 
   return (
     <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 flex items-center space-x-2">
@@ -52,7 +52,7 @@ const MessageBox = ({
   message,
   messageIndex,
   history,
-  loading,
+  loading, // This is the global loading/isGenerating state from ChatWindow
   dividerRef,
   isLast,
   rewrite,
@@ -102,6 +102,7 @@ const MessageBox = ({
     } else {
       setParsedMessage(message.content);
     }
+    // Update speechMessage whenever message.content changes, removing source markers for cleaner speech
     setSpeechMessage(message.content.replace(regex, ''));
   }, [message.content, message.sources, message.role, message.type]);
 
@@ -224,10 +225,10 @@ const MessageBox = ({
         </div>
       )}
 
-      {/* NEW: User Video Prompt Message */}
+      {/* User Video Prompt Message */}
       {message.role === 'user' && message.type === 'video_prompt' && (
         <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-           <VideoIconLucide size={24} className="mr-2 mt-1 text-red-500 flex-shrink-0" /> {/* Video icon color */}
+           <VideoIconLucide size={24} className="mr-2 mt-1 text-red-500 flex-shrink-0" />
           <div className="flex flex-col">
             <span className="text-sm text-gray-500 dark:text-gray-400">Video prompt:</span>
             <h2 className="text-[#000080] dark:text-red-300 bg-[#FDD2D2] dark:bg-slate-700 self-start font-medium text-lg sm:text-xl max-w-max inline rounded-md whitespace-normal p-2">
@@ -242,18 +243,16 @@ const MessageBox = ({
       {/* Assistant Generated Image Message */}
       {message.role === 'assistant' && message.type === 'generated_image' && message.b64Json && (
         <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-          <div className="flex flex-col space-y-2"> {/* Main wrapper */}
-            {/* Standardized Header */}
+          <div className="flex flex-col space-y-2">
             <div className="flex flex-row items-center space-x-2">
               <ImageIconLucide className="text-black dark:text-white" size={20} />
               <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Image</h3>
             </div>
-            {/* Existing Content */}
-            {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.imagePromptText}&quot;</p>}
+            {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.imagePromptText}"</p>}
             <img
               src={`data:image/png;base64,${message.b64Json}`}
               alt={message.imagePromptText || "Generated image"}
-              className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto shadow-md" // Added shadow-md for consistency
+              className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto shadow-md"
             />
             <ContextualActionsPlaceholder messageId={message.messageId} />
           </div>
@@ -263,18 +262,16 @@ const MessageBox = ({
       {/* Assistant Generated Audio Message */}
       {message.role === 'assistant' && message.type === 'generated_audio' && message.b64JsonAudio && (
         <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-          <div className="flex flex-col space-y-2"> {/* Main wrapper */}
-            {/* Standardized Header */}
+          <div className="flex flex-col space-y-2">
             <div className="flex flex-row items-center space-x-2">
               <AudioIconLucide className="text-black dark:text-white" size={20} />
               <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Audio</h3>
             </div>
-            {/* Existing Content */}
-            {message.audioPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.audioPromptText}&quot;</p>}
+            {message.audioPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.audioPromptText}"</p>}
             <audio
               controls
-              src={`data:audio/mpeg;base64,${message.b64JsonAudio}`} // Assuming mpeg, adjust if different (e.g., audio/wav, audio/ogg)
-              className="rounded-lg border dark:border-gray-600 w-full max-w-md shadow-md" // Added shadow-md
+              src={`data:audio/mpeg;base64,${message.b64JsonAudio}`}
+              className="rounded-lg border dark:border-gray-600 w-full max-w-md shadow-md"
             >
               Your browser does not support the audio element.
             </audio>
@@ -286,18 +283,16 @@ const MessageBox = ({
       {/* Assistant Generated Video Message */}
       {message.role === 'assistant' && message.type === 'generated_video' && message.b64JsonVideo && (
         <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-          <div className="flex flex-col space-y-2"> {/* Main wrapper */}
-            {/* Standardized Header */}
+          <div className="flex flex-col space-y-2">
             <div className="flex flex-row items-center space-x-2">
               <VideoIconLucide className="text-black dark:text-white" size={20} />
               <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Video</h3>
             </div>
-            {/* Existing Content */}
-            {message.videoPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.videoPromptText}&quot;</p>}
+            {message.videoPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.videoPromptText}"</p>}
             <video
               controls
               autoPlay
-              muted // Added muted for better autoplay experience
+              muted
               loop
               src={`data:video/mp4;base64,${message.b64JsonVideo}`}
               className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto shadow-md"
@@ -324,18 +319,24 @@ const MessageBox = ({
             )}
             <div className="flex flex-col space-y-2">
               <div className="flex flex-row items-center space-x-2">
-                <Disc3 className={cn('text-black dark:text-white', isLast && loading ? 'animate-spin' : 'animate-none')} size={20} />
+                <Disc3
+                  className={cn(
+                    'text-black dark:text-white',
+                    (isLast && loading) || message.status === 'streaming' ? 'animate-spin' : 'animate-none'
+                  )}
+                  size={20}
+                />
                 <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Answer</h3>
               </div>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkMath]}
                 rehypePlugins={[rehypeKatex]}
-                components={{ code: CodeBlock as any }}
+                components={{ code: CodeBlock }}
                 className={cn('prose prose-p:leading-relaxed prose-pre:p-0', 'dark:prose-invert max-w-none break-words text-black dark:text-gray-200 text-sm md:text-base font-medium')}
               >
                 {parsedMessage}
               </ReactMarkdown>
-              {loading && isLast ? null : (
+              {message.status !== 'streaming' && ! (isLast && loading && message.status !== 'error' && message.status !== 'completed') && (
                 <>
                   <div className="flex flex-row items-center justify-between w-full text-black dark:text-white py-4 -mx-2">
                     <div className="flex flex-row items-center space-x-1">

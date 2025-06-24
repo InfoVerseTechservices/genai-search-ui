@@ -26,7 +26,6 @@ const EmptyChat = ({
   // For EmptyChatMessageInput, it has a textarea (minRows 6 initially) + icon bar + possible param panel.
   // Let's estimate a generous padding, e.g., pb-60 or pb-72 (240px-288px) on the scrollable part.
   // This might need adjustment based on actual rendered height of EmptyChatMessageInput.
-  
   const contentPaddingBottom = "pb-72"; // Adjust as needed
 
   return (

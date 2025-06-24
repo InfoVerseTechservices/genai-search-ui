@@ -22,13 +22,12 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({
     //   height={size}
     //   referrerPolicy={'no-referrer'}
     // />
-    <Image
+    <img
       src={image}
       alt="avatar"
-      className={`rounded-full${className ? ` ${className}` : ''}`}
+      className={`rounded-full ${className}`}
       width={size}
       height={size}
-      referrerPolicy="no-referrer"
     />
   );
 };

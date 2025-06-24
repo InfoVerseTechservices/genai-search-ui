@@ -17,15 +17,21 @@ import Link from 'next/link';
 import { NewGenSearchIcon, HistoryIcon } from './Icons';
 
 import { generateImage } from '@/lib/imageActions';
-import { generateAudio } from '@/lib/audioActions';
+import { generateAudio, type AudioGenerationResponse } from '@/lib/audioActions'; // NEW: Import for AI Chat
 import { generateVideo } from '@/lib/videoActions';
-import { streamChatCompletion, AIChatParams, ChatMessage as AIChatAPIMessage } from '@/lib/chatActions'; // NEW: Import for AI Chat
+import { streamChatCompletion, type ChatMessage as AIChatAPIMessage } from '@/lib/chatActions'; // NEW: Import for AI Chat
 
 // Assuming ImageGenParams, AudioGenParams, VideoGenParams are correctly defined or imported
 // For AIChatParams, it's imported above.
 export interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
 export interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
 export interface VideoGenParams { prompt: string; negative_prompt?: string; guidance_scale?: number; num_frames?: number; duration?: number; model?: string; seed?: number; width?: number; height?: number; num_inference_steps?: number; decode_timestep?: number; decode_noise_scale?: number; upscale_and_refine?: boolean; }
+export type AIChatParams = {
+  model: string;
+  temperature: number;
+  top_p: number;
+  number_of_tokens: number;
+};
 
 
 export type Message = {
@@ -53,7 +59,7 @@ const useSocket = (
 ) => {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const heartbeatInterval = 30000;
-  let heartbeatTimeoutId: any;
+  const heartbeatTimeoutId = useRef<any>(null);
 
   useEffect(() => {
     if (!ws) {
@@ -142,7 +148,7 @@ const useSocket = (
         wsInstance.onclose = () => { clearTimeout(timeoutId); stopHeartbeat(); };
         wsInstance.addEventListener('message', (e) => {
           const data = JSON.parse(e.data);
-          if (data.type === 'pong') clearTimeout(heartbeatTimeoutId);
+          if (data.type === 'pong') clearTimeout(heartbeatTimeoutId.current);
           else if (data.type === 'error') toast.error(data.data);
         });
         setWs(wsInstance);
@@ -152,7 +158,7 @@ const useSocket = (
         const sendPing = () => {
           if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify({ type: 'ping' }));
-            heartbeatTimeoutId = setTimeout(() => socket.close(), heartbeatInterval - 7000);
+            heartbeatTimeoutId.current = setTimeout(() => socket.close(), heartbeatInterval - 7000);
           }
         };
         sendPing(); // Initial ping
@@ -161,7 +167,7 @@ const useSocket = (
       };
 
       const stopHeartbeat = () => {
-        clearTimeout(heartbeatTimeoutId);
+        clearTimeout(heartbeatTimeoutId.current);
         if (ws && (ws as any).heartbeatIntervalId) {
             clearInterval((ws as any).heartbeatIntervalId);
         }
@@ -310,10 +316,10 @@ const ChatWindow = ({ id }: { id?: string }) => {
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Image prompt: "${imagePromptText}"` } : m));
         setMessages((prev) => [...prev, { messageId: assistantImgMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_image', b64Json: result.data[0].b64_json, imagePromptText }]);
         toast.success('Image generated!');
-      } else { throw new Error(result.error || "No image data returned from API."); }
+      } else { throw new Error(result.error ?? "No image data returned from API."); } // eslint-disable-line no-new-object
     } catch (err: any) {
       toast.error(`Image generation failed: ${err.message}`);
-      setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed image prompt: "${imagePromptText}". Error: ${err.message}` } : m));
+      setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed image prompt: "${imagePromptText}". Error: ${err.message}` } : m)); // eslint-disable-line no-new-object
     } finally { setIsGenerating(false); }
   };
 
@@ -323,14 +329,14 @@ const ChatWindow = ({ id }: { id?: string }) => {
     setIsGenerating(true);
     const userPromptMsgId = crypto.randomBytes(7).toString('hex');
     const assistantAudioMsgId = crypto.randomBytes(7).toString('hex');
-    setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating audio for: "${audioPromptText}"`, role: 'user', type: 'audio_prompt', audioPromptText, status: 'loading' }]);
-    try {
-      const result = await generateAudio(params);
+ setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId: chatId!, createdAt: new Date(), content: `Generating audio for: "${audioPromptText}"`, role: 'user', type: 'audio_prompt', audioPromptText, status: 'loading' }]);
+    try { // Argument of type '{ messageId: string; chatId: string | undefined; createdAt: Date; content: string; role: "user"; type: "audio_prompt"; audioPromptText: string; status: "loading"; }' is not assignable to parameter of type 'SetStateAction<Message[]>'.
+      const result: AudioGenerationResponse = await generateAudio(params);
       if (result.data?.[0]?.b64_json) {
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Audio prompt: "${audioPromptText}"` } : m));
         setMessages((prev) => [...prev, { messageId: assistantAudioMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_audio', b64JsonAudio: result.data[0].b64_json, audioPromptText }]);
         toast.success('Audio generated!');
-      } else { throw new Error(result.error || "No audio data returned from API."); }
+      } else { throw new Error(result.error || 'No audio data returned from API.'); }
     } catch (err: any) {
       toast.error(`Audio generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed audio prompt: "${audioPromptText}". Error: ${err.message}` } : m));
@@ -345,12 +351,12 @@ const ChatWindow = ({ id }: { id?: string }) => {
     const assistantVideoMsgId = crypto.randomBytes(7).toString('hex');
 
     setMessages((prev) => [
-      ...prev,
-      { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating video for: "${videoPromptText}"`, role: 'user', type: 'video_prompt', videoPromptText, status: 'loading' }
-    ]);
+ ...prev,
+      { messageId: userPromptMsgId, chatId: chatId!, createdAt: new Date(), content: `Generating video for: "${videoPromptText}"`, role: 'user', type: 'video_prompt', videoPromptText, status: 'loading' },
+ ]);
 
     try {
-      const result = await generateVideo(params);
+      const result: any = await generateVideo(params); // Use 'any' if type is not available
       if (result.status === "processing") {
          setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'loading', content: `Processing video for: "${videoPromptText}"` } : m));
          toast.info('Video is processing...');
@@ -365,8 +371,8 @@ const ChatWindow = ({ id }: { id?: string }) => {
       } else if (result.status && result.status !== "processing") {
            throw new Error(result.error || result.status || "Video data not found or generation failed.");
       } else if (!result.status) {
-          throw new Error("Unknown error: No video data or status returned.");
-      }
+          throw new globalThis.Error("Unknown error: No video data or status returned.");
+ }
     } catch (err: any) {
       toast.error(`Video generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed video prompt: "${videoPromptText}". Error: ${err.message}` } : m));
@@ -378,110 +384,119 @@ const ChatWindow = ({ id }: { id?: string }) => {
     }
   };
 
-  const handleAIChatRequest = async (prompt: string, params: AIChatParams) => {
-    if (!chatId) { toast.error("Chat ID missing for AI Chat."); return; }
-    if (isGenerating || loading) { toast.info("Another operation is in progress."); return; }
-    setIsGenerating(true);
+  const handleAIChatRequest = useCallback(
+    async (prompt: string, params: AIChatParams) => {
+      if (!chatId) {
+        toast.error('Chat ID missing for AI Chat.');
+        return;
+      }
+      if (isGenerating || loading) {
+        toast.info('Another operation is in progress.');
+        return;
+      }
+      setIsGenerating(true);
 
-    const userMessageId = crypto.randomBytes(7).toString('hex');
-    const assistantMessageId = crypto.randomBytes(7).toString('hex');
+      const userMessageId = crypto.randomBytes(7).toString('hex');
+      const assistantMessageId = crypto.randomBytes(7).toString('hex');
 
-    setMessages((prev) => [
-      ...prev,
-      { messageId: userMessageId, chatId, createdAt: new Date(), content: prompt, role: 'user', type: 'text' },
-    ]);
+      setMessages((prev) => [
+        ...prev,
+        { messageId: userMessageId, chatId, createdAt: new Date(), content: prompt, role: 'user', type: 'text' },
+      ]);
 
-    setMessages((prev) => [
-      ...prev,
-      { messageId: assistantMessageId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'text', status: 'streaming' },
-    ]);
+      setMessages((prev) => [
+        ...prev,
+        { messageId: assistantMessageId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'text', status: 'streaming' },
+      ]);
 
-    try {
-      const apiMessages: AIChatAPIMessage[] = [...messagesRef.current.filter(m => m.type === 'text' && (m.role === 'user' || m.role === 'assistant')).map(m => ({role: m.role, content: m.content} as AIChatAPIMessage)), { role: 'user', content: prompt }];
+      try {
+        const apiMessages: AIChatAPIMessage[] = [...messagesRef.current.filter(m => m.type === 'text' && (m.role === 'user' || m.role === 'assistant')).map(m => ({ role: m.role, content: m.content } as AIChatAPIMessage)), { role: 'user', content: prompt }];
 
-      const stream = await streamChatCompletion({ ...params, messages: apiMessages });
-      const reader = stream.getReader();
-      const decoder = new TextDecoder();
-      let accumulatedResponse = "";
-      let done = false;
-      let buffer = "";
+        const stream = await streamChatCompletion({ ...params, messages: apiMessages });
+        const reader = stream.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedResponse = '';
+        let done = false;
+        let buffer = '';
 
-      while (!done) {
-        const { value, done: streamDone } = await reader.read();
-        done = streamDone;
-        const chunk = decoder.decode(value, { stream: !done });
-        buffer += chunk;
+        while (!done) {
+          const { value, done: streamDone } = await reader.read();
+          done = streamDone;
+          const chunk = decoder.decode(value, { stream: !done });
+          buffer += chunk;
 
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || "";
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
 
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const jsonString = line.substring(5).trim();
-            if (jsonString === "[DONE]") {
-              done = true;
-              break;
-            }
-            if (jsonString) {
-              try {
-                const parsedChunk = JSON.parse(jsonString);
-                if (parsedChunk.choices && parsedChunk.choices[0]?.delta?.content) {
-                  const contentPiece = parsedChunk.choices[0].delta.content;
-                  accumulatedResponse += contentPiece;
-                  setMessages((prev) =>
-                    prev.map((m) =>
-                      m.messageId === assistantMessageId
-                        ? { ...m, content: accumulatedResponse, status: 'streaming' }
-                        : m
-                    )
-                  );
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const jsonString = line.substring(5).trim();
+              if (jsonString === '[DONE]') {
+                done = true;
+                break;
+              }
+              if (jsonString) {
+                try {
+                  const parsedChunk = JSON.parse(jsonString);
+                  if (parsedChunk.choices && parsedChunk.choices[0]?.delta?.content) {
+                    const contentPiece = parsedChunk.choices[0].delta.content;
+                    accumulatedResponse += contentPiece;
+                    setMessages((prev) =>
+                      prev.map((m) =>
+                        m.messageId === assistantMessageId
+                          ? { ...m, content: accumulatedResponse, status: 'streaming' }
+                          : m
+                      )
+                    );
+                  }
+                  if (parsedChunk.choices && parsedChunk.choices[0]?.finish_reason === 'stop') {
+                    done = true;
+                    break;
+                  }
+                } catch (e) {
+                  console.error('Failed to parse stream chunk JSON:', jsonString, e);
                 }
-                if (parsedChunk.choices && parsedChunk.choices[0]?.finish_reason === 'stop') {
-                  done = true;
-                  break;
-                }
-              } catch (e) {
-                console.error("Failed to parse stream chunk JSON:", jsonString, e);
               }
             }
           }
+          if (done && buffer.startsWith('data: ')) { // Process any final data: [DONE] or content in buffer
+            const jsonString = buffer.substring(5).trim();
+            if (jsonString === '[DONE]') { } // Handled
+            else if (jsonString) {
+              try {
+                const parsedChunk = JSON.parse(jsonString);
+                if (parsedChunk.choices && parsedChunk.choices[0]?.delta?.content) {
+                  accumulatedResponse += parsedChunk.choices[0].delta.content;
+                  setMessages((prev) => prev.map((m) => m.messageId === assistantMessageId ? { ...m, content: accumulatedResponse, status: 'streaming' } : m));
+                }
+              } catch (e) { /* ignore for final part if not parsable and done */ }
+            }
+          }
         }
-        if (done && buffer.startsWith("data: ")) { // Process any final data: [DONE] or content in buffer
-             const jsonString = buffer.substring(5).trim();
-             if (jsonString === "[DONE]") {} // Handled
-             else if (jsonString) {
-                 try {
-                    const parsedChunk = JSON.parse(jsonString);
-                     if (parsedChunk.choices && parsedChunk.choices[0]?.delta?.content) {
-                         accumulatedResponse += parsedChunk.choices[0].delta.content;
-                         setMessages((prev) => prev.map((m) => m.messageId === assistantMessageId ? { ...m, content: accumulatedResponse, status: 'streaming' } : m));
-                     }
-                 } catch (e) { /* ignore for final part if not parsable and done */ }
-             }
-        }
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.messageId === assistantMessageId ? { ...m, status: 'completed' } : m
+          )
+        );
+        setChatHistory((prev) => [...prev, ['user', prompt], ['assistant', accumulatedResponse]]);
+
+      } catch (err: any) {
+        console.error('AI Chat stream error:', err);
+        toast.error(`AI Chat failed: ${err.message}`);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.messageId === assistantMessageId
+              ? { ...m, content: `Error: ${err.message}`, status: 'error' }
+              : m
+          )
+        );
+      } finally {
+        setIsGenerating(false);
       }
-
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.messageId === assistantMessageId ? { ...m, status: 'completed' } : m
-        )
-      );
-      setChatHistory((prev) => [...prev, ['user', prompt], ['assistant', accumulatedResponse]]);
-
-    } catch (err: any) {
-      console.error("AI Chat stream error:", err);
-      toast.error(`AI Chat failed: ${err.message}`);
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.messageId === assistantMessageId
-            ? { ...m, content: `Error: ${err.message}`, status: 'error' }
-            : m
-        )
-      );
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+    },
+    [chatId, isGenerating, loading, setIsGenerating, setMessages, messagesRef, setChatHistory]
+  );
 
   const rewrite = (messageId: string) => {
     const index = messages.findIndex((msg) => msg.messageId === messageId);
@@ -511,7 +526,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
       const defaultAIChatParams: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, max_tokens: 1000 };
       handleAIChatRequest(initialMessage, defaultAIChatParams);
     }
-  }, [isReady, initialMessage]); // Removed sendMessage, handleAIChatRequest from deps to avoid re-trigger
+  }, [isReady, initialMessage, handleAIChatRequest, messages]); // Added handleAIChatRequest and messages
 
   const editMessage = (messageId: string, newContent: string) => {
     setMessages((prev) => prev.map((msg) => msg.messageId === messageId ? { ...msg, content: newContent } : msg));
@@ -561,24 +576,12 @@ const ChatWindow = ({ id }: { id?: string }) => {
         )}
       </div>
     )
-  ) : ( /* ... loading spinner ... */ );
+  ) : (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-4"></div>
+      <p className="text-black/70 text-sm">Loading...</p>
+    </div>
+  );
 };
 
 export default ChatWindow;
-
-```
-This subtask will modify `components/ChatWindow.tsx`:
-- Import `streamChatCompletion`, `AIChatParams`, `AIChatAPIMessage`.
-- Implement `handleAIChatRequest` to:
-    - Set `isGenerating` state.
-    - Add user prompt and initial assistant placeholder message.
-    - Call `streamChatCompletion`, including historical text messages and the new prompt in `apiMessages`.
-    - Process the stream using `TextDecoder`, parsing `data: ` prefixed JSON chunks.
-    - Update assistant message content in real-time and status to 'completed' or 'error'.
-    - Add the completed interaction to `chatHistory` for future API calls.
-- Pass `handleAIChatRequest` as `onAIChatSubmit` to `Chat` and `EmptyChat`.
-- Refine `isGenerating` and `loading` checks in other submission handlers.
-- Update `rewrite` function to call `handleAIChatRequest` for re-submitting a prompt.
-- Update initial message handling (`useEffect` for `initialMessage`) to use `handleAIChatRequest`.
-- The WebSocket `sendMessage` is kept for now but might be deprecated if AI Chat becomes the primary text interaction.
-This is a significant update to shift text-based chat to the new streaming API.

@@ -3,13 +3,11 @@
 
 /* eslint-disable @next/next/no-img-element */
 import React, { MutableRefObject, useEffect, useState } from 'react';
+import { ComponentPropsWithoutRef } from 'react';
 import { Message } from './ChatWindow';
 import { cn } from '@/lib/utils';
 import { Edit, Image as ImageIconLucide, Waves as AudioIconLucide, Video as VideoIconLucide, BookCopy, Disc3, Volume2, StopCircle, Check, ClipboardList } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { base16AteliersulphurpoolLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -22,6 +20,9 @@ import { useSpeech } from 'react-text-to-speech';
 import SideTopAdComponent from './Ads/SideAdTop';
 import SideBottomAdComponent from './Ads/SideAdBottom';
 import Share from './MessageActions/Share';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import RelatedImages from './GetOneImage';
 
 // Define ContextualActionsPlaceholder component
@@ -139,33 +140,40 @@ const MessageBox = ({
     setIsImageSearchVisible(success);
   };
 
-  interface MarkdownCodeProps {
-    inline?: boolean;
-    className?: string;
-    children?: React.ReactNode;
-    node?: any;
-   }
+const CodeBlock = ({
+  className,
+  children,
+  ...props
+}: React.PropsWithChildren<ComponentPropsWithoutRef<'code'>>) => {
+  const match = /language-(\w+)/.exec(className || '');
+  const language = match ? match[1] : 'text';
+  const [copied, setCopied] = useState(false);
 
-  const CodeBlock: React.FC<MarkdownCodeProps> = ({ node, inline = false, className, children }) => {
-    const match = /language-(\w+)/.exec(className || '');
-    const language = match ? match[1] : 'text';
-    const [copied, setCopied] = useState(false);
-    return !inline && match ? (
-      <div className="relative group my-2">
-        <SyntaxHighlighter language={language} style={base16AteliersulphurpoolLight} customStyle={{ margin: 0, padding: '1rem', borderRadius: '0.5rem' }} PreTag="div">
-          {String(children).replace(/\n$/, '')}
-        </SyntaxHighlighter>
-        <button
-          onClick={() => { navigator.clipboard.writeText(String(children)); setCopied(true); setTimeout(() => setCopied(false), 1000); }}
-          className="absolute top-2 right-2 p-1 bg-gray-200 dark:bg-gray-700 rounded opacity-0 group-hover:opacity-100 text-black dark:text-white transition-opacity"
-          aria-label="Copy code to clipboard"
-        >
-          {copied ? <Check size={16} /> : <ClipboardList size={16} />}
-        </button>
-      </div>
-    ) : (
-      <code className={cn("bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm", className)}>{children}</code>
-    );
+    // Ensure children is always a string
+    const codeString = Array.isArray(children) ? children.join('') : String(children);
+
+    if (match) { // Check node.properties.inline instead
+      return (
+        <div className="relative group my-2">
+          <SyntaxHighlighter language={language} style={base16AteliersulphurpoolLight} customStyle={{ margin: 0, padding: '1rem', borderRadius: '0.5rem' }} PreTag="div">
+            {codeString.replace(/\n$/, '')}
+          </SyntaxHighlighter>
+          <button
+            onClick={() => { navigator.clipboard.writeText(codeString); setCopied(true); setTimeout(() => setCopied(false), 1000); }}
+            className="absolute top-2 right-2 p-1 bg-gray-200 dark:bg-gray-700 rounded opacity-0 group-hover:opacity-100 text-black dark:text-white transition-opacity"
+            aria-label="Copy code to clipboard"
+          >
+            {copied ? <Check size={16} /> : <ClipboardList size={16} />}
+          </button>
+        </div>
+      );
+    } else { // This handles inline code or cases where match is not found
+      return (
+        <code className={cn("bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm", className)} {...props}>
+          {codeString}
+        </code>
+      );
+    }
   };
 
   const currentQuery = history[messageIndex > 0 ? messageIndex - 1 : 0]?.content;
@@ -248,7 +256,7 @@ const MessageBox = ({
               <ImageIconLucide className="text-black dark:text-white" size={20} />
               <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Image</h3>
             </div>
-            {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.imagePromptText}"</p>}
+            {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.imagePromptText}&quot;</p>}
             <img
               src={`data:image/png;base64,${message.b64Json}`}
               alt={message.imagePromptText || "Generated image"}
@@ -267,7 +275,7 @@ const MessageBox = ({
               <AudioIconLucide className="text-black dark:text-white" size={20} />
               <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Audio</h3>
             </div>
-            {message.audioPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.audioPromptText}"</p>}
+            {message.audioPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.audioPromptText}&quot;</p>}
             <audio
               controls
               src={`data:audio/mpeg;base64,${message.b64JsonAudio}`}
@@ -288,7 +296,7 @@ const MessageBox = ({
               <VideoIconLucide className="text-black dark:text-white" size={20} />
               <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Video</h3>
             </div>
-            {message.videoPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: "{message.videoPromptText}"</p>}
+            {message.videoPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.videoPromptText}&quot;</p>}
             <video
               controls
               autoPlay

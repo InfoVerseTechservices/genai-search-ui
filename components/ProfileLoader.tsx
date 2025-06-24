@@ -22,10 +22,8 @@ const ProfileLoader: FC = () => {
       if (isLoggedIn) {
         setName(userDetails.name || "Name Here")
         setProfilePic(userDetails.profile_picture || undefined);
-      }
-  
-      // setProfilePic(localStorage.getItem('profilePic') || undefined);
-    }, []);
+      } // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoggedIn, userDetails.name, userDetails.profile_picture]);
   
     const handleSignOut = () => {
       localStorage.removeItem('profilePic');

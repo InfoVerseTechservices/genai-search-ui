@@ -81,14 +81,11 @@ const LeftSidebar: FC = () => {
     //   return;
     // }
 
-    if (isLoggedIn && userDetails) {
+    if (isLoggedIn) {
       setUsername(userDetails.name || 'Name Here');
       setProfilePic(userDetails.profile_picture || undefined);
     }
-
-    // setProfilePic(localStorage.getItem('profilePic') || undefined);
-
-  }, [isLoggedIn, userDetails]);
+  }, [isLoggedIn, userDetails.name, userDetails.profile_picture]); // Added missing dependencies
 
   const handleSignOut = () => {
     localStorage.removeItem('profilePic');
@@ -123,20 +120,20 @@ const LeftSidebar: FC = () => {
       </div>
       <div className="flex flex-col items-center space-y-6 ">
         {/* <div className="flex flex-col items-center"> */}
-        {/* <div className="flex flex-col items-center space-y-6 flex-grow">
+        <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
             href="https://colomboai.com/genai-search"
             Icon={GenAiIcon as IconComponent}
             label="Gen AI"
           />
-        </div> */}
-        {/* <div className="flex flex-col items-center space-y-6 flex-grow">
+        </div>
+        <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
             href="https://colomboai.com/vibes"
             Icon={VibesIcon as IconComponent}
             label="Vibes"
           />
-        </div> */}
+        </div>
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
             href="https://colomboai.com/feed"
@@ -162,16 +159,14 @@ const LeftSidebar: FC = () => {
         <div className="flex flex-col items-center space-y-6 flex-grow">
           <StarIcon w={24} h={24} fill="#8E8E93" />
         </div>
-        {/* <div className="flex flex-col items-center space-y-6 flex-grow">
+        <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
             href="https://colomboai.com/genai-search/"
             Icon={NewGenSearchIcon as IconComponent}
             label="New Chat"
           />
-
-        </div> */}
-        {/* <div className="flex flex-col items-center space-y-6 flex-grow">
-
+        </div>
+        <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
             href="/image-generator"
             Icon={ImageGeneratorIcon}
@@ -184,16 +179,14 @@ const LeftSidebar: FC = () => {
             Icon={VideoGeneratorIcon}
             label="Video Gen"
           />
-
-        </div> */}
-        {/* <div className="flex flex-col items-center space-y-6 flex-grow">
-
+        </div>
+        <div className="flex flex-col items-center space-y-6 flex-grow">
           <IconLink
             href="https://colomboai.com/genai-search/library/"
             Icon={HistoryIcon as IconComponent}
             label="History"
           />
-        </div> */}
+        </div>
       </div>
     </div>
   );

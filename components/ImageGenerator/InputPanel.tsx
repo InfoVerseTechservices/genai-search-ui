@@ -43,12 +43,12 @@ const InputPanel: React.FC<InputPanelProps> = ({
       }
       setTimer(0);
     }
-    return () => {
+    return () => { // eslint-disable-next-line react-hooks/exhaustive-deps
       if (intervalId) {
         clearInterval(intervalId);
       }
     };
-  }, [isLoading]);
+  }, [intervalId, isLoading]);
 
   const handleGenerateClick = async () => {
     if (!prompt.trim()) {

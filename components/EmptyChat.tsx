@@ -1,11 +1,12 @@
 // components/EmptyChat.tsx
-import EmptyChatMessageInput, { VideoGenParams, ImageGenParams, AudioGenParams } from './EmptyChatMessageInput';
+import EmptyChatMessageInput, { VideoGenParams, ImageGenParams, AudioGenParams, AIChatParams } from './EmptyChatMessageInput';
 
 interface EmptyChatProps {
   sendMessage: (message: string, file: File | null) => void;
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
   onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
   onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void;
+  onAIChatSubmit: (prompt: string, params: AIChatParams) => void;
   focusMode: string;
   setFocusMode: (mode: string) => void;
 }
@@ -15,6 +16,7 @@ const EmptyChat = ({
   onImagePromptSubmit,
   onAudioPromptSubmit,
   onVideoPromptSubmit,
+  onAIChatSubmit,
   focusMode,
   setFocusMode,
 }: EmptyChatProps) => {
@@ -53,6 +55,7 @@ const EmptyChat = ({
             onImagePromptSubmit={onImagePromptSubmit}
             onAudioPromptSubmit={onAudioPromptSubmit}
             onVideoPromptSubmit={onVideoPromptSubmit}
+            onAIChatSubmit={onAIChatSubmit}
             // Assuming EmptyChatMessageInput no longer renders its own H2 title
           />
         </div>

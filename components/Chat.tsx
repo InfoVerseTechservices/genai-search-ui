@@ -2,7 +2,7 @@
 'use client';
 
 import { Fragment, useEffect, useRef } from 'react'; // Removed useState
-import MessageInput, { VideoGenParams, ImageGenParams, AudioGenParams } from './MessageInput'; // Assuming types are exported
+import MessageInput, { VideoGenParams, ImageGenParams, AudioGenParams, AIChatParams } from './MessageInput'; // Assuming types are exported
 import { Message } from './ChatWindow';
 import MessageBox from './MessageBox';
 import MessageBoxLoading from './MessageBoxLoading';
@@ -19,6 +19,7 @@ const Chat = ({
   onImagePromptSubmit,
   onAudioPromptSubmit,
   onVideoPromptSubmit,
+  onAIChatSubmit,
   messageAppeared,
   rewrite,
   editMessage,
@@ -29,6 +30,7 @@ const Chat = ({
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
   onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
   onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void;
+  onAIChatSubmit: (prompt: string, params: AIChatParams) => void;
   loading: boolean;
   messageAppeared: boolean;
   rewrite: (messageId: string) => void;
@@ -87,6 +89,7 @@ const Chat = ({
               onImagePromptSubmit={onImagePromptSubmit}
               onAudioPromptSubmit={onAudioPromptSubmit}
               onVideoPromptSubmit={onVideoPromptSubmit}
+              onAIChatSubmit={onAIChatSubmit}
           />
         </div>
       </div>

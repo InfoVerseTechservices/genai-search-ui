@@ -25,7 +25,7 @@ const Chat = ({
   setMessages,
 }: {
   messages: Message[];
-  sendMessage: (message: string, file?: File | null) => void;
+  sendMessage: (message: string, file: File | null) => void;
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
   onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
   onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void;

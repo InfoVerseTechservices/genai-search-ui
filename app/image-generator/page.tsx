@@ -102,7 +102,7 @@ const ImageGeneratorPage: React.FC = () => {
                 <line x1="12" x2="12" y1="3" y2="15" />
                 </svg>
               <p className="text-lg text-gray-500 dark:text-gray-400">Your generated image will appear here.</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500">Enter a prompt and click &quot;Generate Image&quot; to start.</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">Enter a prompt and click "Generate Image" to start.</p>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Ensure server API settings are configured.</p>
             </div>
           )}

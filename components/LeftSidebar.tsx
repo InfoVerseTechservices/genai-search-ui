@@ -87,6 +87,7 @@ const LeftSidebar: FC = () => {
     }
 
     // setProfilePic(localStorage.getItem('profilePic') || undefined);
+
   }, [isLoggedIn, userDetails]);
 
   const handleSignOut = () => {
@@ -167,8 +168,10 @@ const LeftSidebar: FC = () => {
             Icon={NewGenSearchIcon as IconComponent}
             label="New Chat"
           />
+
         </div> */}
         {/* <div className="flex flex-col items-center space-y-6 flex-grow">
+
           <IconLink
             href="/image-generator"
             Icon={ImageGeneratorIcon}
@@ -181,8 +184,10 @@ const LeftSidebar: FC = () => {
             Icon={VideoGeneratorIcon}
             label="Video Gen"
           />
+
         </div> */}
         {/* <div className="flex flex-col items-center space-y-6 flex-grow">
+
           <IconLink
             href="https://colomboai.com/genai-search/library/"
             Icon={HistoryIcon as IconComponent}

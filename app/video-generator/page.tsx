@@ -13,11 +13,11 @@ interface VideoResponseData {
 
 // Interface for the successful video generation API response
 interface VideoGenerationSuccessResponse {
-  id: string; // id is expected to be present in all responses from the API
-  object?: string;
-  created?: number;
-  model?: string;
-  data?: VideoResponseData[];
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  data: VideoResponseData[];
   status?: string; // To store status like "processing"
 }
 
@@ -137,7 +137,7 @@ const VideoGeneratorPage: React.FC = () => {
                 <path d="M20 12v4a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-4" />
               </svg>
               <p className="text-lg text-gray-500 dark:text-gray-400">Your generated video will appear here.</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500">Enter a prompt and click &quot;Generate Video&quot; to start.</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">Enter a prompt and click "Generate Video" to start.</p>
             </div>
           )}
         </div>

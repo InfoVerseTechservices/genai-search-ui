@@ -25,7 +25,7 @@ const ProfileLoader: FC = () => {
       }
   
       // setProfilePic(localStorage.getItem('profilePic') || undefined);
-    }, [isLoggedIn, userDetails.name, userDetails.profile_picture]);
+    }, []);
   
     const handleSignOut = () => {
       localStorage.removeItem('profilePic');

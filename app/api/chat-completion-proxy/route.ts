@@ -10,11 +10,11 @@ export async function POST(request: NextRequest) {
   try {
     const requestBody = await request.json();
 
-    const apiKey = process.env.COLOMBO_API_KEY;
-    const apiBaseUrl = process.env.COLOMBO_API_URL;
+    const apiKey = process.env.CHAT_COMPLETION_API_KEY;
+    const apiBaseUrl = process.env.CHAT_COMPLETION_BASE_URL;
 
     if (!apiKey) {
-      console.error('COLOMBO_API_KEY is not set in environment variables.');
+      console.error('CHAT_COMPLETION_API_KEY is not set in environment variables.');
       return NextResponse.json(
         { error: 'Chat API key not configured on server.' },
         { status: 500 }
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!apiBaseUrl) {
-      console.error('COLOMBO_API_URL is not set in environment variables.');
+      console.error('CHAT_COMPLETION_BASE_URL is not set in environment variables.');
       return NextResponse.json(
         { error: 'Chat API URL not configured on server.' },
         { status: 500 }

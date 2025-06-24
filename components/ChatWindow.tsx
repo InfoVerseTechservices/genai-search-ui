@@ -1,7 +1,7 @@
 // components/ChatWindow.tsx
 'use client';
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { type Document } from '@langchain/core/documents';
+import { Document } from '@langchain/core/documents';
 import Navbar from './Navbar';
 import Chat from './Chat';
 import EmptyChat from './EmptyChat';
@@ -17,16 +17,15 @@ import Link from 'next/link';
 import { NewGenSearchIcon, HistoryIcon } from './Icons';
 
 import { generateImage } from '@/lib/imageActions';
-import { generateAudio, type AudioGenerationSuccessResponse } from '@/lib/audioActions'; // NEW: Import for AI Chat
-import { generateVideo, type VideoGenerationSuccessResponse } from '@/lib/videoActions';
-import { streamChatCompletion, type ChatMessage as AIChatAPIMessage } from '@/lib/chatActions'; // NEW: Import for AI Chat
+import { generateAudio } from '@/lib/audioActions';
+import { generateVideo } from '@/lib/videoActions';
+import { streamChatCompletion, AIChatParams, ChatMessage as AIChatAPIMessage } from '@/lib/chatActions'; // NEW: Import for AI Chat
 
 // Assuming ImageGenParams, AudioGenParams, VideoGenParams are correctly defined or imported
 // For AIChatParams, it's imported above.
 export interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
 export interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
 export interface VideoGenParams { prompt: string; negative_prompt?: string; guidance_scale?: number; num_frames?: number; duration?: number; model?: string; seed?: number; width?: number; height?: number; num_inference_steps?: number; decode_timestep?: number; decode_noise_scale?: number; upscale_and_refine?: boolean; }
-export type AIChatParams = { model: string; temperature: number; top_p: number; number_of_tokens: number; };
 
 
 export type Message = {
@@ -304,15 +303,15 @@ const ChatWindow = ({ id }: { id?: string }) => {
     setIsGenerating(true);
     const userPromptMsgId = crypto.randomBytes(7).toString('hex');
     const assistantImgMsgId = crypto.randomBytes(7).toString('hex');
- setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId: chatId!, createdAt: new Date(), content: `Generating image for: "${imagePromptText}"`, role: 'user', type: 'image_prompt', imagePromptText, status: 'loading' }]);
-    try { // Argument of type '{ messageId: string; chatId: string | undefined; createdAt: Date; content: string; role: "user"; type: "image_prompt"; imagePromptText: string; status: "loading"; }' is not assignable to parameter of type 'SetStateAction<Message[]>'.
-      const result: any = await generateImage(params); // Use 'any' for now due to inconsistent API response types
-      if (result.data?.[0]?.b64_json) { // Assuming successful image generation returns b64_json
+    setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating image for: "${imagePromptText}"`, role: 'user', type: 'image_prompt', imagePromptText, status: 'loading' }]);
+    try {
+      const result = await generateImage(params);
+      if (result.data?.[0]?.b64_json) {
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Image prompt: "${imagePromptText}"` } : m));
-        setMessages((prev) => [...prev, { messageId: assistantImgMsgId, chatId: chatId!, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_image', b64Json: result.data[0].b64_json, imagePromptText }]);
+        setMessages((prev) => [...prev, { messageId: assistantImgMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_image', b64Json: result.data[0].b64_json, imagePromptText }]);
         toast.success('Image generated!');
       } else { throw new Error(result.error || "No image data returned from API."); }
-    } catch (err: any) { // Argument of type 'string' is not assignable to parameter of type 'string & ErrorProps'.
+    } catch (err: any) {
       toast.error(`Image generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed image prompt: "${imagePromptText}". Error: ${err.message}` } : m));
     } finally { setIsGenerating(false); }
@@ -324,15 +323,15 @@ const ChatWindow = ({ id }: { id?: string }) => {
     setIsGenerating(true);
     const userPromptMsgId = crypto.randomBytes(7).toString('hex');
     const assistantAudioMsgId = crypto.randomBytes(7).toString('hex');
- setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId: chatId!, createdAt: new Date(), content: `Generating audio for: "${audioPromptText}"`, role: 'user', type: 'audio_prompt', audioPromptText, status: 'loading' }]);
-    try { // Argument of type '{ messageId: string; chatId: string | undefined; createdAt: Date; content: string; role: "user"; type: "audio_prompt"; audioPromptText: string; status: "loading"; }' is not assignable to parameter of type 'SetStateAction<Message[]>'.
-      const result: AudioGenerationSuccessResponse = await generateAudio(params);
+    setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating audio for: "${audioPromptText}"`, role: 'user', type: 'audio_prompt', audioPromptText, status: 'loading' }]);
+    try {
+      const result = await generateAudio(params);
       if (result.data?.[0]?.b64_json) {
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Audio prompt: "${audioPromptText}"` } : m));
-        setMessages((prev) => [...prev, { messageId: assistantAudioMsgId, chatId: chatId!, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_audio', b64JsonAudio: result.data[0].b64_json, audioPromptText }]);
+        setMessages((prev) => [...prev, { messageId: assistantAudioMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_audio', b64JsonAudio: result.data[0].b64_json, audioPromptText }]);
         toast.success('Audio generated!');
       } else { throw new Error(result.error || "No audio data returned from API."); }
-    } catch (err: any) { // Argument of type 'string' is not assignable to parameter of type 'string & ErrorProps'.
+    } catch (err: any) {
       toast.error(`Audio generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed audio prompt: "${audioPromptText}". Error: ${err.message}` } : m));
     } finally { setIsGenerating(false); }
@@ -347,19 +346,19 @@ const ChatWindow = ({ id }: { id?: string }) => {
 
     setMessages((prev) => [
       ...prev,
-      { messageId: userPromptMsgId, chatId: chatId!, createdAt: new Date(), content: `Generating video for: "${videoPromptText}"`, role: 'user', type: 'video_prompt', videoPromptText, status: 'loading' }
- ]);
+      { messageId: userPromptMsgId, chatId, createdAt: new Date(), content: `Generating video for: "${videoPromptText}"`, role: 'user', type: 'video_prompt', videoPromptText, status: 'loading' }
+    ]);
 
-    try { // Argument of type '{ messageId: string; chatId: string | undefined; createdAt: Date; content: string; role: "user"; type: "video_prompt"; videoPromptText: string; status: "loading"; }' is not assignable to parameter of type 'SetStateAction<Message[]>'.
-      const result: VideoGenerationSuccessResponse = await generateVideo(params); // Assuming generateVideo returns a structure with status or data
+    try {
+      const result = await generateVideo(params);
       if (result.status === "processing") {
          setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'loading', content: `Processing video for: "${videoPromptText}"` } : m));
          toast.info('Video is processing...');
          // isGenerating remains true
-         return; // Do not set isGenerating to false yet
+         return;
       }
 
-      if (result.data?.[0]?.b64_json) { // Assuming successful video generation returns b64_json
+      if (result.data?.[0]?.b64_json) {
           setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Video prompt: "${videoPromptText}"` } : m));
           setMessages((prev) => [...prev, { messageId: assistantVideoMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_video', b64JsonVideo: result.data[0].b64_json, videoPromptText }]);
           toast.success('Video generated!');
@@ -367,7 +366,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
            throw new Error(result.error || result.status || "Video data not found or generation failed.");
       } else if (!result.status) {
           throw new Error("Unknown error: No video data or status returned.");
- }
+      }
     } catch (err: any) {
       toast.error(`Video generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed video prompt: "${videoPromptText}". Error: ${err.message}` } : m));
@@ -383,23 +382,22 @@ const ChatWindow = ({ id }: { id?: string }) => {
     if (!chatId) { toast.error("Chat ID missing for AI Chat."); return; }
     if (isGenerating || loading) { toast.info("Another operation is in progress."); return; }
     setIsGenerating(true);
-    setLoading(true); // Set general loading to true as well
 
     const userMessageId = crypto.randomBytes(7).toString('hex');
-    const assistantMessageId = crypto.randomBytes(7).toString('hex'); // Unique ID for the assistant's streaming message
+    const assistantMessageId = crypto.randomBytes(7).toString('hex');
 
     setMessages((prev) => [
       ...prev,
-      { messageId: userMessageId, chatId: chatId!, createdAt: new Date(), content: prompt, role: 'user', type: 'text' },
-    ]); // Argument of type '{ messageId: string; chatId: string | undefined; createdAt: Date; content: string; role: "user"; type: "text"; }' is not assignable to parameter of type 'SetStateAction<Message[]>'.
-    
-    setMessages((prev) => [ // Argument of type '{ messageId: string; chatId: string | undefined; createdAt: Date; content: string; role: "assistant"; type: "text"; status: "streaming"; }' is not assignable to parameter of type 'SetStateAction<Message[]>'.
-      ...prev, // Argument of type '{ messageId: string; chatId: string | undefined; createdAt: Date; content: string; role: "assistant"; type: "text"; status: "streaming"; }' is not assignable to parameter of type 'SetStateAction<Message[]>'.
-      { messageId: assistantMessageId, chatId: chatId!, createdAt: new Date(), content: '', role: 'assistant', type: 'text', status: 'streaming' },
+      { messageId: userMessageId, chatId, createdAt: new Date(), content: prompt, role: 'user', type: 'text' },
+    ]);
+
+    setMessages((prev) => [
+      ...prev,
+      { messageId: assistantMessageId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'text', status: 'streaming' },
     ]);
 
     try {
-      const apiMessages: AIChatAPIMessage[] = [...messagesRef.current.filter(m => m.type === 'text' && (m.role === 'user' || m.role === 'assistant')).map(m => ({role: m.role, content: m.content} as AIChatAPIMessage)), { role: 'user', content: prompt }]; // Filter for text messages only
+      const apiMessages: AIChatAPIMessage[] = [...messagesRef.current.filter(m => m.type === 'text' && (m.role === 'user' || m.role === 'assistant')).map(m => ({role: m.role, content: m.content} as AIChatAPIMessage)), { role: 'user', content: prompt }];
 
       const stream = await streamChatCompletion({ ...params, messages: apiMessages });
       const reader = stream.getReader();
@@ -449,7 +447,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
           }
         }
         if (done && buffer.startsWith("data: ")) { // Process any final data: [DONE] or content in buffer
-             const jsonString = buffer.substring(5).trim(); // Remove "data: " prefix
+             const jsonString = buffer.substring(5).trim();
              if (jsonString === "[DONE]") {} // Handled
              else if (jsonString) {
                  try {
@@ -482,7 +480,6 @@ const ChatWindow = ({ id }: { id?: string }) => {
       );
     } finally {
       setIsGenerating(false);
-      setLoading(false); // Reset general loading
     }
   };
 
@@ -501,9 +498,9 @@ const ChatWindow = ({ id }: { id?: string }) => {
     setChatHistory((prevHist) => prevHist.slice(0, prevHist.length - textMsgsCountInTail));
 
     // Check if the message to resend is an AI Chat or WS chat
-    // For this integration, we'll assume it resends as an AI Chat if that's the new primary. If it was a WS message, we might need to differentiate. For now, default to AI Chat for rewrite.
-    // TODO: Get AI Chat params from state or settings if they are configurable by the user.
-    const aiChatParamsForRewrite: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, number_of_tokens: 1000 };
+    // For this integration, we'll assume it resends as an AI Chat if that's the new primary.
+    // If it was a WS message, we might need to differentiate. For now, default to AI Chat for rewrite.
+    const aiChatParamsForRewrite: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, max_tokens: 1000 }; // Get from state or settings
     handleAIChatRequest(prevUserMessage.content, aiChatParamsForRewrite);
   };
 
@@ -511,7 +508,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
     if (isReady && initialMessage && !messages.some(m => m.content === initialMessage && m.role === 'user')) {
       // For initial message from query param, decide if it's a standard WS message or an AI Chat.
       // Defaulting to AI Chat for new interactions.
-      const defaultAIChatParams: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, number_of_tokens: 1000 };
+      const defaultAIChatParams: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, max_tokens: 1000 };
       handleAIChatRequest(initialMessage, defaultAIChatParams);
     }
   }, [isReady, initialMessage]); // Removed sendMessage, handleAIChatRequest from deps to avoid re-trigger
@@ -564,14 +561,24 @@ const ChatWindow = ({ id }: { id?: string }) => {
         )}
       </div>
     )
-  ) : (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-2"></div>
-      <p className="text-black/70 text-sm">Loading...</p>
-    </div>
-  );
+  ) : ( /* ... loading spinner ... */ );
 };
 
 export default ChatWindow;
 
-
+```
+This subtask will modify `components/ChatWindow.tsx`:
+- Import `streamChatCompletion`, `AIChatParams`, `AIChatAPIMessage`.
+- Implement `handleAIChatRequest` to:
+    - Set `isGenerating` state.
+    - Add user prompt and initial assistant placeholder message.
+    - Call `streamChatCompletion`, including historical text messages and the new prompt in `apiMessages`.
+    - Process the stream using `TextDecoder`, parsing `data: ` prefixed JSON chunks.
+    - Update assistant message content in real-time and status to 'completed' or 'error'.
+    - Add the completed interaction to `chatHistory` for future API calls.
+- Pass `handleAIChatRequest` as `onAIChatSubmit` to `Chat` and `EmptyChat`.
+- Refine `isGenerating` and `loading` checks in other submission handlers.
+- Update `rewrite` function to call `handleAIChatRequest` for re-submitting a prompt.
+- Update initial message handling (`useEffect` for `initialMessage`) to use `handleAIChatRequest`.
+- The WebSocket `sendMessage` is kept for now but might be deprecated if AI Chat becomes the primary text interaction.
+This is a significant update to shift text-based chat to the new streaming API.

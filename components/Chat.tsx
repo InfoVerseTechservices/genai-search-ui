@@ -42,7 +42,8 @@ const Chat = ({
     messageEnd.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const messageListPaddingBottom = 'pb-24 md:pb-28';
+  // MODIFIED: Reduced bottom padding
+  const messageListPaddingBottom = 'pb-20 md:pb-24';
 
   return (
     <div className="flex flex-col h-full w-full">

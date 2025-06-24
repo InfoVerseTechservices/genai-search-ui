@@ -85,9 +85,7 @@ const LeftSidebar: FC = () => {
       setUsername(userDetails.name || 'Name Here');
       setProfilePic(userDetails.profile_picture || undefined);
     }
-
-    // setProfilePic(localStorage.getItem('profilePic') || undefined);
-  }, []);
+  }, [isLoggedIn, userDetails.name, userDetails.profile_picture]); // Added missing dependencies
 
   const handleSignOut = () => {
     localStorage.removeItem('profilePic');

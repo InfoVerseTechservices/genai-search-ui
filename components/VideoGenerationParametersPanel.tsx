@@ -1,141 +1,235 @@
-// components/VideoGenerationParametersPanel.tsx
+// components/VideoGenerationPanel.tsx
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { generateVideo } from '@/lib/videoActions'; // This will be created in a future step
 
-// Define an interface for the component's props
-export interface VideoGenParams {
-  prompt: string; // This will be from the main input, not part of this panel's direct props for input
-  negative_prompt?: string;
-  guidance_scale?: number;
-  num_frames?: number;
-  duration?: number;
-  model?: string; // Will be fixed to "ltx-video"
-  seed?: number;
-  width?: number;
-  height?: number;
-  num_inference_steps?: number;
-  decode_timestep?: number;
-  decode_noise_scale?: number;
-  upscale_and_refine?: boolean;
+// Interface for the expected video data in the response from the page
+interface VideoResponseData {
+  b64_json?: string;
 }
 
-interface VideoGenerationParametersPanelProps {
-  videoNegativePrompt: string;
-  setVideoNegativePrompt: (value: string) => void;
-  videoGuidanceScale: number;
-  setVideoGuidanceScale: (value: number) => void;
-  videoNumFrames: number;
-  setVideoNumFrames: (value: number) => void;
-  videoDuration: number;
-  setVideoDuration: (value: number) => void;
-  videoSeed: number;
-  setVideoSeed: (value: number) => void;
-  videoWidth: number;
-  setVideoWidth: (value: number) => void;
-  videoHeight: number;
-  setVideoHeight: (value: number) => void;
-  videoNumInferenceSteps: number;
-  setVideoNumInferenceSteps: (value: number) => void;
-  videoDecodeTimestep: number;
-  setVideoDecodeTimestep: (value: number) => void;
-  videoDecodeNoiseScale: number;
-  setVideoDecodeNoiseScale: (value: number) => void;
-  videoUpscaleAndRefine: boolean;
-  setVideoUpscaleAndRefine: (value: boolean) => void;
-  // Model is fixed, so no props for setting it.
+// Interface for the successful video generation API response (full structure)
+export interface VideoGenerationSuccessResponse {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  data: VideoResponseData[];
+  status?: string; // To handle "processing" or other statuses
 }
 
-const VideoGenerationParametersPanel: React.FC<VideoGenerationParametersPanelProps> = ({
-  videoNegativePrompt, setVideoNegativePrompt,
-  videoGuidanceScale, setVideoGuidanceScale,
-  videoNumFrames, setVideoNumFrames,
-  videoDuration, setVideoDuration,
-  videoSeed, setVideoSeed,
-  videoWidth, setVideoWidth,
-  videoHeight, setVideoHeight,
-  videoNumInferenceSteps, setVideoNumInferenceSteps,
-  videoDecodeTimestep, setVideoDecodeTimestep,
-  videoDecodeNoiseScale, setVideoDecodeNoiseScale,
-  videoUpscaleAndRefine, setVideoUpscaleAndRefine,
+interface VideoGenerationPanelProps {
+  onGenerationStart: (prompt: string) => void;
+  onGenerationSuccess: (data: VideoGenerationSuccessResponse) => void;
+  onGenerationFailure: (error: string) => void;
+  onGenerationProcessing: (data: VideoGenerationSuccessResponse) => void; // For "processing" status
+  isLoading: boolean;
+  currentStatus?: string | null; // To display current status like "processing"
+  // defaultModelName is fixed to "ltx-video" as per requirements, so not needed as a prop
+}
+
+const VideoGenerationPanel: React.FC<VideoGenerationPanelProps> = ({
+  onGenerationStart,
+  onGenerationSuccess,
+  onGenerationFailure,
+  onGenerationProcessing,
+  isLoading,
+  currentStatus,
 }) => {
+  const [prompt, setPrompt] = useState<string>('');
+  const [negativePrompt, setNegativePrompt] = useState<string>('');
+  const [guidanceScale, setGuidanceScale] = useState<number>(7.5);
+  const [numFrames, setNumFrames] = useState<number>(65); // Default from API docs
+  const [duration, setDuration] = useState<number>(1); // Default from API docs
+  const [seed, setSeed] = useState<number>(0); // Default from API docs
+  const [width, setWidth] = useState<number>(768); // Default from API docs
+  const [height, setHeight] = useState<number>(512); // Default from API docs
+  const [numInferenceSteps, setNumInferenceSteps] = useState<number>(50); // Default from API docs
+  const [decodeTimestep, setDecodeTimestep] = useState<number>(0.03); // Default from API docs
+  const [decodeNoiseScale, setDecodeNoiseScale] = useState<number>(0.025); // Default from API docs
+  const [upscaleAndRefine, setUpscaleAndRefine] = useState<boolean>(false); // Default from API docs
+
+  const [timer, setTimer] = useState<number>(0);
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+
   const MODEL_NAME = "ltx-video"; // Fixed model as per requirements
 
-  return (
-    <div className="text-left w-full"> {/* Simplified classes */}
-      <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-200">Video Parameters</h3>
-      <div className="space-y-3">
-        <textarea
-          value={videoNegativePrompt}
-          onChange={(e) => setVideoNegativePrompt(e.target.value)}
-          placeholder="Negative prompt (e.g., blurry, low quality)"
-          className="w-full p-2 border rounded-md text-xs sm:text-sm bg-white dark:bg-gray-700 dark:text-white dark:border-gray-500 focus:ring-blue-500 focus:border-blue-500"
-          rows={1}
-        />
+  useEffect(() => {
+    if (isLoading) {
+      const id = setInterval(() => {
+        setTimer((prevTimer) => prevTimer + 1);
+      }, 1000);
+      setIntervalId(id);
+    } else {
+      if (intervalId) {
+        clearInterval(intervalId);
+        setIntervalId(null);
+      }
+      setTimer(0);
+    }
+    return () => { // eslint-disable-next-line react-hooks/exhaustive-deps
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [intervalId, isLoading]);
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+  const handleGenerateClick = async () => {
+    if (!prompt.trim()) {
+      onGenerationFailure("Prompt cannot be empty.");
+      return;
+    }
+
+    onGenerationStart(prompt); // Notify page that generation is starting
+
+    try {
+      const params = {
+        prompt,
+        negative_prompt: negativePrompt,
+        guidance_scale: guidanceScale,
+        num_frames: numFrames,
+        duration,
+        model: MODEL_NAME, // Fixed model
+        seed,
+        width,
+        height,
+        num_inference_steps: numInferenceSteps,
+        decode_timestep: decodeTimestep,
+        decode_noise_scale: decodeNoiseScale,
+        upscale_and_refine: upscaleAndRefine,
+      };
+
+      const result = await generateVideo(params); // API call
+
+      if (result.status === "processing") {
+        onGenerationProcessing(result);
+      } else if (result.data && result.data.length > 0 && result.data[0].b64_json) {
+        onGenerationSuccess(result);
+      } else {
+        // This case might indicate a success response but no actual video data,
+        // or a status that's not "processing" and not clearly a success with data.
+        // Or if the API directly returns the video without a "processing" step.
+        // The page level handlers should make the final decision based on the structure.
+        // For now, if not "processing" and no b64_json, treat as potential issue or incomplete data.
+        onGenerationFailure(result.status || "Video data not found in response.");
+      }
+    } catch (error: any) {
+      onGenerationFailure(error.message || 'An unknown error occurred during video generation.');
+    }
+  };
+
+  return (
+    <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg bg-white dark:bg-gray-800">
+      <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-white">Video Generation Settings</h2>
+
+      <div className="space-y-5">
+        <div>
+          <label htmlFor="prompt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prompt</label>
+          <textarea
+            id="prompt"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            rows={3}
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+            placeholder="e.g., A serene beach with waves crashing, cinematic lighting"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="negativePrompt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Negative Prompt</label>
+          <textarea
+            id="negativePrompt"
+            value={negativePrompt}
+            onChange={(e) => setNegativePrompt(e.target.value)}
+            rows={2}
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+            placeholder="e.g., blurry, low quality, cartoonish"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
           <div>
-            <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Width: {videoWidth}px</label>
-            <input type="range" min="256" max="1024" step="64" value={videoWidth} onChange={(e) => setVideoWidth(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-600" />
+            <label htmlFor="width" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Width: {width}px</label>
+            <input id="width" type="range" min="256" max="1024" step="64" value={width} onChange={e => setWidth(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
           </div>
           <div>
-            <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Height: {videoHeight}px</label>
-            <input type="range" min="256" max="1024" step="64" value={videoHeight} onChange={(e) => setVideoHeight(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-600" />
+            <label htmlFor="height" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Height: {height}px</label>
+            <input id="height" type="range" min="256" max="1024" step="64" value={height} onChange={e => setHeight(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
           </div>
           <div>
-            <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Frames: {videoNumFrames}</label>
-            <input type="range" min="10" max="120" step="1" value={videoNumFrames} onChange={(e) => setVideoNumFrames(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-600" />
+            <label htmlFor="num_frames" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Number of Frames: {numFrames}</label>
+            <input id="num_frames" type="range" min="10" max="120" step="1" value={numFrames} onChange={e => setNumFrames(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
           </div>
           <div>
-            <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Duration: {videoDuration}s</label>
-            <input type="range" min="1" max="10" step="0.5" value={videoDuration} onChange={(e) => setVideoDuration(parseFloat(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-600" />
+            <label htmlFor="duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Duration (seconds): {duration}</label>
+            <input id="duration" type="range" min="1" max="10" step="0.5" value={duration} onChange={e => setDuration(parseFloat(e.target.value))} className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
+          </div>
+           <div>
+            <label htmlFor="guidanceScale" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Guidance Scale: {guidanceScale}</label>
+            <input id="guidanceScale" type="range" min="1" max="20" step="0.1" value={guidanceScale} onChange={e => setGuidanceScale(parseFloat(e.target.value))} className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
           </div>
           <div>
-            <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Guidance: {videoGuidanceScale}</label>
-            <input type="range" min="1" max="20" step="0.1" value={videoGuidanceScale} onChange={(e) => setVideoGuidanceScale(parseFloat(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-600" />
+            <label htmlFor="numInferenceSteps" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Inference Steps: {numInferenceSteps}</label>
+            <input id="numInferenceSteps" type="range" min="10" max="100" step="1" value={numInferenceSteps} onChange={e => setNumInferenceSteps(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
           </div>
           <div>
-            <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Steps: {videoNumInferenceSteps}</label>
-            <input type="range" min="10" max="100" step="1" value={videoNumInferenceSteps} onChange={(e) => setVideoNumInferenceSteps(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-600" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Seed</label>
-            <input type="number" value={videoSeed} onChange={(e) => setVideoSeed(parseInt(e.target.value) || 0)} className="w-full p-1.5 border rounded-md text-xs sm:text-sm bg-white dark:bg-gray-700 dark:text-white dark:border-gray-500 focus:ring-blue-500 focus:border-blue-500" placeholder="Seed (e.g., 0)"/>
-          </div>
-          <div className="sm:col-span-2 md:col-span-1"> {/* Model display */}
-            <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Model</label>
-            <input type="text" value={MODEL_NAME} readOnly className="w-full p-1.5 border rounded-md text-xs sm:text-sm bg-gray-100 dark:bg-gray-600 dark:text-gray-300 dark:border-gray-500 cursor-not-allowed" />
+            <label htmlFor="seed" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Seed</label>
+            <input type="number" id="seed" value={seed} onChange={e => setSeed(parseInt(e.target.value))} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-white"/>
           </div>
         </div>
 
-        <details className="pt-2">
-          <summary className="text-xs text-gray-500 dark:text-gray-400 cursor-pointer hover:text-gray-700 dark:hover:text-gray-200">Advanced Settings</summary>
-          <div className="mt-2 space-y-3 p-2 border-t dark:border-gray-600">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Decode Timestep: {videoDecodeTimestep}</label>
-                <input type="range" min="0.01" max="0.1" step="0.005" value={videoDecodeTimestep} onChange={(e) => setVideoDecodeTimestep(parseFloat(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-600" />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-300 mb-1">Decode Noise Scale: {videoDecodeNoiseScale}</label>
-                <input type="range" min="0.01" max="0.1" step="0.005" value={videoDecodeNoiseScale} onChange={(e) => setVideoDecodeNoiseScale(parseFloat(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-600" />
-              </div>
+        <div className="pt-2">
+            <label htmlFor="modelName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Model</label>
+            <input type="text" id="modelName" value={MODEL_NAME} readOnly className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm sm:text-sm dark:bg-gray-600 dark:text-gray-300 cursor-not-allowed"/>
+        </div>
+
+        {/* Advanced Settings (Collapsible or directly shown) */}
+        {/* For simplicity, showing directly. Could be put in a details/summary tag */}
+        <details className="mt-4 p-3 border dark:border-gray-600 rounded-md">
+            <summary className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">Advanced Settings</summary>
+            <div className="mt-3 space-y-4">
+                 <div>
+                    <label htmlFor="decodeTimestep" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Decode Timestep: {decodeTimestep}</label>
+                    <input id="decodeTimestep" type="range" min="0.01" max="0.1" step="0.005" value={decodeTimestep} onChange={e => setDecodeTimestep(parseFloat(e.target.value))} className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
+                </div>
+                <div>
+                    <label htmlFor="decodeNoiseScale" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Decode Noise Scale: {decodeNoiseScale}</label>
+                    <input id="decodeNoiseScale" type="range" min="0.01" max="0.1" step="0.005" value={decodeNoiseScale} onChange={e => setDecodeNoiseScale(parseFloat(e.target.value))} className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
+                </div>
+                <div className="flex items-center">
+                    <input id="upscaleAndRefine" type="checkbox" checked={upscaleAndRefine} onChange={e => setUpscaleAndRefine(e.target.checked)} className="h-4 w-4 text-indigo-600 border-gray-300 dark:border-gray-600 rounded focus:ring-indigo-500"/>
+                    <label htmlFor="upscaleAndRefine" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">Upscale and Refine</label>
+                </div>
             </div>
-            <div className="flex items-center mt-2">
-              <input
-                type="checkbox"
-                id="videoUpscaleAndRefine"
-                checked={videoUpscaleAndRefine}
-                onChange={(e) => setVideoUpscaleAndRefine(e.target.checked)}
-                className="h-3.5 w-3.5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <label htmlFor="videoUpscaleAndRefine" className="ml-2 text-xs text-gray-700 dark:text-gray-300">Upscale and Refine</label>
-            </div>
-          </div>
         </details>
+
+      </div>
+
+      <div className="mt-8">
+        <button
+          onClick={handleGenerateClick}
+          disabled={isLoading || !prompt.trim()}
+          className="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 dark:disabled:bg-gray-500 transition ease-in-out duration-150"
+        >
+          {isLoading ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {currentStatus === 'processing' ? `Processing... (${timer}s)` : `Generating... (${timer}s)`}
+            </>
+          ) : (
+            'Generate Video'
+          )}
+        </button>
+        {currentStatus && (
+             <p className="mt-3 text-sm text-center text-gray-600 dark:text-gray-300">Status: {currentStatus}</p>
+        )}
       </div>
     </div>
   );
 };
 
-export default VideoGenerationParametersPanel;
+export default VideoGenerationPanel;

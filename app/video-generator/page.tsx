@@ -2,28 +2,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import VideoGenerationPanel from '@/components/VideoGenerationPanel'; // This will be created in the next step
+import VideoGenerationPanel from '@/components/VideoGenerationPanel';
 import { toast } from 'sonner';
+import { VideoGenerationSuccessResponse } from '@/components/VideoGenerationParametersPanel';
 
-// Interface for the expected video data in the response
-interface VideoResponseData {
-  b64_json?: string; // Assuming b64_json will be used for video
-  // Potentially other fields like 'url' if the API might return a direct link
-}
-
-// Interface for the successful video generation API response
-interface VideoGenerationSuccessResponse {
-  id: string;
-  object: string;
-  created: number;
-  model: string;
-  data: VideoResponseData[];
-  status?: string; // To store status like "processing"
-}
 
 const VideoGeneratorPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [videoData, setVideoData] = useState<VideoGenerationSuccessResponse | null>(null);
+  const [videoData, setVideoData] = useState<VideoGenerationSuccessResponse | null>(null); // This type is correctly imported from VideoGenerationPanel
   const [error, setError] = useState<string | null>(null);
   const [currentPrompt, setCurrentPrompt] = useState<string>('');
   const [status, setStatus] = useState<string | null>(null); // For "processing", "success", etc.
@@ -137,7 +123,7 @@ const VideoGeneratorPage: React.FC = () => {
                 <path d="M20 12v4a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-4" />
               </svg>
               <p className="text-lg text-gray-500 dark:text-gray-400">Your generated video will appear here.</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500">Enter a prompt and click "Generate Video" to start.</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">Enter a prompt and click &quot;Generate Video&quot; to start.</p>
             </div>
           )}
         </div>
@@ -145,5 +131,3 @@ const VideoGeneratorPage: React.FC = () => {
     </div>
   );
 };
-
-export default VideoGeneratorPage;

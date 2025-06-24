@@ -316,11 +316,10 @@ const ChatWindow = ({ id }: { id?: string }) => {
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Image prompt: "${imagePromptText}"` } : m));
         setMessages((prev) => [...prev, { messageId: assistantImgMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_image', b64Json: result.data[0].b64_json, imagePromptText }]);
         toast.success('Image generated!');
-      } else { throw new Error(result.error || "No image data returned from API."); }
-    } catch (err: any) {
+      } else { throw new Error(result.error ?? "No image data returned from API."); } // eslint-disable-line no-new-object
     } catch (err: any) {
       toast.error(`Image generation failed: ${err.message}`);
-      setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed image prompt: "${imagePromptText}". Error: ${err.message}` } : m));
+      setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed image prompt: "${imagePromptText}". Error: ${err.message}` } : m)); // eslint-disable-line no-new-object
     } finally { setIsGenerating(false); }
   };
 
@@ -385,110 +384,119 @@ const ChatWindow = ({ id }: { id?: string }) => {
     }
   };
 
-  const handleAIChatRequest = async (prompt: string, params: AIChatParams) => {
-    if (!chatId) { toast.error("Chat ID missing for AI Chat."); return; }
-    if (isGenerating || loading) { toast.info("Another operation is in progress."); return; }
-    setIsGenerating(true);
+  const handleAIChatRequest = useCallback(
+    async (prompt: string, params: AIChatParams) => {
+      if (!chatId) {
+        toast.error('Chat ID missing for AI Chat.');
+        return;
+      }
+      if (isGenerating || loading) {
+        toast.info('Another operation is in progress.');
+        return;
+      }
+      setIsGenerating(true);
 
-    const userMessageId = crypto.randomBytes(7).toString('hex');
-    const assistantMessageId = crypto.randomBytes(7).toString('hex');
+      const userMessageId = crypto.randomBytes(7).toString('hex');
+      const assistantMessageId = crypto.randomBytes(7).toString('hex');
 
-    setMessages((prev) => [
-      ...prev,
-      { messageId: userMessageId, chatId, createdAt: new Date(), content: prompt, role: 'user', type: 'text' },
-    ]);
+      setMessages((prev) => [
+        ...prev,
+        { messageId: userMessageId, chatId, createdAt: new Date(), content: prompt, role: 'user', type: 'text' },
+      ]);
 
-    setMessages((prev) => [
-      ...prev,
-      { messageId: assistantMessageId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'text', status: 'streaming' },
-    ]);
+      setMessages((prev) => [
+        ...prev,
+        { messageId: assistantMessageId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'text', status: 'streaming' },
+      ]);
 
-    try {
-      const apiMessages: AIChatAPIMessage[] = [...messagesRef.current.filter(m => m.type === 'text' && (m.role === 'user' || m.role === 'assistant')).map(m => ({role: m.role, content: m.content} as AIChatAPIMessage)), { role: 'user', content: prompt }];
+      try {
+        const apiMessages: AIChatAPIMessage[] = [...messagesRef.current.filter(m => m.type === 'text' && (m.role === 'user' || m.role === 'assistant')).map(m => ({ role: m.role, content: m.content } as AIChatAPIMessage)), { role: 'user', content: prompt }];
 
-      const stream = await streamChatCompletion({ ...params, messages: apiMessages });
-      const reader = stream.getReader();
-      const decoder = new TextDecoder();
-      let accumulatedResponse = "";
-      let done = false;
-      let buffer = "";
+        const stream = await streamChatCompletion({ ...params, messages: apiMessages });
+        const reader = stream.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedResponse = '';
+        let done = false;
+        let buffer = '';
 
-      while (!done) {
-        const { value, done: streamDone } = await reader.read();
-        done = streamDone;
-        const chunk = decoder.decode(value, { stream: !done });
-        buffer += chunk;
+        while (!done) {
+          const { value, done: streamDone } = await reader.read();
+          done = streamDone;
+          const chunk = decoder.decode(value, { stream: !done });
+          buffer += chunk;
 
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || "";
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
 
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const jsonString = line.substring(5).trim();
-            if (jsonString === "[DONE]") {
-              done = true;
-              break;
-            }
-            if (jsonString) {
-              try {
-                const parsedChunk = JSON.parse(jsonString);
-                if (parsedChunk.choices && parsedChunk.choices[0]?.delta?.content) {
-                  const contentPiece = parsedChunk.choices[0].delta.content;
-                  accumulatedResponse += contentPiece;
-                  setMessages((prev) =>
-                    prev.map((m) =>
-                      m.messageId === assistantMessageId
-                        ? { ...m, content: accumulatedResponse, status: 'streaming' }
-                        : m
-                    )
-                  );
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const jsonString = line.substring(5).trim();
+              if (jsonString === '[DONE]') {
+                done = true;
+                break;
+              }
+              if (jsonString) {
+                try {
+                  const parsedChunk = JSON.parse(jsonString);
+                  if (parsedChunk.choices && parsedChunk.choices[0]?.delta?.content) {
+                    const contentPiece = parsedChunk.choices[0].delta.content;
+                    accumulatedResponse += contentPiece;
+                    setMessages((prev) =>
+                      prev.map((m) =>
+                        m.messageId === assistantMessageId
+                          ? { ...m, content: accumulatedResponse, status: 'streaming' }
+                          : m
+                      )
+                    );
+                  }
+                  if (parsedChunk.choices && parsedChunk.choices[0]?.finish_reason === 'stop') {
+                    done = true;
+                    break;
+                  }
+                } catch (e) {
+                  console.error('Failed to parse stream chunk JSON:', jsonString, e);
                 }
-                if (parsedChunk.choices && parsedChunk.choices[0]?.finish_reason === 'stop') {
-                  done = true;
-                  break;
-                }
-              } catch (e) {
-                console.error("Failed to parse stream chunk JSON:", jsonString, e);
               }
             }
           }
+          if (done && buffer.startsWith('data: ')) { // Process any final data: [DONE] or content in buffer
+            const jsonString = buffer.substring(5).trim();
+            if (jsonString === '[DONE]') { } // Handled
+            else if (jsonString) {
+              try {
+                const parsedChunk = JSON.parse(jsonString);
+                if (parsedChunk.choices && parsedChunk.choices[0]?.delta?.content) {
+                  accumulatedResponse += parsedChunk.choices[0].delta.content;
+                  setMessages((prev) => prev.map((m) => m.messageId === assistantMessageId ? { ...m, content: accumulatedResponse, status: 'streaming' } : m));
+                }
+              } catch (e) { /* ignore for final part if not parsable and done */ }
+            }
+          }
         }
-        if (done && buffer.startsWith("data: ")) { // Process any final data: [DONE] or content in buffer
-             const jsonString = buffer.substring(5).trim();
-             if (jsonString === "[DONE]") {} // Handled
-             else if (jsonString) {
-                 try {
-                    const parsedChunk = JSON.parse(jsonString);
-                     if (parsedChunk.choices && parsedChunk.choices[0]?.delta?.content) {
-                         accumulatedResponse += parsedChunk.choices[0].delta.content;
-                         setMessages((prev) => prev.map((m) => m.messageId === assistantMessageId ? { ...m, content: accumulatedResponse, status: 'streaming' } : m));
-                     }
-                 } catch (e) { /* ignore for final part if not parsable and done */ }
-             }
-        }
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.messageId === assistantMessageId ? { ...m, status: 'completed' } : m
+          )
+        );
+        setChatHistory((prev) => [...prev, ['user', prompt], ['assistant', accumulatedResponse]]);
+
+      } catch (err: any) {
+        console.error('AI Chat stream error:', err);
+        toast.error(`AI Chat failed: ${err.message}`);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.messageId === assistantMessageId
+              ? { ...m, content: `Error: ${err.message}`, status: 'error' }
+              : m
+          )
+        );
+      } finally {
+        setIsGenerating(false);
       }
-
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.messageId === assistantMessageId ? { ...m, status: 'completed' } : m
-        )
-      );
-      setChatHistory((prev) => [...prev, ['user', prompt], ['assistant', accumulatedResponse]]);
-
-    } catch (err: any) {
-      console.error("AI Chat stream error:", err);
-      toast.error(`AI Chat failed: ${err.message}`);
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.messageId === assistantMessageId
-            ? { ...m, content: `Error: ${err.message}`, status: 'error' }
-            : m
-        )
-      );
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+    },
+    [chatId, isGenerating, loading, setIsGenerating, setMessages, messagesRef, setChatHistory]
+  );
 
   const rewrite = (messageId: string) => {
     const index = messages.findIndex((msg) => msg.messageId === messageId);
@@ -518,7 +526,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
       const defaultAIChatParams: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, max_tokens: 1000 };
       handleAIChatRequest(initialMessage, defaultAIChatParams);
     }
-  }, [isReady, initialMessage]); // Removed sendMessage, handleAIChatRequest from deps to avoid re-trigger
+  }, [isReady, initialMessage, handleAIChatRequest, messages]); // Added handleAIChatRequest and messages
 
   const editMessage = (messageId: string, newContent: string) => {
     setMessages((prev) => prev.map((msg) => msg.messageId === messageId ? { ...msg, content: newContent } : msg));
@@ -568,7 +576,12 @@ const ChatWindow = ({ id }: { id?: string }) => {
         )}
       </div>
     )
-  ) : ( /* ... loading spinner ... */ );
+  ) : (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-4"></div>
+      <p className="text-black/70 text-sm">Loading...</p>
+    </div>
+  );
 };
 
 export default ChatWindow;

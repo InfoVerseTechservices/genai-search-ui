@@ -22,6 +22,7 @@ const ProfilePicture: React.FC<ProfilePictureProps> = ({
     //   height={size}
     //   referrerPolicy={'no-referrer'}
     // />
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={image}
       alt="avatar"

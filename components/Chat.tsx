@@ -1,9 +1,10 @@
 // components/Chat.tsx
 'use client';
 
-import { Fragment, useEffect, useRef } from 'react'; // Removed useState
-import MessageInput, { VideoGenParams, ImageGenParams, AudioGenParams } from './MessageInput'; // Assuming types are exported
+import { Fragment, useEffect, useRef, type MutableRefObject } from 'react';
+import MessageInput, { ImageGenParams, AudioGenParams } from './MessageInput';
 import { Message } from './ChatWindow';
+import { AIChatParams } from './ChatCompletionParametersPanel'; // Import AIChatParams from ChatCompletionParametersPanel
 import MessageBox from './MessageBox';
 import MessageBoxLoading from './MessageBoxLoading';
 
@@ -11,6 +12,7 @@ import MessageBoxLoading from './MessageBoxLoading';
 // interface ImageGenParams { /* ... */ } (defined in MessageInput)
 // interface AudioGenParams { /* ... */ } (defined in MessageInput)
 // interface VideoGenParams { /* ... */ } (defined in MessageInput)
+import { VideoGenParams as UIVideoGenParams } from './ChatWindow';
 
 const Chat = ({
   loading,
@@ -19,6 +21,7 @@ const Chat = ({
   onImagePromptSubmit,
   onAudioPromptSubmit,
   onVideoPromptSubmit,
+  onAIChatSubmit,
   messageAppeared,
   rewrite,
   editMessage,
@@ -28,7 +31,8 @@ const Chat = ({
   sendMessage: (message: string, file?: File | null) => void;
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
   onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
-  onVideoPromptSubmit: (params: VideoGenParams, videoPromptText: string) => void;
+  onVideoPromptSubmit: (params: UIVideoGenParams, videoPromptText: string) => void; // Use UIVideoGenParams
+  onAIChatSubmit: (prompt: string, params: AIChatParams) => void; // Corrected type for AIChatParams
   loading: boolean;
   messageAppeared: boolean;
   rewrite: (messageId: string) => void;
@@ -88,6 +92,7 @@ const Chat = ({
               onImagePromptSubmit={onImagePromptSubmit}
               onAudioPromptSubmit={onAudioPromptSubmit}
               onVideoPromptSubmit={onVideoPromptSubmit}
+              onAIChatSubmit={onAIChatSubmit}
           />
         </div>
       </div>

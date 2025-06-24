@@ -96,13 +96,13 @@ const ImageGeneratorPage: React.FC = () => {
           )}
           {!isLoading && !imageData && !error && (
             <div className="flex flex-col justify-center items-center p-10 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg min-h-[300px] text-center">
-               <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 dark:text-gray-500 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400 dark:text-gray-500 mb-4">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" x2="12" y1="3" y2="15" />
-                </svg>
+              </svg>
               <p className="text-lg text-gray-500 dark:text-gray-400">Your generated image will appear here.</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500">Enter a prompt and click "Generate Image" to start.</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">Enter a prompt and click &quot;Generate Image&quot; to start.</p>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Ensure server API settings are configured.</p>
             </div>
           )}

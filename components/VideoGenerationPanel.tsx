@@ -1,6 +1,6 @@
 // components/VideoGenerationPanel.tsx
 'use client';
-
+ 
 import React, { useState, useEffect } from 'react';
 import { generateVideo } from '@/lib/videoActions'; // This will be created in a future step
 
@@ -14,8 +14,8 @@ interface VideoGenerationSuccessResponse {
   id: string;
   object: string;
   created: number;
-  model: string;
-  data: VideoResponseData[];
+  model: string; // This is the model name string, not the type "ltx-video"
+  data?: VideoResponseData[]; // Make data optional as it might not be present during processing
   status?: string; // To handle "processing" or other statuses
 }
 
@@ -73,7 +73,7 @@ const VideoGenerationPanel: React.FC<VideoGenerationPanelProps> = ({
         clearInterval(intervalId);
       }
     };
-  }, [isLoading]);
+  }, [intervalId, isLoading]);
 
   const handleGenerateClick = async () => {
     if (!prompt.trim()) {
@@ -101,8 +101,8 @@ const VideoGenerationPanel: React.FC<VideoGenerationPanelProps> = ({
       };
 
       const result = await generateVideo(params); // API call
-
-      if (result.status === "processing") {
+      // The 'result' from generateVideo is of type VideoGenerationApiResponse, which has id?: string.
+      if (result.status === "processing" && result.id) { // Ensure 'id' is present for processing status
         onGenerationProcessing(result);
       } else if (result.data && result.data.length > 0 && result.data[0].b64_json) {
         onGenerationSuccess(result);

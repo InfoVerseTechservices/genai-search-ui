@@ -366,8 +366,8 @@ const RelatedImages: React.FC<RelatedImagesProps> = ({
     if (query) {
       // Ensure there is a query before fetching
       fetchChatAndImages();
-    }
-  }, []); // Dependency on chatId and query to refetch when they change
+    } // Dependency on chat_history and query to refetch when they change
+  }, [chat_history, query]);
 
   return (
     // <div className="flex flex-col items-center md:gap-1 md:mr-[6.3rem] lg:gap-1.5 xl:gap-2.5 hide-scrollbar overflow-y-auto">
@@ -375,6 +375,7 @@ const RelatedImages: React.FC<RelatedImagesProps> = ({
     <>
       {images && images.length > 0 && (
         <a href={images[0].url} target="_blank" rel="noopener noreferrer">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={images[0].img_src}
             alt={images[0].title}

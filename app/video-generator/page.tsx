@@ -2,14 +2,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import VideoGenerationPanel from '@/components/VideoGenerationPanel';
+import VideoGenerationPanel, { VideoGenerationSuccessResponse } from '@/components/VideoGenerationPanel';
 import { toast } from 'sonner';
-import { VideoGenerationSuccessResponse } from '@/components/VideoGenerationParametersPanel';
 
 
 const VideoGeneratorPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [videoData, setVideoData] = useState<VideoGenerationSuccessResponse | null>(null); // This type is correctly imported from VideoGenerationPanel
+  const [videoData, setVideoData] = useState<VideoGenerationSuccessResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [currentPrompt, setCurrentPrompt] = useState<string>('');
   const [status, setStatus] = useState<string | null>(null); // For "processing", "success", etc.
@@ -66,9 +65,9 @@ const VideoGeneratorPage: React.FC = () => {
             onGenerationStart={handleGenerationStart}
             onGenerationSuccess={handleGenerationSuccess}
             onGenerationFailure={handleGenerationFailure}
-            onGenerationProcessing={handleGenerationProcessing} // Pass the new handler
+            onGenerationProcessing={handleGenerationProcessing}
             isLoading={isLoading}
-            currentStatus={status} // Pass current status
+            currentStatus={status}
             // defaultModelName={"ltx-video"} // As specified
           />
         </div>
@@ -131,3 +130,5 @@ const VideoGeneratorPage: React.FC = () => {
     </div>
   );
 };
+
+export default VideoGeneratorPage;

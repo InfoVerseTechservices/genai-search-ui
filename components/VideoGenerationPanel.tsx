@@ -10,11 +10,11 @@ interface VideoResponseData {
 }
 
 // Interface for the successful video generation API response (full structure)
-interface VideoGenerationSuccessResponse {
-  id: string;
-  object: string;
-  created: number;
-  model: string; // This is the model name string, not the type "ltx-video"
+export interface VideoGenerationSuccessResponse {
+  id?: string;
+  object?: string;
+  created?: number;
+  model?: string;
   data?: VideoResponseData[]; // Make data optional as it might not be present during processing
   status?: string; // To handle "processing" or other statuses
 }
@@ -101,18 +101,17 @@ const VideoGenerationPanel: React.FC<VideoGenerationPanelProps> = ({
       };
 
       const result = await generateVideo(params); // API call
-      // The 'result' from generateVideo is of type VideoGenerationApiResponse, which has id?: string.
-      if (result.status === "processing" && result.id) { // Ensure 'id' is present for processing status
-        onGenerationProcessing(result);
-      } else if (result.data && result.data.length > 0 && result.data[0].b64_json) {
+
+      // Handle successful response with video data
+      if (result.data && result.data.length > 0 && result.data[0].b64_json) {
         onGenerationSuccess(result);
+      } else if (result.status === "processing" && result.id) {
+        // Handle response indicating the job is processing
+        onGenerationProcessing(result);
       } else {
-        // This case might indicate a success response but no actual video data,
-        // or a status that's not "processing" and not clearly a success with data.
-        // Or if the API directly returns the video without a "processing" step.
-        // The page level handlers should make the final decision based on the structure.
-        // For now, if not "processing" and no b64_json, treat as potential issue or incomplete data.
-        onGenerationFailure(result.status || "Video data not found in response.");
+        // Handle all other cases as failures (e.g., status: "failed", or unexpected response structure)
+        const errorMessage = result.error || result.status || "Video data not found in response.";
+        onGenerationFailure(errorMessage);
       }
     } catch (error: any) {
       onGenerationFailure(error.message || 'An unknown error occurred during video generation.');

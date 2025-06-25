@@ -1,7 +1,7 @@
 // lib/videoActions.ts
 
 // Interface for video generation parameters, based on the API documentation
-interface VideoGenerationParams {
+export interface VideoGenerationParams {
   prompt: string;
   negative_prompt?: string;
   guidance_scale?: number;

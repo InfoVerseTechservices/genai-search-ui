@@ -11,12 +11,30 @@ interface VideoResponseData {
 
 // Interface for the successful video generation API response (full structure)
 export interface VideoGenerationSuccessResponse {
-  id: string;
-  object: string;
-  created: number;
-  model: string;
-  data: VideoResponseData[];
-  status?: string; // To handle "processing" or other statuses
+  id?: string;
+  object?: string;
+  created?: number;
+  model?: string;
+  data?: VideoResponseData[];
+  status?: string;
+  error?: string;
+}
+
+// Interface for video generation parameters
+export interface VideoGenParams {
+  prompt: string;
+  negative_prompt?: string;
+  guidance_scale?: number;
+  num_frames?: number;
+  duration?: number;
+  model?: "ltx-video"; // Changed type to literal string
+  seed?: number;
+  width?: number;
+  height?: number;
+  num_inference_steps?: number;
+  decode_timestep?: number;
+  decode_noise_scale?: number;
+  upscale_and_refine?: boolean;
 }
 
 interface VideoGenerationPanelProps {
@@ -68,7 +86,7 @@ const VideoGenerationPanel: React.FC<VideoGenerationPanelProps> = ({
       }
       setTimer(0);
     }
-    return () => { // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
       if (intervalId) {
         clearInterval(intervalId);
       }
@@ -90,7 +108,7 @@ const VideoGenerationPanel: React.FC<VideoGenerationPanelProps> = ({
         guidance_scale: guidanceScale,
         num_frames: numFrames,
         duration,
-        model: MODEL_NAME, // Fixed model
+        model: MODEL_NAME as "ltx-video", // Fixed model
         seed,
         width,
         height,

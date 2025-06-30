@@ -1,19 +1,22 @@
 // components/EmptyChatMessageInput.tsx
 import { ArrowRight, Image as ImageIconLucide, Paperclip, Video as VideoIconLucide, SlidersHorizontal as SlidersHorizontalIcon, Bot as AIChatIcon } from 'lucide-react'; // Added AIChatIcon
 import CustomAudioWaveformIcon from './Icons/CustomAudioWaveformIcon';
-import React, { useEffect, useRef, useState, ChangeEvent } from 'react';
-import TextareaAutosize from 'react-textarea-autosize';
 import { UploadIcon as CustomUploadIcon } from './Icons';
+import React, { useEffect, useRef, useState, ChangeEvent, useCallback } from 'react';
+import { toast } from 'sonner'; // This line was already present.
+import TextareaAutosize from 'react-textarea-autosize'; // Keep this import
 import ImageGenerationPanel from './ImageGenerationPanel';
-import AudioGenerationPanel from './AudioGenerationPanel';
+//import AudioGenerationPanel from './AudioGenerationPanel'; // This line was already present.
 import VideoGenerationParametersPanel, { VideoGenParams as UIVideoGenParams } from './VideoGenerationParametersPanel';
-import ChatCompletionParametersPanel, { AIChatParams } from './ChatCompletionParametersPanel'; // NEW
+import ChatCompletionParametersPanel, { AIChatParams } from './ChatCompletionParametersPanel';
 import GenericModal from './GenericModal';
+import { ImageGenParams } from './MessageInput';
+import AudioGenerationPanel from './AudioGenerationPanel';
 
 export type { UIVideoGenParams as VideoGenParams };
 export type { AIChatParams }; // NEW Export
+export type { ImageGenParams };
 
-export interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
 export interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
 
 interface EmptyChatMessageInputProps {
@@ -411,18 +414,13 @@ const EmptyChatMessageInput = ({
       )}
       {isVideoModeActive && (
         <GenericModal isOpen={isVideoParamsModalOpen} onClose={() => setIsVideoParamsModalOpen(false)} title="Video Generation Settings" size="xl">
-          <VideoGenerationParametersPanel
-            videoNegativePrompt={videoNegativePrompt} setVideoNegativePrompt={setVideoNegativePrompt}
-            videoGuidanceScale={videoGuidanceScale} setVideoGuidanceScale={setVideoGuidanceScale}
-            videoNumFrames={videoNumFrames} setVideoNumFrames={setVideoNumFrames}
-            videoDuration={videoDuration} setVideoDuration={setVideoDuration}
-            videoSeed={videoSeed} setVideoSeed={setVideoSeed}
-            videoWidth={videoWidth} setVideoWidth={setVideoWidth}
-            videoHeight={videoHeight} setVideoHeight={setVideoHeight}
-            videoNumInferenceSteps={videoNumInferenceSteps} setVideoNumInferenceSteps={setVideoNumInferenceSteps}
-            videoDecodeTimestep={videoDecodeTimestep} setVideoDecodeTimestep={setVideoDecodeTimestep}
-            videoDecodeNoiseScale={videoDecodeNoiseScale} setVideoDecodeNoiseScale={setVideoDecodeNoiseScale}
-            videoUpscaleAndRefine={videoUpscaleAndRefine} setVideoUpscaleAndRefine={setVideoUpscaleAndRefine}
+          <VideoGenerationParametersPanel // Pass props expected by VideoGenerationPanel
+            onGenerationStart={() => {}} // Dummy function, as this panel doesn't directly trigger generation
+            onGenerationSuccess={() => {}} // Dummy function
+            onGenerationFailure={() => {}} // Dummy function
+            onGenerationProcessing={() => {}} // Dummy function
+            isLoading={false} // Not loading from this modal
+            currentStatus={null} // No status to display here
           />
         </GenericModal>
       )}

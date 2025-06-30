@@ -153,7 +153,6 @@ const InputPanel: React.FC<InputPanelProps> = ({
           />
         </div>
       </div>
-
       <div className="mt-6">
         <button
           onClick={handleGenerateClick}

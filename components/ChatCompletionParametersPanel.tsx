@@ -1,9 +1,8 @@
-// components/ChatCompletionParametersPanel.tsx
+
 'use client';
 
 import React from 'react';
 
-// Matches the parameters that can be sent, excluding messages and stream
 export interface AIChatParams {
   model: string;
   temperature: number;
@@ -14,13 +13,13 @@ export interface AIChatParams {
 interface ChatCompletionParametersPanelProps {
   params: AIChatParams;
   setParams: (newParams: AIChatParams | ((prevParams: AIChatParams) => AIChatParams)) => void;
-  defaultModelName?: string; // e.g., "qwen-3"
+  defaultModelName?: string;
 }
 
 const ChatCompletionParametersPanel: React.FC<ChatCompletionParametersPanelProps> = ({
   params,
   setParams,
-  defaultModelName = "qwen-3", // Default model from API spec
+  defaultModelName = "qwen-3", 
 }) => {
 
   const handleParamChange = (field: keyof AIChatParams, value: string | number) => {
@@ -31,12 +30,10 @@ const ChatCompletionParametersPanel: React.FC<ChatCompletionParametersPanelProps
   };
 
   return (
-    // Using simplified root div styling, similar to other panels after their refactor for modal use
+    
     <div className="text-left w-full">
-      {/* The modal will provide a title like "AI Chat Settings" */}
-      {/* <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-200">Chat Parameters</h3> */}
       <div className="space-y-4">
-        {/* Model Input */}
+   
         <div>
           <label htmlFor="aiChatModel" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
             Model
@@ -52,7 +49,6 @@ const ChatCompletionParametersPanel: React.FC<ChatCompletionParametersPanelProps
            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">e.g., qwen-3</p>
         </div>
 
-        {/* Temperature Slider */}
         <div>
           <label htmlFor="aiChatTemperature" className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
             Temperature: {params.temperature.toFixed(2)}
@@ -61,7 +57,7 @@ const ChatCompletionParametersPanel: React.FC<ChatCompletionParametersPanelProps
             id="aiChatTemperature"
             type="range"
             min="0"
-            max="2"       // Common range for temperature
+            max="2"       
             step="0.01"
             value={params.temperature}
             onChange={(e) => handleParamChange('temperature', parseFloat(e.target.value))}

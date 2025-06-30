@@ -1,4 +1,3 @@
-// components/ChatWindow.tsx
 'use client';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Document } from '@langchain/core/documents';
@@ -17,12 +16,11 @@ import Link from 'next/link';
 import { NewGenSearchIcon, HistoryIcon } from './Icons';
 
 import { generateImage } from '@/lib/imageActions';
-import { generateAudio, type AudioGenerationResponse } from '@/lib/audioActions'; // NEW: Import for AI Chat
+import { generateAudio, type AudioGenerationResponse } from '@/lib/audioActions';
 import { generateVideo } from '@/lib/videoActions';
-import { streamChatCompletion, type ChatMessage as AIChatAPIMessage } from '@/lib/chatActions'; // NEW: Import for AI Chat
+import { streamChatCompletion, type ChatMessage as AIChatAPIMessage } from '@/lib/chatActions';
 
-// Assuming ImageGenParams, AudioGenParams, VideoGenParams are correctly defined or imported
-// For AIChatParams, it's imported above.
+
 export interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
 export interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
 export interface VideoGenParams { prompt: string; negative_prompt?: string; guidance_scale?: number; num_frames?: number; duration?: number; model?: string; seed?: number; width?: number; height?: number; num_inference_steps?: number; decode_timestep?: number; decode_noise_scale?: number; upscale_and_refine?: boolean; }
@@ -32,7 +30,6 @@ export type AIChatParams = {
   top_p: number;
   number_of_tokens: number;
 };
-
 
 export type Message = {
   messageId: string;
@@ -49,8 +46,9 @@ export type Message = {
   b64Json?: string;
   b64JsonAudio?: string;
   b64JsonVideo?: string;
-  status?: 'loading' | 'completed' | 'error' | 'streaming'; // Added 'streaming'
+  status?: 'loading' | 'completed' | 'error' | 'streaming';
 };
+
 
 const useSocket = (
   url: string,
@@ -161,9 +159,9 @@ const useSocket = (
             heartbeatTimeoutId.current = setTimeout(() => socket.close(), heartbeatInterval - 7000);
           }
         };
-        sendPing(); // Initial ping
+        sendPing(); 
         const intervalId = setInterval(sendPing, heartbeatInterval);
-        (socket as any).heartbeatIntervalId = intervalId; // Store to clear later
+        (socket as any).heartbeatIntervalId = intervalId; 
       };
 
       const stopHeartbeat = () => {
@@ -174,7 +172,6 @@ const useSocket = (
       };
       connectWs();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ws, url, setIsWSReady, setError]);
   return ws;
 };
@@ -221,7 +218,6 @@ const loadMessages = async (
   setIsMessagesLoaded(true);
 };
 
-
 const ChatWindow = ({ id }: { id?: string }) => {
   const { userDetails, isLoggedIn } = useUserProfile();
   const router = useRouter();
@@ -242,6 +238,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
   const [isMessagesLoaded, setIsMessagesLoaded] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const messagesRef = useRef<Message[]>([]);
 
 
   useEffect(() => {
@@ -253,20 +250,19 @@ const ChatWindow = ({ id }: { id?: string }) => {
       const newChatId = crypto.randomBytes(20).toString('hex');
       setChatId(newChatId);
     }
-  }, [isLoggedIn, router, chatId, newChatCreated, isMessagesLoaded, messages.length]); // Removed messages.length as it caused re-renders
+  }, [isLoggedIn, router, chatId, newChatCreated, isMessagesLoaded, messages.length]);
 
   const closeWebSocket = useCallback(() => {
     if (ws?.readyState === 1) { ws.close(); console.log('[DEBUG] closed websocket'); }
-   }, [ws]);
+  }, [ws]);
   useEffect(() => { return closeWebSocket; }, [closeWebSocket]);
 
-  const messagesRef = useRef<Message[]>([]);
   useEffect(() => { messagesRef.current = messages; }, [messages]);
 
   useEffect(() => { if (isMessagesLoaded && isWSReady) setIsReady(true); }, [isMessagesLoaded, isWSReady]);
 
   const sendMessage = async (messageContent: string, file: File | null = null) => {
-    if (loading || isGenerating) return; // Block new WS message if any generation is in progress too
+    if (loading || isGenerating) return;
     setLoading(true); setMessageAppeared(false);
     let sources: Document[] | undefined = undefined;
     let recievedMessage = ''; let added = false;
@@ -301,11 +297,11 @@ const ChatWindow = ({ id }: { id?: string }) => {
       }
     };
     ws?.addEventListener('message', messageHandler);
-   };
+  };
 
   const handleImageGenerationRequest = async (params: ImageGenParams, imagePromptText: string) => {
     if (!chatId) { toast.error("Chat ID missing."); return; }
-    if (isGenerating || loading) { toast.info("Another operation is in progress."); return; } // Check general loading too
+    if (isGenerating || loading) { toast.info("Another operation is in progress."); return; }
     setIsGenerating(true);
     const userPromptMsgId = crypto.randomBytes(7).toString('hex');
     const assistantImgMsgId = crypto.randomBytes(7).toString('hex');
@@ -316,10 +312,10 @@ const ChatWindow = ({ id }: { id?: string }) => {
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Image prompt: "${imagePromptText}"` } : m));
         setMessages((prev) => [...prev, { messageId: assistantImgMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_image', b64Json: result.data[0].b64_json, imagePromptText }]);
         toast.success('Image generated!');
-      } else { throw new Error(result.error ?? "No image data returned from API."); } // eslint-disable-line no-new-object
+      } else { throw new Error(result.error ?? "No image data returned from API."); }
     } catch (err: any) {
       toast.error(`Image generation failed: ${err.message}`);
-      setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed image prompt: "${imagePromptText}". Error: ${err.message}` } : m)); // eslint-disable-line no-new-object
+      setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed image prompt: "${imagePromptText}". Error: ${err.message}` } : m));
     } finally { setIsGenerating(false); }
   };
 
@@ -329,8 +325,8 @@ const ChatWindow = ({ id }: { id?: string }) => {
     setIsGenerating(true);
     const userPromptMsgId = crypto.randomBytes(7).toString('hex');
     const assistantAudioMsgId = crypto.randomBytes(7).toString('hex');
- setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId: chatId!, createdAt: new Date(), content: `Generating audio for: "${audioPromptText}"`, role: 'user', type: 'audio_prompt', audioPromptText, status: 'loading' }]);
-    try { // Argument of type '{ messageId: string; chatId: string | undefined; createdAt: Date; content: string; role: "user"; type: "audio_prompt"; audioPromptText: string; status: "loading"; }' is not assignable to parameter of type 'SetStateAction<Message[]>'.
+    setMessages((prev) => [...prev, { messageId: userPromptMsgId, chatId: chatId!, createdAt: new Date(), content: `Generating audio for: "${audioPromptText}"`, role: 'user', type: 'audio_prompt', audioPromptText, status: 'loading' }]);
+    try {
       const result: AudioGenerationResponse = await generateAudio(params);
       if (result.data?.[0]?.b64_json) {
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Audio prompt: "${audioPromptText}"` } : m));
@@ -351,16 +347,15 @@ const ChatWindow = ({ id }: { id?: string }) => {
     const assistantVideoMsgId = crypto.randomBytes(7).toString('hex');
 
     setMessages((prev) => [
- ...prev,
+      ...prev,
       { messageId: userPromptMsgId, chatId: chatId!, createdAt: new Date(), content: `Generating video for: "${videoPromptText}"`, role: 'user', type: 'video_prompt', videoPromptText, status: 'loading' },
- ]);
+    ]);
 
     try {
-      const result: any = await generateVideo(params); // Use 'any' if type is not available
+      const result: any = await generateVideo(params);
       if (result.status === "processing") {
          setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'loading', content: `Processing video for: "${videoPromptText}"` } : m));
          toast.info('Video is processing...');
-         // isGenerating remains true
          return;
       }
 
@@ -372,7 +367,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
            throw new Error(result.error || result.status || "Video data not found or generation failed.");
       } else if (!result.status) {
           throw new globalThis.Error("Unknown error: No video data or status returned.");
- }
+      }
     } catch (err: any) {
       toast.error(`Video generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed video prompt: "${videoPromptText}". Error: ${err.message}` } : m));
@@ -459,9 +454,9 @@ const ChatWindow = ({ id }: { id?: string }) => {
               }
             }
           }
-          if (done && buffer.startsWith('data: ')) { // Process any final data: [DONE] or content in buffer
+          if (done && buffer.startsWith('data: ')) {
             const jsonString = buffer.substring(5).trim();
-            if (jsonString === '[DONE]') { } // Handled
+            if (jsonString === '[DONE]') { }
             else if (jsonString) {
               try {
                 const parsedChunk = JSON.parse(jsonString);
@@ -469,7 +464,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
                   accumulatedResponse += parsedChunk.choices[0].delta.content;
                   setMessages((prev) => prev.map((m) => m.messageId === assistantMessageId ? { ...m, content: accumulatedResponse, status: 'streaming' } : m));
                 }
-              } catch (e) { /* ignore for final part if not parsable and done */ }
+              } catch (e) {  }
             }
           }
         }
@@ -511,48 +506,61 @@ const ChatWindow = ({ id }: { id?: string }) => {
         if (messages[i].type === 'text' || !messages[i].type) textMsgsCountInTail++;
     }
     setChatHistory((prevHist) => prevHist.slice(0, prevHist.length - textMsgsCountInTail));
-
-    // Check if the message to resend is an AI Chat or WS chat
-    // For this integration, we'll assume it resends as an AI Chat if that's the new primary.
-    // If it was a WS message, we might need to differentiate. For now, default to AI Chat for rewrite.
-    const aiChatParamsForRewrite: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, max_tokens: 1000 }; // Get from state or settings
+    
+    const aiChatParamsForRewrite: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, number_of_tokens: 1000 };
     handleAIChatRequest(prevUserMessage.content, aiChatParamsForRewrite);
   };
 
   useEffect(() => {
     if (isReady && initialMessage && !messages.some(m => m.content === initialMessage && m.role === 'user')) {
-      // For initial message from query param, decide if it's a standard WS message or an AI Chat.
-      // Defaulting to AI Chat for new interactions.
-      const defaultAIChatParams: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, max_tokens: 1000 };
+      const defaultAIChatParams: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, number_of_tokens: 1000 };
       handleAIChatRequest(initialMessage, defaultAIChatParams);
     }
-  }, [isReady, initialMessage, handleAIChatRequest, messages]); // Added handleAIChatRequest and messages
+  }, [isReady, initialMessage, handleAIChatRequest, messages]);
 
   const editMessage = (messageId: string, newContent: string) => {
     setMessages((prev) => prev.map((msg) => msg.messageId === messageId ? { ...msg, content: newContent } : msg));
-   };
-  if (hasError) { return <div className="flex flex-col items-center justify-center min-h-screen"><p className="text-black/70 text-sm">Connection error. Try again.</p></div>; }
+  };
+  
+  if (hasError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="text-gray-600 dark:text-gray-400 text-sm">Connection error. Please try again.</p>
+      </div>
+    );
+  }
 
   return isReady ? (
     notFound ? ( <Error statusCode={404} /> ) : (
-      <div className="">
-        <div className="absolute top-3 right-2 z-[999] md:hidden">
-          <div className="flex space-x-4 mt-3">
-            <button onClick={(e) => { /* ... reset logic ... */ }}>
-              <div className="flex flex-col items-center"> <div className="w-6 h-6 mb-1"> <NewGenSearchIcon w={24} h={24} fill={'#8E8E93'} /> </div> </div>
+      <div className="flex flex-col h-screen w-full">
+       
+       
+        <div className="absolute top-3 right-4 z-[999] md:hidden">
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={(e) => { /* ... reset logic ... */ }} 
+              className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+              title="New Chat"
+            >
+              <NewGenSearchIcon w={24} h={24} fill="currentColor" />
             </button>
-            <Link href="/library/">
-              <div className="flex flex-col items-center"> <div className="w-8 sm:w-6 h-6 mb-1"> <HistoryIcon w={24} h={24} fill={'#8E8E93'} /> </div> </div>
+            <Link 
+              href="/library/"
+              className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+              title="History"
+            >
+              <HistoryIcon w={24} h={24} fill="currentColor" />
             </Link>
           </div>
         </div>
+        
         {messages.length > 0 ? (
           <>
             <Navbar messages={messages} />
             <Chat
               loading={loading || isGenerating}
               messages={messages}
-              sendMessage={sendMessage} // Kept for potential future use or hybrid model
+              sendMessage={sendMessage}
               onImagePromptSubmit={handleImageGenerationRequest}
               onAudioPromptSubmit={handleAudioGenerationRequest}
               onVideoPromptSubmit={handleVideoGenerationRequest}
@@ -565,7 +573,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
           </>
         ) : (
           <EmptyChat
-            sendMessage={sendMessage} // Kept for potential future use
+            sendMessage={sendMessage}
             onImagePromptSubmit={handleImageGenerationRequest}
             onAudioPromptSubmit={handleAudioGenerationRequest}
             onVideoPromptSubmit={handleVideoGenerationRequest}
@@ -578,8 +586,8 @@ const ChatWindow = ({ id }: { id?: string }) => {
     )
   ) : (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-4"></div>
-      <p className="text-black/70 text-sm">Loading...</p>
+      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900 dark:border-gray-100 mb-4"></div>
+      <p className="text-gray-600 dark:text-gray-400 text-sm">Loading...</p>
     </div>
   );
 };

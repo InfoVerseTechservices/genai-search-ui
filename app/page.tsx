@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const Home = () => {
   return (
-    <div className='flex flex-col items-center'>
+    <div className='flex flex-col items-center overflow-hidden'>
       {/* <head>
         <link rel="icon" href="/images/favicon.svg" />
       </head> */}

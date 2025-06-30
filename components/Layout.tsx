@@ -14,7 +14,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <header className="sticky top-0 z-40 xl:border-b-[1px] w-full flex flex-row justify-center lg:border-b-[1px] border-[#E3E3E3] dark:border-gray-700 bg-white dark:bg-slate-900 sm:border-0 h-[60px] md:h-auto">
 
         {/* Desktop Header */}
-        <div className="py-[14px] md:flex hidden lg:flex sm:hidden items-center">
+        <div className="py-[14px] md:flex hidden lg:flex sm:hidden items-center ">
           <Image src={Logo} alt="ColomboAI" className="w-[10rem]" />
         </div>
 

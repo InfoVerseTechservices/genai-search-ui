@@ -1,17 +1,11 @@
-// components/Chat.tsx
 'use client';
 
 import { Fragment, useEffect, useRef, type MutableRefObject } from 'react';
 import MessageInput, { ImageGenParams, AudioGenParams } from './MessageInput';
 import { Message } from './ChatWindow';
-import { AIChatParams } from './ChatCompletionParametersPanel'; // Import AIChatParams from ChatCompletionParametersPanel
+import { AIChatParams } from './ChatCompletionParametersPanel';
 import MessageBox from './MessageBox';
 import MessageBoxLoading from './MessageBoxLoading';
-
-// Ensure these prop types are complete as expected by MessageInput and ChatWindow
-// interface ImageGenParams { /* ... */ } (defined in MessageInput)
-// interface AudioGenParams { /* ... */ } (defined in MessageInput)
-// interface VideoGenParams { /* ... */ } (defined in MessageInput)
 import { VideoGenParams as UIVideoGenParams } from './ChatWindow';
 
 const Chat = ({
@@ -22,7 +16,6 @@ const Chat = ({
   onAudioPromptSubmit,
   onVideoPromptSubmit,
   onAIChatSubmit,
-  messageAppeared,
   rewrite,
   editMessage,
   setMessages,
@@ -31,61 +24,51 @@ const Chat = ({
   sendMessage: (message: string, file?: File | null) => void;
   onImagePromptSubmit: (params: ImageGenParams, imagePromptText: string) => void;
   onAudioPromptSubmit: (params: AudioGenParams, audioPromptText: string) => void;
-  onVideoPromptSubmit: (params: UIVideoGenParams, videoPromptText: string) => void; // Use UIVideoGenParams
-  onAIChatSubmit: (prompt: string, params: AIChatParams) => void; // Corrected type for AIChatParams
+  onVideoPromptSubmit: (params: UIVideoGenParams, videoPromptText: string) => void;
+  onAIChatSubmit: (prompt: string, params: AIChatParams) => void;
   loading: boolean;
-  messageAppeared: boolean;
   rewrite: (messageId: string) => void;
   editMessage: (messageId: string, newContent: string) => void;
   setMessages: (messages: Message[]) => void;
 }) => {
-  const dividerRef = useRef<HTMLDivElement | null>(null);
   const messageEnd = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     messageEnd.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // MODIFIED: Reduced bottom padding
-  const messageListPaddingBottom = 'pb-20 md:pb-24';
-
   return (
     <div className="flex flex-col h-full w-full">
 
-      {/* Messages list area - scrollable */}
-      <div className={`flex-grow overflow-y-auto space-y-6 pt-8 ${messageListPaddingBottom} px-2 sm:px-4 md:px-6`}>
-        {messages.map((msg, i) => {
-          const isLast = i === messages.length - 1;
-          return (
-            <Fragment key={msg.messageId}>
-              <MessageBox
-                key={msg.messageId}
-                message={msg}
-                callAd = {i === messages.length - 1}
-                messageIndex={i}
-                history={messages}
-                loading={loading}
-                dividerRef={isLast ? dividerRef : undefined}
-                isLast={isLast}
-                rewrite={rewrite}
-                sendMessage={sendMessage}
-                editMessage={editMessage}
-                setMessages={setMessages}
-              />
-              {!isLast && msg.role === 'assistant' && (
-                <div className="h-px w-full bg-light-secondary dark:bg-dark-secondary" />
-              )}
-            </Fragment>
-          );
-        })}
-        {loading && messages.length > 0 && messages[messages.length -1].role === 'user' && <MessageBoxLoading />}
+    
+      <div className="flex-grow overflow-y-auto px-2 sm:px-4 md:px-6 pb-24 ">
+        {messages.map((msg, i) => (
+          <Fragment key={msg.messageId}>
+            <MessageBox
+              message={msg}
+              callAd={i === messages.length - 1}
+              messageIndex={i}
+              history={messages}
+              loading={loading}
+              isLast={i === messages.length - 1}
+              rewrite={rewrite}
+              sendMessage={sendMessage}
+              editMessage={editMessage}
+              setMessages={setMessages}
+            />
+            {i < messages.length - 1 && msg.role === 'assistant' && (
+              <div className="h-px w-full bg-gray-200 dark:bg-gray-700/50 my-4" />
+            )}
+          </Fragment>
+        ))}
+        {loading && messages.length > 0 && messages[messages.length - 1].role === 'user' && <MessageBoxLoading />}
         <div ref={messageEnd} className="h-0" />
       </div>
 
-      {/* Sticky Input Area Wrapper */}
-      <div className="sticky bottom-0 w-full bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-gray-700 py-2 md:py-3 z-10">
-        {/* Centering and max-width container for the input itself */}
-        <div className="w-full max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-2 md:px-0">
+      
+      <div className="fixed bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-white via-white to-transparent dark:from-gray-900 dark:via-gray-900 dark:to-transparent">
+       
+        <div className="w-full max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-4 pb-4 pt-8">
           <MessageInput
               loading={loading}
               sendMessage={sendMessage}

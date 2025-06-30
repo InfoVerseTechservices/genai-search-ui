@@ -1,9 +1,16 @@
 'use client';
+
 import React, { useEffect, useState, FunctionComponent as FC } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import ProfilePicture from '@/components/LeftSidebar/ProfilePicture';
-import Dropdown from './LeftSidebar/Dropdown';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { useUserProfile } from '@/app/context/user'; 
+
+import ProfilePicture from '@/components/LeftSidebar/ProfilePicture'; 
+import Dropdown from './LeftSidebar/Dropdown'; 
+import HistoryPanel from '@/components/HistoryPanel';
+import ThemeToggle from './theme/Switcher'; 
+
 import {
   FeedIcon,
   VibesIcon,
@@ -12,486 +19,145 @@ import {
   NewsIcon,
   StarIcon,
   NewGenSearchIcon,
-  HistoryIcon,
-} from './Icons';
-import { Image as ImageIconLucide, Video as VideoIconLucide } from 'lucide-react'; // Import Lucide icons
+} from './Icons'; 
+import { ChevronLeft, PanelLeftClose, PanelRightOpen } from 'lucide-react';
 
-// USER PROFILE Context
-import { useUserProfile } from '@/app/context/user';
-// import { useRouter } from 'next/router';
-
-interface IconProps {
-  w: number;
-  h: number;
-  fill: string;
-}
-
+interface IconProps { w: number; h: number; fill: string; }
 type IconComponent = FC<IconProps>;
-
-// Wrapper for Lucide icon to fit the existing IconComponent type
-const ImageGeneratorIcon: IconComponent = ({ w, h, fill }) => {
-  return <ImageIconLucide width={w} height={h} color={fill} strokeWidth={1.5} />; // Adjusted strokeWidth
-};
-
-// Wrapper for Lucide video icon
-const VideoGeneratorIcon: IconComponent = ({ w, h, fill }) => {
-  return <VideoIconLucide width={w} height={h} color={fill} strokeWidth={1.5} />;
-};
 
 interface IconLinkProps {
   href: string;
   Icon: IconComponent;
   label: string;
+  isOpen: boolean;
 }
 
-const IconLink: FC<IconLinkProps> = ({ href, Icon, label }) => {
+
+interface IconLinkProps {
+  href: string;
+  Icon: IconComponent;
+  label: string;
+  isOpen: boolean;
+}
+
+const IconLink: FC<IconLinkProps> = ({ href, Icon, label, isOpen }) => {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  const isActive = pathname.startsWith(href);
 
   return (
-    <Link href={href}>
-      <div className="flex flex-col items-center">
-        <div className="w-6 h-6 mb-1">
-          <Icon w={24} h={24} fill={isActive ? '#1E71F2' : '#8E8E93'} />
-        </div>
-        <p
-          className={`
-          ${isActive ? 'text-[#1E71F2]' : 'text-[#8E8E93]'}
-          text-center text-[10px]
-        `}
-        >
-          {label}
-        </p>
+    <Link
+      href={href}
+      className={cn(
+        'group relative flex items-center p-3 my-2 rounded-lg gap-x-4 cursor-pointer transition-colors duration-150 dark:hover:text-blue-400 hover:text-blue-400',
+        {
+          'bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400': isActive,
+          'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700': !isActive,
+          'justify-center': !isOpen,
+        }
+      )}
+    >
+      <div className="w-6 h-6 flex-shrink-0">
+        <Icon w={24} h={24} fill="currentColor" />
       </div>
+      {!isOpen && (
+        <div className="absolute left-full ml-2  px-2 py-1 text-xs font-medium bg-black text-white rounded-md shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+          {label}
+        </div>
+      )}
+      {isOpen && <p className="text-sm font-medium whitespace-nowrap">{label}</p>}
     </Link>
   );
 };
+interface LeftSidebarProps {
+  isOpen: boolean;
+  onToggle: () => void;
+}
 
-const LeftSidebar: FC = () => {
+const LeftSidebar: FC<LeftSidebarProps> = ({ isOpen, onToggle }) => {
+  const { userDetails } = useUserProfile();
   const [profilePic, setProfilePic] = useState<string | undefined>(undefined);
-  const router = useRouter();
-  const [username, setUsername] = useState('');
-
-  const { userDetails, isLoggedIn } = useUserProfile();
 
   useEffect(() => {
-    // Don't use it on the sidebar - since the sidebar is present on login as well - infinite loop
-    // if (!isLoggedIn) {
-    //   router.push('/login');
-    //   return;
-    // }
-
-    if (isLoggedIn) {
-      setUsername(userDetails.name || 'Name Here');
-      setProfilePic(userDetails.profile_picture || undefined);
-    }
-  }, [isLoggedIn, userDetails.name, userDetails.profile_picture]); // Added missing dependencies
-
-  const handleSignOut = () => {
-    localStorage.removeItem('profilePic');
-    router.push('/sign-up');
-  };
+    setProfilePic(userDetails.profile_picture || undefined);
+  }, [userDetails.profile_picture]);
 
   return (
-    <div className="  xl:w-20 lg:w-[3.5rem] bg-white h-screen md:pr-2 xl:pr-0 flex flex-col items-center py-4 border-r  border-[#1E71F2]">
-      {/* <div className="lg:mb-[40px] md:mt-[1.5rem] md:mb-[46px] xl:mt-[1.5rem] lg:mt-[1.5rem] relative"> */}
-      <div className="lg:mt-6 mb-6 relative">
+    <div className="flex flex-col h-full w-full p-3 border-r border-[#487ed5]">
+     
+      
+      {/* 1. Profile Section */}
+      <div className={cn('mb-10 h-12 flex items-center', isOpen ? 'self-start' : 'self-center')}>
         <Dropdown
           offset={[0, 10]}
           placement="bottom-start"
-          btnClassName="flex z-[150] justify-center items-center rounded-full hover:text-brandprimary cursor-pointer mx-auto"
+          btnClassName="flex z-[150] justify-center items-center rounded-full"
           button={<ProfilePicture image={profilePic} />}
         >
-          <ul className="min-w-[160px] rounded-lg bg-white shadow-md">
-            {/* user name to be imported here */}
+          <ul className="min-w-[160px] rounded-lg bg-white dark:bg-gray-900 shadow-md dark:border dark:border-gray-700 text-gray-800 dark:text-gray-200">
             <Link href="https://colomboai.com/profile">
-              <p className="px-4 py-2 hover:bg-gray-100 cursor-pointer  text-brandprimary">
-                {username}
-              </p>
+              <li className="px-4 py-2 hover:bg-neutral-100 dark:hover:bg-gray-800 cursor-pointer font-semibold text-blue-600 dark:text-blue-400">
+                {userDetails.name}
+              </li>
             </Link>
-            <li
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer "
-              onClick={handleSignOut}
-            >
+            <li className="px-4 py-2 hover:bg-neutral-100 dark:hover:bg-gray-800 cursor-pointer">
               Log out
             </li>
           </ul>
         </Dropdown>
       </div>
-      <div className="flex flex-col items-center space-y-6 ">
-        {/* <div className="flex flex-col items-center"> */}
-        <div className="flex flex-col items-center space-y-6 flex-grow">
-          <IconLink
-            href="https://colomboai.com/genai-search"
-            Icon={GenAiIcon as IconComponent}
-            label="Gen AI"
-          />
-        </div>
-        <div className="flex flex-col items-center space-y-6 flex-grow">
-          <IconLink
-            href="https://colomboai.com/vibes"
-            Icon={VibesIcon as IconComponent}
-            label="Vibes"
-          />
-        </div>
-        <div className="flex flex-col items-center space-y-6 flex-grow">
-          <IconLink
-            href="https://colomboai.com/feed"
-            Icon={FeedIcon as IconComponent}
-            label="Feed"
-          />
-        </div>
-        <div className="flex flex-col items-center space-y-6 flex-grow">
-          <IconLink
-            href="https://colomboai.com/shop"
-            Icon={ShopIcon as IconComponent}
-            label="Shop"
-          />
-        </div>
-        <div className="flex flex-col items-center space-y-6 flex-grow">
-          <IconLink
-            href="https://colomboai.com/news"
-            Icon={NewsIcon as IconComponent}
-            label="News"
-          />
-        </div>
 
-        <div className="flex flex-col items-center space-y-6 flex-grow">
-          <StarIcon w={24} h={24} fill="#8E8E93" />
+      {/* 2. Navigation Links */}
+      <nav>
+        <button
+  onClick={onToggle}
+  className={cn(
+    'group relative flex items-center w-full p-3 py-4 rounded-lg gap-x-4 cursor-pointer transition-colors duration-200',
+    'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700',
+    !isOpen && 'justify-center'
+  )}
+>
+  <PanelRightOpen className={cn('w-6 h-6 transition-transform duration-300 hover:text-blue-400 dark:hover:text-blue-400', !isOpen && 'rotate-180')} />
+  {/* Tooltip for collapsed state */}
+  {!isOpen && (
+    <div className="absolute left-full ml-2  px-2 py-1 text-xs font-medium bg-black text-white rounded-md shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+      {isOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+    </div>
+  )}
+</button>
+        <IconLink href="/genai-search" Icon={GenAiIcon as IconComponent} label="Gen AI" isOpen={isOpen} />
+        <IconLink href="/vibes" Icon={VibesIcon as IconComponent} label="Vibes" isOpen={isOpen} />
+        <IconLink href="/feed" Icon={FeedIcon as IconComponent} label="Feed" isOpen={isOpen}/>
+        <IconLink href="/shop" Icon={ShopIcon as IconComponent} label="Shop" isOpen={isOpen}/>
+        <IconLink href="/news" Icon={NewsIcon as IconComponent} label="News" isOpen={isOpen}/>
+        <IconLink href="/favorites" Icon={StarIcon as IconComponent} label="Favorites" isOpen={isOpen}/>
+
+        <hr className="my-4 border-gray-200 dark:border-gray-600" />
+        <IconLink href="/new-chat" Icon={NewGenSearchIcon as IconComponent} label="New Chat" isOpen={isOpen} />
+      </nav>
+
+    
+
+      {/* 4. CONDITIONAL HISTORY PANEL */}
+      {isOpen && (
+        <div className="flex flex-col min-h-0 my-4">
+          <hr className="mb-4 border-gray-200 dark:border-gray-600" />
+          <h3 className="px-3 mb-2 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+            History
+          </h3>
+          <div className="overflow-y-auto pr-2 ">
+            <HistoryPanel />
+          </div>
         </div>
-        <div className="flex flex-col items-center space-y-6 flex-grow">
-          <IconLink
-            href="https://colomboai.com/genai-search/"
-            Icon={NewGenSearchIcon as IconComponent}
-            label="New Chat"
-          />
-        </div>
-        <div className="flex flex-col items-center space-y-6 flex-grow">
-          <IconLink
-            href="/image-generator"
-            Icon={ImageGeneratorIcon}
-            label="Image Gen"
-          />
-        </div>
-        <div className="flex flex-col items-center space-y-6 flex-grow">
-          <IconLink
-            href="/video-generator"
-            Icon={VideoGeneratorIcon}
-            label="Video Gen"
-          />
-        </div>
-        <div className="flex flex-col items-center space-y-6 flex-grow">
-          <IconLink
-            href="https://colomboai.com/genai-search/library/"
-            Icon={HistoryIcon as IconComponent}
-            label="History"
-          />
-        </div>
-      </div>
+      )}
+
+
+<div className="mt-auto pt-4">
+  <hr className="mt-4 border-gray-200 dark:border-gray-600" />
+  <ThemeToggle />
+</div>
+    
     </div>
   );
 };
 
 export default LeftSidebar;
-
-// 'use client'
-// import React, { useEffect, useState, FunctionComponent as FC } from 'react'
-// import Link from "next/link"
-// import { usePathname, useRouter } from "next/navigation"
-// import ProfilePicture from "@/components/LeftSidebar/ProfilePicture"
-// import { FeedIcon, VibesIcon, GenAiIcon, ShopIcon, NewsIcon, StarIcon, NewGenSearchIcon, HistoryIcon } from "./Icons"
-
-// interface IconProps {
-//   w: number;
-//   h: number;
-//   fill: string;
-// }
-
-// type IconComponent = FC<IconProps>;
-
-// interface IconLinkProps {
-//   href: string;
-//   Icon: IconComponent;
-//   label: string;
-// }
-
-// const IconLink: FC<IconLinkProps> = ({ href, Icon, label }) => {
-//   const pathname = usePathname()
-//   const isActive = pathname === href
-
-//   return (
-//     <Link href={href}>
-//       <div className="flex flex-col items-center">
-//         <div className="w-6 h-6 mb-1">
-//           <Icon
-//             w={24}
-//             h={24}
-//             fill={isActive ? "#1E71F2" : "#8E8E93"}
-//           />
-//         </div>
-//         <p className={`
-//           ${isActive ? "text-[#1E71F2]" : "text-[#8E8E93]"}
-//           text-center text-[10px]
-//         `}>
-//           {label}
-//         </p>
-//       </div>
-//     </Link>
-//   )
-// }
-
-// const LeftSidebar: FC = () => {
-//     const [profilePic, setProfilePic] = useState<string | undefined>(undefined)
-//     const router = useRouter()
-
-//     useEffect(() => {
-//         setProfilePic(localStorage.getItem('profilePic') || undefined)
-//     }, [])
-
-//     const handleSignOut = () => {
-//         localStorage.removeItem('profilePic')
-//         router.push("/sign-up")
-//     };
-
-//     return (
-//         <div className="w-16 bg-white h-screen  flex flex-col items-center py-4 border-r border-gray-200">
-//             <div className="mt-0 mb-6">
-//                 <ProfilePicture image={profilePic} />
-//             </div>
-//             <div className="flex flex-col items-center space-y-6 flex-grow">
-//             {/* <IconLink
-//                   href="https://colomboai.com/genai-search"
-//                   Icon={GenAiIcon as IconComponent}
-//                   label="Gen AI"
-//                 /> */}
-//    <div className="flex flex-col items-center">
-//         <div className="w-6 h-6 mb-1">
-//           <GenAiIcon
-//             w={24}
-//             h={24}
-//             fill={"#8E8E93"}
-//           />
-//         </div>
-//         <p className={`
-//           ${"text-[#8E8E93]"}
-//           text-center text-[10px]
-//         `}>
-//           Gen AI
-//         </p>
-//       </div>
-
-//       <div className="flex flex-col items-center">
-//         <div className="w-6 h-6 mb-1">
-//           <VibesIcon
-//             w={24}
-//             h={24}
-//             fill={"#8E8E93"}
-//           />
-//         </div>
-//         <p className={`
-//           ${"text-[#8E8E93]"}
-//           text-center text-[10px]
-//         `}>
-//           Vibes
-//         </p>
-//       </div>
-//       <div className="flex flex-col items-center">
-//         <div className="w-6 h-6 mb-1">
-//           <FeedIcon
-//             w={24}
-//             h={24}
-//             fill={"#8E8E93"}
-//           />
-//         </div>
-//         <p className={`
-//           ${"text-[#8E8E93]"}
-//           text-center text-[10px]
-//         `}>
-//           Feed
-//         </p>
-//       </div>
-//       <div className="flex flex-col items-center">
-//         <div className="w-6 h-6 mb-1">
-//           <ShopIcon
-//             w={24}
-//             h={24}
-//             fill={"#8E8E93"}
-//           />
-//         </div>
-//         <p className={`
-//           ${"text-[#8E8E93]"}
-//           text-center text-[10px]
-//         `}>
-//           Shop
-//         </p>
-//       </div>
-//       <div className="flex flex-col items-center">
-//         <div className="w-6 h-6 mb-1">
-//           <NewsIcon
-//             w={24}
-//             h={24}
-//             fill={"#8E8E93"}
-//           />
-//         </div>
-//         <p className={`
-//           ${"text-[#8E8E93]"}
-//           text-center text-[10px]
-//         `}>
-//           News
-//         </p>
-//       </div>
-
-//                 {/* <IconLink
-//                   href="https://colomboai.com/vibes"
-//                   Icon={VibesIcon as IconComponent}
-//                   label="Vibes"
-//                 /> */}
-//                 {/* <IconLink
-//                   href="https://colomboai.com/feed"
-//                   Icon={FeedIcon as IconComponent}
-//                   label="Feed"
-//                 /> */}
-//                 {/* <IconLink
-//                   href="https://colomboai.com/shop"
-//                   Icon={ShopIcon as IconComponent}
-//                   label="Shop"
-//                 /> */}
-//                 {/* <IconLink
-//                   href="https://colomboai.com/news"
-//                   Icon={NewsIcon as IconComponent}
-//                   label="News"
-//                 /> */}
-//                 <div className="flex flex-col items-center">
-//                     <StarIcon
-//                       w={24}
-//                       h={24}
-//                       fill="#8E8E93"
-//                     />
-//                 </div>
-
-//             <IconLink
-//             href='https://colomboai.com/genai-search'
-//             Icon={NewGenSearchIcon as IconComponent}
-//             label='New Chat'
-//             />
-//             <IconLink
-//             href='https://colomboai.com/genai-search/library/'
-//             Icon={HistoryIcon as IconComponent}
-//             label='History'
-//             />
-//             </div>
-//             {/* <div className="mt-auto">
-//                 <button onClick={handleSignOut} className=" text-xs text-gray-400" disabled>
-//                     Sign Out
-//                 </button>
-//             </div> */}
-//         </div>
-//     )
-// }
-
-// export default LeftSidebar
-
-// 'use client'
-// import React from 'react'
-// import Link from "next/link"
-// import { useEffect, useState } from "react"
-// import { usePathname, useRouter } from "next/navigation"
-// import ProfilePicture from "@/components/LeftSidebar/ProfilePicture"
-// import { FeedIcon, GenAiIcon, NewsIcon, ShopIcon, VibesIcon, StarIcon } from "./Icons"
-
-// const LeftSidebar: React.FC = () => {
-//     const [name, setName] = useState<string | undefined>(undefined);
-//     const [profilePic, setProfilePic] = useState<string | undefined>(undefined)
-
-//     const pathname = usePathname()
-//     const router = useRouter()
-
-//     const feedSections = ['/feed', '/video', '/vibes', '/thoughts', '/images', '/explore', '/profile'];
-
-//     useEffect(() => {
-//         setName(localStorage.getItem('name') || undefined)
-//         setProfilePic(localStorage.getItem('profilePic') || undefined)
-//     }, [])
-
-//     const handleSignOut = () => {
-//         localStorage.removeItem('name');
-//         localStorage.removeItem('profilePic')
-//         router.push("/sign-up")
-//     };
-
-//     return (
-//         <div className="w-[100%] mt-[20px] overflow-hidden">
-//             <div className="mb-[46px] mt-[5px] relative">
-//                 <div className="flex z-50 justify-center items-center rounded-full hover:text-brandprimary cursor-pointer mx-auto">
-//                     <ProfilePicture image={profilePic} />
-//                 </div>
-//             </div>
-//             <div className="h-[75vh] overflow-hidden">
-
-//                 {/* <Link href="https://colomboai.com/genai-search">
-//                     <div className="mb-[50px]">
-//                         <div className="w-[29px] mx-auto">
-//                             <GenAiIcon w={30} h={30} fill="gray"/>
-//                         </div>
-//                          <p className="text-black text-center text-[14px] mt-[7px] font-sans">
-//                             Gen AI
-//                          </p>
-//                     </div>
-//                 </Link> */}
-
-//                 <Link href="https://colomboai.com/vibes">
-//                     <div className="mb-[50px]">
-//                         <div className="w-[29px] mx-auto">
-//                             <VibesIcon w={30} h={30} fill="gray" />
-//                         </div>
-//                          <p className="text-black text-center text-[14px] mt-[7px] font-sans">
-//                             Vibes
-//                          </p>
-//                     </div>
-//                 </Link>
-
-//                 <Link href="https://colomboai.com/feed">
-//                     <div className="mb-[50px]">
-//                         <div className="w-[40px] mx-auto">
-//                             <FeedIcon w={30} h={30} fill="gray" />
-//                         </div>
-//                          <p className="text-black text-center text-[14px] mt-[7px] font-sans">
-//                             Feed
-//                          </p>
-//                     </div>
-//                 </Link>
-
-//                 <Link href="https://colomboai.com/shop">
-//                     <div className="mb-[50px]">
-//                         <div className="w-[29px] mx-auto">
-//                             <ShopIcon w={30} h={30} fill="gray" />
-//                         </div>
-//                          <p className="text-black text-center text-[14px] mt-[7px] font-sans">
-//                             Shop
-//                          </p>
-//                     </div>
-//                 </Link>
-
-//                 <Link href="/https://colomboai.com/news">
-//                     <div className="mb-[50px]">
-//                         <div className="w-[29px] mx-auto">
-//                             <NewsIcon w={30} h={30} fill="gray" />
-//                         </div>
-//                          <p className="text-black text-center text-[14px] mt-[7px] font-sans">
-//                             News
-//                          </p>
-//                     </div>
-//                 </Link>
-
-//                 <div className="mb-[30px]">
-//                   <div className="w-[50px] mx-auto">
-//                     <StarIcon w={30} h={30} fill="gray" />
-//                   </div>
-//                 </div>
-
-//             </div>
-//         </div>
-//     )
-// }
-
-//export default LeftSidebar

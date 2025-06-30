@@ -154,7 +154,7 @@ const CodeBlock = ({
 
     if (match) { // Check node.properties.inline instead
       return (
-        <div className="relative group my-2">
+        <div className="relative group my-2 ">
           <SyntaxHighlighter language={language} style={base16AteliersulphurpoolLight} customStyle={{ margin: 0, padding: '1rem', borderRadius: '0.5rem' }} PreTag="div">
             {codeString.replace(/\n$/, '')}
           </SyntaxHighlighter>
@@ -180,7 +180,7 @@ const CodeBlock = ({
   const historyForSearch = history.slice(0, messageIndex > 0 ? messageIndex - 1 : 0);
 
   return (
-    <div className='dark:text-white'>
+    <div className='dark:text-white  px-5 flex items-center justify-center'>
       {/* Standard User Text Message */}
       {message.role === 'user' && (message.type === 'text' || !message.type) && (
         <div className={cn('flex items-center', messageIndex === 0 ? 'pt-16' : 'pt-8')}>

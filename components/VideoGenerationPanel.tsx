@@ -90,7 +90,7 @@ const VideoGenerationPanel: React.FC<VideoGenerationPanelProps> = ({
         guidance_scale: guidanceScale,
         num_frames: numFrames,
         duration,
-        model: MODEL_NAME, // Fixed model
+        model: MODEL_NAME as "ltx-video",
         seed,
         width,
         height,

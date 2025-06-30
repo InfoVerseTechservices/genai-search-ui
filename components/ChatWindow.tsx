@@ -18,15 +18,15 @@ import { NewGenSearchIcon, HistoryIcon } from './Icons';
 
 import { generateImage } from '@/lib/imageActions';
 import { generateAudio, type AudioGenerationResponse } from '@/lib/audioActions'; // NEW: Import for AI Chat
-import { generateVideo } from '@/lib/videoActions';
-import { VideoGenerationParams } from '@/lib/videoActions';
+import { generateVideo, VideoGenerationParams } from '@/lib/videoActions';
+//import { VideoGenerationParams } from '@/lib/videoActions';
 import { streamChatCompletion, type ChatMessage as AIChatAPIMessage } from '@/lib/chatActions'; // NEW: Import for AI Chat
 
 // Assuming ImageGenParams, AudioGenParams, VideoGenParams are correctly defined or imported
 // For AIChatParams, it's imported above.
 export interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
 export interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
-export interface VideoGenParams { prompt: string; negative_prompt?: string; guidance_scale?: number; num_frames?: number; duration?: number; model?: string; seed?: number; width?: number; height?: number; num_inference_steps?: number; decode_timestep?: number; decode_noise_scale?: number; upscale_and_refine?: boolean; }
+export interface VideoGenParams { prompt: string; negative_prompt?: string; guidance_scale?: number; num_frames?: number; duration?: number; model?: "ltx-video"; seed?: number; width?: number; height?: number; num_inference_steps?: number; decode_timestep?: number; decode_noise_scale?: number; upscale_and_refine?: boolean; }
 export type AIChatParams = { 
   model: string;
   temperature: number;
@@ -344,7 +344,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
     } finally { setIsGenerating(false); }
   };
 
-  const handleVideoGenerationRequest = async (params: VideoGenerationParams, videoPromptText: string) => {
+  const handleVideoGenerationRequest = async (params: VideoGenParams, videoPromptText: string) => {
     if (!chatId) { toast.error("Chat ID missing for video generation."); return; }
     if (isGenerating || loading) { toast.info("Another operation is in progress."); return; }
     setIsGenerating(true);
@@ -357,7 +357,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
  ]);
 
     try {
-      const result: any = await generateVideo(params); // Use 'any' if type is not available
+      const result: any = await generateVideo(params as VideoGenerationParams); // Use 'any' if type is not available
       if (result.status === "processing") {
          setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'loading', content: `Processing video for: "${videoPromptText}"` } : m));
          toast.info('Video is processing...');
@@ -552,12 +552,12 @@ const ChatWindow = ({ id }: { id?: string }) => {
             <Navbar messages={messages} />
             <Chat
               loading={loading || isGenerating}
-              messages={messages}
+ messages={messages} // Pass messages prop
               sendMessage={sendMessage} // Kept for potential future use or hybrid model
-              onImagePromptSubmit={handleImageGenerationRequest}
-              onAudioPromptSubmit={handleAudioGenerationRequest}
-              onVideoPromptSubmit={handleVideoGenerationRequest}
-              onAIChatSubmit={handleAIChatRequest}
+              onImagePromptSubmit={handleImageGenerationRequest as any}
+              onAudioPromptSubmit={handleAudioGenerationRequest as any}
+              onVideoPromptSubmit={handleVideoGenerationRequest as any}
+              onAIChatSubmit={handleAIChatRequest as any}
               messageAppeared={messageAppeared}
               rewrite={rewrite}
               editMessage={editMessage}

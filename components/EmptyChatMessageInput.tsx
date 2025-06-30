@@ -16,11 +16,14 @@ import {
 
 // Import local components (ensure these paths are correct in your project)
 import CustomAudioWaveformIcon from './Icons/CustomAudioWaveformIcon';
-import TextareaAutosize from 'react-textarea-autosize';
 
+import TextareaAutosize from 'react-textarea-autosize';
 import { UploadIcon as CustomUploadIcon } from './Icons';
+import React, { useEffect, useRef, useState, ChangeEvent, useCallback } from 'react';
+import { toast } from 'sonner'; // This line was already present.
+import TextareaAutosize from 'react-textarea-autosize'; // Keep this import
 import ImageGenerationPanel from './ImageGenerationPanel';
-import AudioGenerationPanel from './AudioGenerationPanel';
+//import AudioGenerationPanel from './AudioGenerationPanel'; // This line was already present.
 import VideoGenerationParametersPanel, { VideoGenParams as UIVideoGenParams } from './VideoGenerationParametersPanel';
 import ChatCompletionParametersPanel, { AIChatParams } from './ChatCompletionParametersPanel';
 import GenericModal from './GenericModal';
@@ -139,6 +142,7 @@ const useDynamicBorderStyle = () => {
 
 export type { UIVideoGenParams as VideoGenParams, AIChatParams };
 export interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
+
 export interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
 
 interface EmptyChatMessageInputProps {
@@ -555,6 +559,7 @@ const EmptyChatMessageInput = ({
       
       {isVideoModeActive && (
         <GenericModal isOpen={isVideoParamsModalOpen} onClose={() => setIsVideoParamsModalOpen(false)} title="Video Generation Settings" size="xl">
+
           <VideoGenerationParametersPanel 
             negativePrompt={videoNegativePrompt} 
             setNegativePrompt={setVideoNegativePrompt} 
@@ -578,6 +583,7 @@ const EmptyChatMessageInput = ({
             setVideoDecodeNoiseScale={setVideoDecodeNoiseScale} 
             videoUpscaleAndRefine={videoUpscaleAndRefine} 
             setVideoUpscaleAndRefine={setVideoUpscaleAndRefine} 
+
           />
         </GenericModal>
       )}

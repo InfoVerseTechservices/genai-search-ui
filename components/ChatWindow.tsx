@@ -16,19 +16,18 @@ import Link from 'next/link';
 import { NewGenSearchIcon, HistoryIcon } from './Icons';
 
 import { generateImage } from '@/lib/imageActions';
+
 import { generateAudio, type AudioGenerationResponse } from '@/lib/audioActions';
-import { generateVideo } from '@/lib/videoActions';
+import { generateVideo, VideoGenerationParams  } from '@/lib/videoActions';
 import { streamChatCompletion, type ChatMessage as AIChatAPIMessage } from '@/lib/chatActions';
-
-
 export interface ImageGenParams { prompt: string; negative_prompt?: string; model?: string; size?: string; guidance_scale?: number; }
 export interface AudioGenParams { prompt: string; negative_prompt?: string; duration_seconds?: number; seed?: number; model?: string; }
-export interface VideoGenParams { prompt: string; negative_prompt?: string; guidance_scale?: number; num_frames?: number; duration?: number; model?: string; seed?: number; width?: number; height?: number; num_inference_steps?: number; decode_timestep?: number; decode_noise_scale?: number; upscale_and_refine?: boolean; }
-export type AIChatParams = {
+export interface VideoGenParams { prompt: string; negative_prompt?: string; guidance_scale?: number; num_frames?: number; duration?: number; model?: "ltx-video"; seed?: number; width?: number; height?: number; num_inference_steps?: number; decode_timestep?: number; decode_noise_scale?: number; upscale_and_refine?: boolean; }
+export type AIChatParams = { 
   model: string;
   temperature: number;
   top_p: number;
-  number_of_tokens: number;
+  max_tokens: number; // Changed from number_of_tokens to max_tokens
 };
 
 export type Message = {
@@ -312,7 +311,9 @@ const ChatWindow = ({ id }: { id?: string }) => {
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Image prompt: "${imagePromptText}"` } : m));
         setMessages((prev) => [...prev, { messageId: assistantImgMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_image', b64Json: result.data[0].b64_json, imagePromptText }]);
         toast.success('Image generated!');
-      } else { throw new Error(result.error ?? "No image data returned from API."); }
+
+      } else { throw new global.Error(result.error ?? "No image data returned from API."); } // eslint-disable-line no-new-object
+
     } catch (err: any) {
       toast.error(`Image generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed image prompt: "${imagePromptText}". Error: ${err.message}` } : m));
@@ -332,7 +333,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
         setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'completed', content: `Audio prompt: "${audioPromptText}"` } : m));
         setMessages((prev) => [...prev, { messageId: assistantAudioMsgId, chatId, createdAt: new Date(), content: '', role: 'assistant', type: 'generated_audio', b64JsonAudio: result.data[0].b64_json, audioPromptText }]);
         toast.success('Audio generated!');
-      } else { throw new Error(result.error || 'No audio data returned from API.'); }
+      } else { throw new global.Error(result.error || 'No audio data returned from API.'); }
     } catch (err: any) {
       toast.error(`Audio generation failed: ${err.message}`);
       setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'error', content: `Failed audio prompt: "${audioPromptText}". Error: ${err.message}` } : m));
@@ -352,7 +353,9 @@ const ChatWindow = ({ id }: { id?: string }) => {
     ]);
 
     try {
-      const result: any = await generateVideo(params);
+
+      const result: any = await generateVideo(params as VideoGenerationParams);
+
       if (result.status === "processing") {
          setMessages((prev) => prev.map((m) => m.messageId === userPromptMsgId ? { ...m, status: 'loading', content: `Processing video for: "${videoPromptText}"` } : m));
          toast.info('Video is processing...');
@@ -380,7 +383,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
   };
 
   const handleAIChatRequest = useCallback(
-    async (prompt: string, params: AIChatParams) => {
+    async (prompt: string, params: AIChatParams) => { // Removed 'async' from here as it's already async
       if (!chatId) {
         toast.error('Chat ID missing for AI Chat.');
         return;
@@ -559,12 +562,14 @@ const ChatWindow = ({ id }: { id?: string }) => {
             <Navbar messages={messages} />
             <Chat
               loading={loading || isGenerating}
-              messages={messages}
+
+              sendmessages={messages}
               sendMessage={sendMessage}
-              onImagePromptSubmit={handleImageGenerationRequest}
-              onAudioPromptSubmit={handleAudioGenerationRequest}
-              onVideoPromptSubmit={handleVideoGenerationRequest}
-              onAIChatSubmit={handleAIChatRequest}
+              onImagePromptSubmit={handleImageGenerationRequest as any}
+              onAudioPromptSubmit={handleAudioGenerationRequest as any}
+              onVideoPromptSubmit={handleVideoGenerationRequest as any}
+              onAIChatSubmit={handleAIChatRequest as any}
+
               messageAppeared={messageAppeared}
               rewrite={rewrite}
               editMessage={editMessage}

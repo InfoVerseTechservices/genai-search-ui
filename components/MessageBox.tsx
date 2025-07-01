@@ -1,8 +1,7 @@
-// components/MessageBox.tsx
 'use client';
 
 /* eslint-disable @next/next/no-img-element */
-import React, { MutableRefObject, useEffect, useState } from 'react';
+import React, { MutableRefObject, useEffect, useState, useRef,  useCallback  } from 'react';
 import { ComponentPropsWithoutRef } from 'react';
 import { Message } from './ChatWindow';
 import { cn } from '@/lib/utils';
@@ -14,16 +13,10 @@ import { base16AteliersulphurpoolLight } from 'react-syntax-highlighter/dist/esm
 import Copy from './MessageActions/Copy';
 import Rewrite from './MessageActions/Rewrite';
 import MessageSources from './MessageSources';
-import SearchImages from './SearchImages';
-import SearchVideos from './SearchVideos';
-import { useSpeech } from 'react-text-to-speech';
-import SideTopAdComponent from './Ads/SideAdTop';
-import SideBottomAdComponent from './Ads/SideAdBottom';
 import Share from './MessageActions/Share';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import RelatedImages from './GetOneImage';
 
 // Define ContextualActionsPlaceholder component
 const ContextualActionsPlaceholder: React.FC<{ messageId: string }> = ({ messageId }) => {
@@ -53,26 +46,22 @@ const MessageBox = ({
   message,
   messageIndex,
   history,
-  loading, // This is the global loading/isGenerating state from ChatWindow
-  dividerRef,
+  loading,
   isLast,
   rewrite,
   sendMessage,
   editMessage,
   setMessages,
-  callAd,
 }: {
   message: Message;
   messageIndex: number;
   history: Message[];
   loading: boolean;
-  dividerRef?: MutableRefObject<HTMLDivElement | null>;
   isLast: boolean;
   rewrite: (messageId: string) => void;
   sendMessage: (message: string, file?: File | null) => void;
   editMessage: (messageId: string, newContent: string) => void;
   setMessages: (messages: Message[]) => void;
-  callAd: boolean;
 }) => {
   const [parsedMessage, setParsedMessage] = useState(message.content);
   const [speechMessage, setSpeechMessage] = useState(message.content);
@@ -103,7 +92,6 @@ const MessageBox = ({
     } else {
       setParsedMessage(message.content);
     }
-    // Update speechMessage whenever message.content changes, removing source markers for cleaner speech
     setSpeechMessage(message.content.replace(regex, ''));
   }, [message.content, message.sources, message.role, message.type]);
 
@@ -128,33 +116,19 @@ const MessageBox = ({
     setIsEditing(false);
   };
 
-  const [isImageSearchVisible, setIsImageSearchVisible] = useState(true);
-  const [isVideoSearchVisible, setIsVideoSearchVisible] = useState(true);
-
-  const handleImageSearchCompletion = (success: boolean) => {
-    setIsImageSearchVisible(!success);
-    setIsVideoSearchVisible(success);
-  };
-  const handleVideoSearchCompletion = (success: boolean) => {
-    setIsVideoSearchVisible(!success);
-    setIsImageSearchVisible(success);
-  };
-
-const CodeBlock = ({
-  className,
-  children,
-  ...props
-}: React.PropsWithChildren<ComponentPropsWithoutRef<'code'>>) => {
-  const match = /language-(\w+)/.exec(className || '');
-  const language = match ? match[1] : 'text';
-  const [copied, setCopied] = useState(false);
-
-    // Ensure children is always a string
+  const CodeBlock = ({
+    className,
+    children,
+    ...props
+  }: React.PropsWithChildren<ComponentPropsWithoutRef<'code'>>) => {
+    const match = /language-(\w+)/.exec(className || '');
+    const language = match ? match[1] : 'text';
+    const [copied, setCopied] = useState(false);
     const codeString = Array.isArray(children) ? children.join('') : String(children);
 
-    if (match) { // Check node.properties.inline instead
+    if (match) {
       return (
-        <div className="relative group my-2 ">
+        <div className="relative group my-2">
           <SyntaxHighlighter language={language} style={base16AteliersulphurpoolLight} customStyle={{ margin: 0, padding: '1rem', borderRadius: '0.5rem' }} PreTag="div">
             {codeString.replace(/\n$/, '')}
           </SyntaxHighlighter>
@@ -167,7 +141,7 @@ const CodeBlock = ({
           </button>
         </div>
       );
-    } else { // This handles inline code or cases where match is not found
+    } else {
       return (
         <code className={cn("bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm", className)} {...props}>
           {codeString}
@@ -176,11 +150,8 @@ const CodeBlock = ({
     }
   };
 
-  const currentQuery = history[messageIndex > 0 ? messageIndex - 1 : 0]?.content;
-  const historyForSearch = history.slice(0, messageIndex > 0 ? messageIndex - 1 : 0);
-
   return (
-    <div className='dark:text-white  px-5 flex items-center justify-center'>
+    <div className='dark:text-white px-2 sm:px-4 pb-5 flex flex-col'>
       {/* Standard User Text Message */}
       {message.role === 'user' && (message.type === 'text' || !message.type) && (
         <div className={cn('flex items-center', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
@@ -193,7 +164,7 @@ const CodeBlock = ({
               />
             ) : (
               <h2 className="text-[#000080] dark:text-blue-300 bg-[#D2E3FD] dark:bg-slate-700 font-medium text-xl sm:text-3xl inline-block rounded-md whitespace-normal p-2">
-                {message.content}
+                {message.content} 
               </h2>
             )}
             <button onClick={isEditing ? handleSave : handleEdit} className="ml-2 p-1 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white">
@@ -203,9 +174,9 @@ const CodeBlock = ({
         </div>
       )}
 
-      {/* User Image Prompt Message */}
+      {/* User Prompts for Image, Audio, Video */}
       {message.role === 'user' && message.type === 'image_prompt' && (
-        <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
+         <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
            <ImageIconLucide size={24} className="mr-2 mt-1 text-blue-500 flex-shrink-0" />
           <div className="flex flex-col">
             <span className="text-sm text-gray-500 dark:text-gray-400">Image prompt:</span>
@@ -213,172 +184,91 @@ const CodeBlock = ({
               {message.imagePromptText || message.content}
             </h2>
             {message.status === 'loading' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Generating image...</p>}
-            {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Image generation failed. {message.content && message.content.includes("Error: ") ? message.content.split("Error: ")[1] : message.content}</p>}
+            {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Image generation failed.</p>}
           </div>
         </div>
       )}
-
-      {/* User Audio Prompt Message */}
       {message.role === 'user' && message.type === 'audio_prompt' && (
-        <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
+         <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
            <AudioIconLucide size={24} className="mr-2 mt-1 text-purple-500 flex-shrink-0" />
           <div className="flex flex-col">
             <span className="text-sm text-gray-500 dark:text-gray-400">Audio prompt:</span>
             <h2 className="text-[#000080] dark:text-purple-300 bg-[#E0D2FD] dark:bg-slate-700 self-start font-medium text-lg sm:text-xl max-w-max inline rounded-md whitespace-normal p-2">
               {message.audioPromptText || message.content}
             </h2>
-            {message.status === 'loading' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Generating audio...</p>}
-            {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Audio generation failed. {message.content && message.content.includes("Error: ") ? message.content.split("Error: ")[1] : message.content}</p>}
+             {message.status === 'loading' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Generating audio...</p>}
+            {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Audio generation failed.</p>}
           </div>
         </div>
       )}
-
-      {/* User Video Prompt Message */}
       {message.role === 'user' && message.type === 'video_prompt' && (
-        <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
+         <div className={cn('flex items-start', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
            <VideoIconLucide size={24} className="mr-2 mt-1 text-red-500 flex-shrink-0" />
           <div className="flex flex-col">
             <span className="text-sm text-gray-500 dark:text-gray-400">Video prompt:</span>
             <h2 className="text-[#000080] dark:text-red-300 bg-[#FDD2D2] dark:bg-slate-700 self-start font-medium text-lg sm:text-xl max-w-max inline rounded-md whitespace-normal p-2">
               {message.videoPromptText || message.content}
             </h2>
-            {message.status === 'loading' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Generating video... (this may take a moment)</p>}
-            {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Video generation failed. {message.content && message.content.includes("Error: ") ? message.content.split("Error: ")[1] : message.content}</p>}
+            {message.status === 'loading' && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Generating video...</p>}
+            {message.status === 'error' && <p className="text-sm text-red-500 dark:text-red-400 mt-1">Video generation failed.</p>}
           </div>
         </div>
       )}
 
-      {/* Assistant Generated Image Message */}
       {message.role === 'assistant' && message.type === 'generated_image' && message.b64Json && (
-        <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-          <div className="flex flex-col space-y-2">
-            <div className="flex flex-row items-center space-x-2">
-              <ImageIconLucide className="text-black dark:text-white" size={20} />
-              <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Image</h3>
-            </div>
-            {message.imagePromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.imagePromptText}&quot;</p>}
-            <img
-              src={`data:image/png;base64,${message.b64Json}`}
-              alt={message.imagePromptText || "Generated image"}
-              className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto shadow-md"
-            />
-            <ContextualActionsPlaceholder messageId={message.messageId} />
-          </div>
+        <div className="pt-4">
+          <img src={`data:image/png;base64,${message.b64Json}`} alt={message.imagePromptText || "Generated image"} className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto shadow-md" />
         </div>
       )}
-
-      {/* Assistant Generated Audio Message */}
       {message.role === 'assistant' && message.type === 'generated_audio' && message.b64JsonAudio && (
-        <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-          <div className="flex flex-col space-y-2">
-            <div className="flex flex-row items-center space-x-2">
-              <AudioIconLucide className="text-black dark:text-white" size={20} />
-              <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Audio</h3>
-            </div>
-            {message.audioPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.audioPromptText}&quot;</p>}
-            <audio
-              controls
-              src={`data:audio/mpeg;base64,${message.b64JsonAudio}`}
-              className="rounded-lg border dark:border-gray-600 w-full max-w-md shadow-md"
-            >
-              Your browser does not support the audio element.
-            </audio>
-            <ContextualActionsPlaceholder messageId={message.messageId} />
-          </div>
+        <div className="pt-4">
+          <audio controls src={`data:audio/mpeg;base64,${message.b64JsonAudio}`} className="rounded-lg w-full max-w-md" />
         </div>
       )}
-
-      {/* Assistant Generated Video Message */}
       {message.role === 'assistant' && message.type === 'generated_video' && message.b64JsonVideo && (
-        <div className={cn("pt-4", messageIndex === 0 ? 'pt-16' : 'pt-8')}>
-          <div className="flex flex-col space-y-2">
-            <div className="flex flex-row items-center space-x-2">
-              <VideoIconLucide className="text-black dark:text-white" size={20} />
-              <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Generated Video</h3>
-            </div>
-            {message.videoPromptText && <p className="text-sm text-gray-600 dark:text-gray-400 italic">From prompt: &quot;{message.videoPromptText}&quot;</p>}
-            <video
-              controls
-              autoPlay
-              muted
-              loop
-              src={`data:video/mp4;base64,${message.b64JsonVideo}`}
-              className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto shadow-md"
-            >
-              Your browser does not support the video tag.
-            </video>
-            <ContextualActionsPlaceholder messageId={message.messageId} />
-          </div>
+        <div className="pt-4">
+          <video controls autoPlay muted loop src={`data:video/mp4;base64,${message.b64JsonVideo}`} className="rounded-lg border dark:border-gray-600 max-w-md w-full h-auto shadow-md" />
         </div>
       )}
 
-      {/* Standard Assistant Text Message */}
       {message.role === 'assistant' && (message.type === 'text' || !message.type) && (
-        <div className="flex flex-col space-y-9 lg:space-y-0 lg:flex-row lg:justify-between lg:space-x-24 lg:w-[65rem]">
-           <div ref={dividerRef} className="flex flex-col space-y-6 w-full lg:w-8/12 h-full">
-            {message.sources && message.sources.length > 0 && (
-              <div className="flex flex-col space-y-2">
-                 <div className="flex flex-row items-center space-x-2">
-                  <BookCopy className="text-black dark:text-white" size={20} />
-                  <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Sources</h3>
-                </div>
-                <MessageSources sources={message.sources} />
-              </div>
-            )}
+        <div className="w-full flex flex-col space-y-6">
+          {message.sources && message.sources.length > 0 && (
             <div className="flex flex-col space-y-2">
               <div className="flex flex-row items-center space-x-2">
-                <Disc3
-                  className={cn(
-                    'text-black dark:text-white',
-                    (isLast && loading) || message.status === 'streaming' ? 'animate-spin' : 'animate-none'
-                  )}
-                  size={20}
-                />
-                <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Answer</h3>
+                <BookCopy className="text-black dark:text-white" size={20} />
+                <h3 className="text-black dark:text-white font-medium text-lg sm:text-xl">Sources</h3>
               </div>
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkMath]}
-                rehypePlugins={[rehypeKatex]}
-                components={{ code: CodeBlock }}
-                className={cn('prose prose-p:leading-relaxed prose-pre:p-0', 'dark:prose-invert max-w-none break-words text-black dark:text-gray-200 text-sm md:text-base font-medium')}
-              >
-                {parsedMessage}
-              </ReactMarkdown>
-              {message.status !== 'streaming' && ! (isLast && loading && message.status !== 'error' && message.status !== 'completed') && (
-                <>
-                  <div className="flex flex-row items-center justify-between w-full text-black dark:text-white py-4 -mx-2">
+              <MessageSources sources={message.sources} />
+            </div>
+          )}
+          <div className="flex flex-col space-y-2">
+           
+
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+              components={{ code: CodeBlock }}
+              className="prose prose-p:leading-relaxed prose-pre:p-0 dark:prose-invert max-w-none break-words text-black dark:text-gray-200 text-sm md:text-base font-medium"
+            >
+              {parsedMessage}
+            </ReactMarkdown>
+            {message.status !== 'streaming' && !(isLast && loading) && (
+              <>
+                <div className="flex flex-row items-center justify-between w-full text-black dark:text-white py-4 -mx-2">
                     <div className="flex flex-row items-center space-x-1">
                       <Share message={message.content} chatId={message.chatId} messageId={message.messageId}/>
                       <Rewrite rewrite={rewrite} messageId={message.messageId} />
                     </div>
                     <div className="flex flex-row items-center space-x-1">
                       <Copy initialMessage={message.content} message={message} />
-                      <button
-                        onClick={() => { if (speechStatus === 'started') stop(); else start(); }}
-                        className="p-2 text-black dark:text-white rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200"
-                      >
+                      <button onClick={() => { if (speechStatus === 'started') stop(); else start(); }} className="p-2 text-black dark:text-white rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary">
                         {speechStatus === 'started' ? <StopCircle size={18} /> : <Volume2 size={18} />}
                       </button>
                     </div>
-                  </div>
-                  <ContextualActionsPlaceholder messageId={message.messageId} />
-                </>
-              )}
-            </div>
-          </div>
-          <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3 w-[300px] z-30 h-full pb-4">
-            <div className='w-[300px] h-[207.36px]'>
-              <div className="h-full w-full">
-                <RelatedImages chat_history={historyForSearch} query={currentQuery} />
-              </div>
-            </div>
-            {isImageSearchVisible && <SearchImages key="image-search" query={currentQuery} chat_history={historyForSearch} complete={handleImageSearchCompletion} visible={true} />}
-            {isVideoSearchVisible && <SearchVideos key="video-search" chat_history={historyForSearch} query={currentQuery} complete={handleVideoSearchCompletion} visible={true} />}
-            {callAd && (
-              <div className="w-[300px] mt-10 hidden lg:flex xl:flex flex-col items-center gap-2.5 h-[calc(100vh-110px)] hide-scrollbar overflow-y-auto overflow-x-hidden">
-                <div className="w-[300px] h-[250px] cursor-pointer"><SideTopAdComponent divid={`top-message-${messageIndex}`} /></div>
-                <div className="w-[300px] h-[600px] cursor-pointer"><SideBottomAdComponent divid={`bottom-message-${messageIndex}`} /></div>
-              </div>
+                </div>
+                <ContextualActionsPlaceholder messageId={message.messageId} />
+              </>
             )}
           </div>
         </div>
@@ -388,3 +278,32 @@ const CodeBlock = ({
 };
 
 export default MessageBox;
+function useSpeech({ text }: { text: string }): { speechStatus: 'idle' | 'started' | 'stopped'; start: () => void; stop: () => void } {
+  const [speechStatus, setSpeechStatus] = useState<'idle' | 'started' | 'stopped'>('idle');
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  const start = useCallback(() => {
+    if (!window.speechSynthesis) return;
+    if (speechStatus === 'started') return;
+    if (utteranceRef.current) {
+      window.speechSynthesis.cancel();
+      utteranceRef.current = null;
+    }
+    const utterance = new window.SpeechSynthesisUtterance(text);
+    utterance.onend = () => setSpeechStatus('stopped');
+    utterance.onerror = () => setSpeechStatus('stopped');
+    utteranceRef.current = utterance;
+    setSpeechStatus('started');
+    window.speechSynthesis.speak(utterance);
+  }, [text, speechStatus]);
+
+  const stop = useCallback(() => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    setSpeechStatus('stopped');
+    utteranceRef.current = null;
+  }, []);
+
+  return { speechStatus, start, stop };
+}
+

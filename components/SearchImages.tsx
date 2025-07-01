@@ -1,157 +1,156 @@
-/* eslint-disable @next/next/no-img-element */
-import { ImagesIcon, PlusIcon } from 'lucide-react';
-import { useState } from 'react';
+
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Image as ImageIcon, ExternalLink } from 'lucide-react';
+import Image from 'next/image';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { Message } from './ChatWindow';
 import { getCookie } from '@/components/LeftSidebar/cookies';
 
-type Image = {
+type ImageResult = {
   url: string;
   img_src: string;
   title: string;
 };
 
-const SearchImages = ({
-  query,
-  chat_history,
-  complete,
-  visible,
-}: {
-  query: string;
-  chat_history: Message[];
-  complete?: (success: boolean) => void;
-  visible: boolean;
-}) => {
-  const [images, setImages] = useState<Image[] | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [slides, setSlides] = useState<any[]>([]);
-  const [isVisible, setVisible] = useState(visible);
-  return (
-    <>
-      {!loading && images === null && (
-        <button
-          onClick={async () => {
-            setLoading(true);
-            if (complete) {
-              complete(true);
-            }
-            setVisible(true);
-            const chatModelProvider = localStorage.getItem('chatModelProvider');
-            const chatModel = localStorage.getItem('chatModel');
+const MediaCard = ({ imageUrl, link, onClick }: { imageUrl: string; link: string; onClick: () => void; }) => (
+  <a
+    href={link}
+    target="_blank"
+    rel="noopener noreferrer"
+    onClick={(e) => { e.preventDefault(); onClick(); }}
+    className="group relative block aspect-square w-full overflow-hidden rounded-lg cursor-pointer"
+  >
+    <Image
+      src={imageUrl}
+      alt="Related search result"
+      fill
+      className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+      sizes="(max-width: 768px) 100vw, 50vw"
+      priority={false}
+    />
+    <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex items-center justify-center">
+      <ExternalLink className="h-6 w-6 text-white" />
+    </div>
+  </a>
+);
 
-            const res = await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/images`,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: getCookie('token'),
-                },
-                body: JSON.stringify({
-                  query: query,
-                  chat_history: chat_history,
-                  chat_model_provider: chatModelProvider,
-                  chat_model: chatModel,
-                }),
-              },
-            );
-
-            const data = await res.json();
-
-            const images = data.images;
-            setImages(images);
-            setSlides(
-              images.map((image: Image) => {
-                return {
-                  src: image.img_src,
-                };
-              }),
-            );
-            setLoading(false);
-          }}
-          className="border border-dashed  border-dark-200 bg-white active:scale-95 duration-200 transition px-4 py-2 flex flex-row items-center justify-between rounded-lg text-black text-sm w-full"
-        >
-          <div className="flex flex-row items-center space-x-2">
-            <ImagesIcon size={17} />
-            <p>Search images</p>
-          </div>
-          <PlusIcon className="text-[#24A0ED]" size={17} />
-        </button>
-      )}
-      {loading && isVisible && (
-        <div className="grid grid-cols-2 gap-2">
-          {[...Array(4)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-light-secondary dark:bg-dark-secondary h-32 w-full rounded-lg animate-pulse aspect-video object-cover"
-            />
-          ))}
+// --- Styled Skeleton Loader ---
+const SearchImagesSkeleton = () => (
+    <div className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-3">
+        <div className="flex items-center space-x-2 mb-3">
+            <ImageIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+            <div className="h-5 w-28 rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
         </div>
-      )}
-      {images && images?.length > 0 && isVisible && (
-        <>
-          <div className="grid grid-cols-2 gap-2">
-            {images.length > 4
-              ? images.slice(0, 3).map((image, i) => (
-                  <img
-                    onClick={() => {
-                      setOpen(true);
-                      setSlides([
-                        slides[i],
-                        ...slides.slice(0, i),
-                        ...slides.slice(i + 1),
-                      ]);
-                    }}
-                    key={i}
-                    src={image.img_src}
-                    alt={image.title}
-                    className="h-full w-full aspect-video object-cover rounded-lg transition duration-200 active:scale-95 hover:scale-[1.02] cursor-zoom-in"
-                  />
-                ))
-              : images.map((image, i) => (
-                  <img
-                    onClick={() => {
-                      setOpen(true);
-                      setSlides([
-                        slides[i],
-                        ...slides.slice(0, i),
-                        ...slides.slice(i + 1),
-                      ]);
-                    }}
-                    key={i}
-                    src={image.img_src}
-                    alt={image.title}
-                    className="h-full w-full aspect-video object-cover rounded-lg transition duration-200 active:scale-95 hover:scale-[1.02] cursor-zoom-in"
-                  />
+        <div className="grid grid-cols-2 gap-2">
+            {[...Array(4)].map((_, i) => (
+                <div key={i} className="aspect-square w-full rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            ))}
+        </div>
+    </div>
+);
+
+
+const SearchImages = ({ query, chat_history, complete, visible }: { query: string; chat_history: Message[]; complete?: (success: boolean) => void; visible: boolean; }) => {
+    const [images, setImages] = useState<ImageResult[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
+
+    useEffect(() => {
+        if (!query) {
+            setLoading(false);
+            return;
+        }
+
+        const fetchImages = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/images`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: getCookie('token') },
+                    body: JSON.stringify({ query, chat_history }),
+                });
+
+                if (!res.ok) throw new Error('Failed to fetch images');
+
+                const data = await res.json();
+                if (data.images && data.images.length > 0) {
+                    setImages(data.images);
+                    complete?.(true);
+                } else {
+                    complete?.(false);
+                }
+            } catch (err) {
+                setError('Failed to fetch images.');
+                console.error(err);
+                complete?.(false);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchImages();
+    }, [query, chat_history, complete]);
+
+    const openLightboxAtIndex = (index: number) => {
+        setLightboxIndex(index);
+        setLightboxOpen(true);
+    };
+
+    if (!visible) return null;
+    if (loading) return <SearchImagesSkeleton />;
+    if (error || images.length === 0) return null;
+
+    const slides = images.map(img => ({ src: img.img_src }));
+
+    return (
+        <div className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-3">
+            <div className="flex items-center space-x-2 mb-3">
+                <ImageIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-200">Related Images</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+                {images.slice(0, 3).map((image, i) => (
+                    <MediaCard key={i} imageUrl={image.img_src} link={image.url} onClick={() => openLightboxAtIndex(i)} />
                 ))}
-            {images.length > 4 && (
-              <button
-                onClick={() => setOpen(true)}
-                className="bg-light-100 hover:bg-light-200 dark:bg-dark-100 dark:hover:bg-dark-200 transition duration-200 active:scale-95 hover:scale-[1.02] h-auto w-full rounded-lg flex flex-col justify-between text-white p-2"
-              >
-                <div className="flex flex-row items-center space-x-1">
-                  {images.slice(3, 6).map((image, i) => (
-                    <img
-                      key={i}
-                      src={image.img_src}
-                      alt={image.title}
-                      className="h-6 w-12 rounded-md lg:h-3 lg:w-6 lg:rounded-sm aspect-video object-cover"
-                    />
-                  ))}
-                </div>
-                <p className="text-black/70 dark:text-white/70 text-xs">
-                  View {images.length - 3} more
-                </p>
-              </button>
-            )}
-          </div>
-          <Lightbox open={open} close={() => setOpen(false)} slides={slides} />
-        </>
-      )}
-    </>
-  );
+                
+                {images.length > 3 && (
+                    images.length === 4 ? (
+                        <MediaCard imageUrl={images[3].img_src} link={images[3].url} onClick={() => openLightboxAtIndex(3)} />
+                    ) : (
+                        <button
+                            onClick={() => openLightboxAtIndex(3)}
+                            className="group relative flex items-center justify-center aspect-square w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700/50"
+                        >
+                            <>
+                                <Image
+                                    src={images[3].img_src}
+                                    alt="View more images"
+                                    fill
+                                    className="object-cover transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:brightness-50"
+                                    style={{ objectFit: 'cover' }}
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    priority={false}
+                                />
+                                <span className="absolute text-white font-bold text-lg">+{images.length - 3}</span>
+                            </>
+                        </button>
+                    )
+                )}
+            </div>
+            <Lightbox
+                open={lightboxOpen}
+                close={() => setLightboxOpen(false)}
+                slides={slides}
+                index={lightboxIndex}
+            />
+        </div>
+    );
 };
 
 export default SearchImages;

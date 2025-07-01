@@ -535,7 +535,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
 
   return isReady ? (
     notFound ? ( <Error statusCode={404} /> ) : (
-      <div className="flex flex-col h-screen w-full">
+      <div className="flex flex-col h-screen w-full ">
        
        
         <div className="absolute top-3 right-4 z-[999] md:hidden">
@@ -559,7 +559,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
         
         {messages.length > 0 ? (
           <>
-            <Navbar messages={messages} />
+            {/* <Navbar messages={messages} /> */}
             <Chat
               loading={loading || isGenerating}
 
@@ -590,7 +590,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
       </div>
     )
   ) : (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen ">
       <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900 dark:border-gray-100 mb-4"></div>
       <p className="text-gray-600 dark:text-gray-400 text-sm">Loading...</p>
     </div>

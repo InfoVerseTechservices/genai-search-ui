@@ -1,42 +1,5 @@
-// import React from 'react';
-// import { Mail } from 'lucide-react'; // Assuming you're using lucide icons like in your Rewrite component
-
-// interface ShareProps {
-//   message: string;
-// }
-
-// // const shareByEmail = (message: string): void => {
-// //   const subject = encodeURIComponent('Interesting Article');
-// //   const body = encodeURIComponent(message);
-// //   window.location.href = `mailto:?subject=${subject}&body=${body}`;
-// // }
-// const shareByEmail = (message: string): void => {
-//   const subject = encodeURIComponent('Interesting Article');
-//   const body = encodeURIComponent(message);
-//   const mailto = `mailto:?subject=${subject}&body=${body}`;
-//   console.log('Share by Email:', mailto); // Check the full mailto link
-//   window.location.href = mailto;
-// };
-// const Share: React.FC<ShareProps> = ({ message }) => {
-//   return (
-//     <button
-//       onClick={() => shareByEmail(message)}
-//       className="p-2 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black dark:hover:text-white flex items-center space-x-2"
-//       title="Share via Email"
-//     >
-//       <Mail size={18} /> {/* Icon */}
-//       <span className="text-sm">Share</span>
-//     </button>
-//   );
-// };
-
-// export default Share;
-
-
-
-
 import React from 'react';
-import { Mail } from 'lucide-react'; // Ensure you have this imported correctly for the icon
+import { Mail, Share2 } from 'lucide-react'; // Ensure you have this imported correctly for the icon
 // import SharePopupComponent from './SharePopup';
 import { EmailIcon, FacebookIcon, InstagramIcon, LinkedinIcon, MessengerIcon, PinterestIcon, RedditIcon, SendIconCopy, ShareIcon, SMSIcon, TelegramIcon, TumblrIcon, WhatsAppIcon, XIcon } from "../Icons";
 import { useEffect, useState } from 'react';
@@ -163,7 +126,7 @@ rounded-[20px] h-[440px] w-[430px]  border border-white ">
                 </div>
               </div>
               <div className="w-[56px] h-[74px] text-[10px] mb-[9px]">
-                <div className="bg-black h-[45px] w-[45px] rounded-[50%] flex items-center justify-center">
+                <div className="bg-black dark:bg-white h-[45px] w-[45px] rounded-[50%] flex items-center justify-center">
                   {/* <XIcon/> */}
                   <XIcon w={30} h={30} />
                 </div>
@@ -272,11 +235,11 @@ rounded-[20px] h-[440px] w-[430px]  border border-white ">
       }
       <button
         onClick={() => SharePopup(message)}
-        className="p-2 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black dark:hover:text-white flex items-center space-x-2"
+        className="py-2 px-3  rounded-xl hover:bg-light-secondary hover:text-black dark:hover:bg-dark-secondary transition duration-200 text-black dark:text-white flex flex-row items-center space-x-1"
         title="Share the response"
       >
-        {/* Icon */}
-        <ShareIcon />
+    
+        <Share2 size={18}/>
 
         <span className="text-sm font-medium">Share</span>
       </button>

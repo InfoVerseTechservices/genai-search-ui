@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState, ChangeEvent, FunctionComponent as FC } from 'react';
+import React, { useEffect, useRef, useState, FunctionComponent as FC, ChangeEvent } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -19,11 +19,10 @@ import CustomAudioWaveformIcon from './Icons/CustomAudioWaveformIcon';
 
 import TextareaAutosize from 'react-textarea-autosize';
 import { UploadIcon as CustomUploadIcon } from './Icons';
-import React, { useEffect, useRef, useState, ChangeEvent, useCallback } from 'react';
+// Removed duplicate import of React hooks/types
 import { toast } from 'sonner'; // This line was already present.
-import TextareaAutosize from 'react-textarea-autosize'; // Keep this import
 import ImageGenerationPanel from './ImageGenerationPanel';
-//import AudioGenerationPanel from './AudioGenerationPanel'; // This line was already present.
+import AudioGenerationPanel from './AudioGenerationPanel';
 import VideoGenerationParametersPanel, { VideoGenParams as UIVideoGenParams } from './VideoGenerationParametersPanel';
 import ChatCompletionParametersPanel, { AIChatParams } from './ChatCompletionParametersPanel';
 import GenericModal from './GenericModal';

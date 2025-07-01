@@ -510,13 +510,13 @@ const ChatWindow = ({ id }: { id?: string }) => {
     }
     setChatHistory((prevHist) => prevHist.slice(0, prevHist.length - textMsgsCountInTail));
     
-    const aiChatParamsForRewrite: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, number_of_tokens: 1000 };
+    const aiChatParamsForRewrite: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, max_tokens: 1000 };
     handleAIChatRequest(prevUserMessage.content, aiChatParamsForRewrite);
   };
 
   useEffect(() => {
     if (isReady && initialMessage && !messages.some(m => m.content === initialMessage && m.role === 'user')) {
-      const defaultAIChatParams: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, number_of_tokens: 1000 };
+      const defaultAIChatParams: AIChatParams = { model: "qwen-3", temperature: 0.7, top_p: 1, max_tokens: 1000 };
       handleAIChatRequest(initialMessage, defaultAIChatParams);
     }
   }, [isReady, initialMessage, handleAIChatRequest, messages]);
@@ -563,14 +563,13 @@ const ChatWindow = ({ id }: { id?: string }) => {
             <Chat
               loading={loading || isGenerating}
 
-              sendmessages={messages}
+              messages={messages}
               sendMessage={sendMessage}
               onImagePromptSubmit={handleImageGenerationRequest as any}
               onAudioPromptSubmit={handleAudioGenerationRequest as any}
               onVideoPromptSubmit={handleVideoGenerationRequest as any}
               onAIChatSubmit={handleAIChatRequest as any}
 
-              messageAppeared={messageAppeared}
               rewrite={rewrite}
               editMessage={editMessage}
               setMessages={setMessages}

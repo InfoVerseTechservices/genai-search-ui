@@ -70,9 +70,14 @@ const LeftSidebar: FC<LeftSidebarProps> = ({ isOpen, onToggle, onNewChat }) => {
 
   return (
     <div className="flex flex-col h-full w-full p-3 border-r border-[#487ed5]">
-      {/* --- No changes needed in Profile Section --- */}
+      {/* Profile Section */}
       <div className={cn('mb-10 h-12 flex items-center', isOpen ? 'self-start' : 'self-center')}>
-        <Dropdown offset={[0, 10]} placement="bottom-start" btnClassName="flex z-[150] justify-center items-center rounded-full" button={<ProfilePicture image={profilePic} />}>
+        <Dropdown 
+          offset={[0, 10]} 
+          placement="bottom-start" 
+          btnClassName="flex z-[150] justify-center items-center rounded-full" 
+          button={<ProfilePicture image={profilePic} />}
+        >
           <ul className="min-w-[160px] rounded-lg bg-white dark:bg-gray-900 shadow-md dark:border dark:border-gray-700 text-gray-800 dark:text-gray-200">
             <a href="https://colomboai.com/profile">
               <li className="px-4 py-2 hover:bg-neutral-100 dark:hover:bg-gray-800 cursor-pointer font-semibold text-blue-600 dark:text-blue-400"> {userDetails.name} </li>
@@ -83,39 +88,41 @@ const LeftSidebar: FC<LeftSidebarProps> = ({ isOpen, onToggle, onNewChat }) => {
       </div>
 
       <nav>
-        
-          <button
-    onClick={onNewChat}
-    className={cn(
-      'relative group p-3 py-4  rounded-full transition hover:bg-gray-100 dark:hover:bg-gray-700',
-      isOpen ? 'self-start ml-2' : 'self-center'
-    )}
-    aria-label="New Chat"
-  >
-    <Image
-      src={ColomboAISymbol}
-      alt="ColomboAI Symbol"
-      width={35}
-      height={35}
-      className="object-contain"
-    />
-    {!isOpen && (
-      <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 text-xs font-medium bg-black text-white rounded-md shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
-        New Chat
-      </div>
-    )}
-  </button>
-        <button onClick={onToggle} className={cn('group relative flex items-center w-full p-3 py-4 rounded-lg gap-x-4 cursor-pointer transition-colors duration-200', 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700', !isOpen && 'justify-center')}>
-          <PanelRightOpen className={cn('w-6 h-6 transition-transform duration-300 hover:text-blue-400 dark:hover:text-blue-400', !isOpen && 'rotate-180')} />
-          {!isOpen && (
+        {/* Sidebar Toggle Button */}
+          <button onClick={onToggle} className={cn('group relative flex items-center w-full p-3 py-4 rounded-lg gap-x-4 cursor-pointer transition-colors duration-200', 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700', !isOpen && 'justify-center')}>
+           <PanelRightOpen className={cn('w-6 h-6 transition-transform duration-300 hover:text-blue-400 dark:hover:text-blue-400', !isOpen && 'rotate-180')} />
+         {!isOpen && (
             <div className="absolute left-full ml-2 px-2 py-1 text-xs font-medium bg-black text-white rounded-md shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
               {isOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
             </div>
           )}
         </button>
+       
 
+        {/* New Chat Button with Image */}
+        <button
+          onClick={onNewChat}
+          className={cn('group relative flex items-center w-full p-3 py-4 rounded-lg gap-x-4 cursor-pointer transition-colors duration-200', 'text-gray-700 hover:bg-gray-100 hover:text-blue-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400', !isOpen && 'justify-center')}
+          aria-label="New Chat"
+        >
+          <div className="w-6 h-6 flex-shrink-0">
+            <Image
+              src={ColomboAISymbol}
+              alt="ColomboAI Symbol"
+              width={24}
+              height={24}
+              className="object-contain w-full h-full"
+            />
+          </div>
+          {!isOpen && (
+            <div className="absolute left-full ml-2 px-2 py-1 text-xs font-medium bg-black text-white rounded-md shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+              New Chat
+            </div>
+          )}
+          {isOpen && <p className="text-sm font-medium whitespace-nowrap">New Chat</p>}
+        </button>
         
-        
+        {/* Navigation Links */}
         <IconLink href="https://colomboai.com/genai-search" Icon={GenAiIcon as IconComponent} label="Gen AI" isOpen={isOpen} />
         <IconLink href="https://colomboai.com/vibes" Icon={VibesIcon as IconComponent} label="Vibes" isOpen={isOpen} />
         <IconLink href="https://colomboai.com/feed" Icon={FeedIcon as IconComponent} label="Feed" isOpen={isOpen} />
@@ -124,16 +131,28 @@ const LeftSidebar: FC<LeftSidebarProps> = ({ isOpen, onToggle, onNewChat }) => {
         <IconLink href="https://colomboai.com/favorites" Icon={StarIcon as IconComponent} label="Favorites" isOpen={isOpen} /> 
         <hr className="my-4 border-gray-200 dark:border-gray-600" />
         
-        {/* New Chat Button - This remains a button and is perfectly fine. */}
-        <button onClick={onNewChat} className={cn('group relative flex items-center w-full p-3 my-2 rounded-lg gap-x-4 cursor-pointer transition-colors duration-150 dark:hover:text-blue-400 hover:text-blue-400', 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700', !isOpen && 'justify-center')}>
-          <div className="w-6 h-6 flex-shrink-0"> <NewGenSearchIcon w={24} h={24} fill="currentColor" /> </div>
+        {/* New Chat Button with Icon */}
+        <button 
+          onClick={onNewChat} 
+          className={cn(
+            'group relative flex items-center p-3 my-2 rounded-lg gap-x-4 cursor-pointer transition-colors duration-150 dark:hover:text-blue-400 hover:text-blue-400', 
+            'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700', 
+            !isOpen && 'justify-center'
+          )}
+        >
+          <div className="w-6 h-6 flex-shrink-0"> 
+            <NewGenSearchIcon w={24} h={24} fill="currentColor" /> 
+          </div>
           {!isOpen && (
-            <div className="absolute left-full ml-2 px-2 py-1 text-xs font-medium bg-black text-white rounded-md shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50"> New Chat </div>
+            <div className="absolute left-full ml-2 px-2 py-1 text-xs font-medium bg-black text-white rounded-md shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50"> 
+              New Chat 
+            </div>
           )}
           {isOpen && <p className="text-sm font-medium whitespace-nowrap">New Chat</p>}
         </button>
       </nav>
 
+      {/* History Panel */}
       {isOpen && (
         <div className="flex flex-col min-h-0 my-4">
           <hr className="mb-4 border-gray-200 dark:border-gray-600" />
@@ -142,11 +161,10 @@ const LeftSidebar: FC<LeftSidebarProps> = ({ isOpen, onToggle, onNewChat }) => {
         </div>
       )}
 
+      {/* Footer Section */}
       <div className="mt-auto pt-4 flex flex-col items-center gap-y-4 relative">
         <hr className="mt-4 border-gray-200 dark:border-gray-600 w-full" />
         <ThemeToggle />
-
-       
       </div>
     </div>
   );

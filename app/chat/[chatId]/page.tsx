@@ -14,9 +14,17 @@ interface PageProps {
 
 export default function ChatPage({ params }: PageProps) {
   return (
-    <Suspense fallback={<div>Loading Chat...</div>}>
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
+        <div
+          className="w-8 h-8 mb-4 border-4 border-blue-500 border-solid rounded-full border-t-transparent animate-spin"
+          role="status"
+        />
+        <p>Loading Chat...</p>
+      </div>
+    }>
       <LayoutClientWrapper>
-      <ChatWindow id={params.chatId} />
+        <ChatWindow id={params.chatId} />
       </LayoutClientWrapper>
     </Suspense>
   );

@@ -7,6 +7,7 @@ import { Toaster } from 'sonner';
 import ThemeProvider from '@/components/theme/Provider';
 import UserProfileContextProvider from '@/app/context/user';
 import { LayoutProvider } from '@/app/context/LayoutContext';
+import { ChatProvider } from './context/ChatContext';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -40,7 +41,10 @@ export default function RootLayout({
         <ThemeProvider>
           <UserProfileContextProvider>
             <LayoutProvider>
-              {children}
+             
+ {children}
+                        
+
             </LayoutProvider>
           </UserProfileContextProvider>
 

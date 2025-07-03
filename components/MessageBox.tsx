@@ -16,7 +16,6 @@ import Share from './MessageActions/Share';
 import Rewrite from './MessageActions/Rewrite';
 import Copy from './MessageActions/Copy';
 
-// ContextualActionsPlaceholder component
 const ContextualActionsPlaceholder: React.FC<{ messageId: string }> = ({ messageId }) => {
   const handleRegenerate = () => console.log("Regenerate clicked for:", messageId);
   const handleFollowUp = () => console.log("More like this clicked for:", messageId);
@@ -139,10 +138,10 @@ const MessageBox = ({
   const { speechStatus, start, stop } = useSpeech({ text: speechMessage });
 
   return (
-    <div className='dark:text-white px-2 sm:px-4 pb-5 flex flex-col'>
+    <div className='dark:text-white  px-2 sm:px-4 pb-5 flex flex-col'>
       {/* User Messages */}
       {message.role === 'user' && (
-        <div className={cn('flex items-center', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
+        <div className={cn('flex items-center ', messageIndex === 0 ? 'pt-16' : 'pt-8')}>
           <div className="flex items-center">
             {isEditing ? (
               <div className="flex flex-col w-full">
@@ -186,7 +185,7 @@ const MessageBox = ({
 
       {/* Assistant Messages */}
       {message.role === 'assistant' && (
-        <div className="w-full flex flex-col space-y-6 pt-4">
+        <div className={cn("w-full flex flex-col space-y-6 pt-4", isLast && "pb-60")}>
           {/* Generated Media */}
           {message.type === 'generated_image' && message.b64Json && (
             <Image
@@ -271,6 +270,8 @@ const MessageBox = ({
 };
 
 export default MessageBox;
+
+// NOTE: The useSpeech hook is unchanged and remains correct.
 function useSpeech({ text }: { text: string }): { speechStatus: 'idle' | 'started' | 'stopped'; start: () => void; stop: () => void } {
   const [speechStatus, setSpeechStatus] = useState<'idle' | 'started' | 'stopped'>('idle');
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -307,4 +308,3 @@ function useSpeech({ text }: { text: string }): { speechStatus: 'idle' | 'starte
 
   return { speechStatus, start, stop };
 }
-

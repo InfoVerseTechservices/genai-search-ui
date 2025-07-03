@@ -46,10 +46,7 @@ const Navbar = ({ messages }: { messages: Message[] }) => {
   }, [messages]); // Rerun if messages array changes (e.g. new chat)
 
 
-  // If there are no messages, perhaps don't render the navbar content related to a specific chat?
-  // Or render a default state. For now, it will render with empty title/time.
-  // The user wants top-right icons for New Chat / History on mobile (added in ChatWindow.tsx)
-  // So this Navbar might be simpler or focus on context of current chat, if any.
+  
 
   return (
     <div className="fixed z-30 top-0 left-0 right-0 px-4 lg:pl-[calc(5%+1rem)] xl:pl-[calc(5%+1rem)] flex flex-row items-center justify-between w-full py-3 h-[50px] text-sm text-black dark:text-white/70 border-b bg-light-primary dark:bg-dark-primary border-light-100 dark:border-dark-200">
@@ -72,22 +69,9 @@ const Navbar = ({ messages }: { messages: Message[] }) => {
         )}
       </div>
 
-      {/* Right side: Actions (currently commented out, but kept for structure if needed later) */}
-      {/* The user requested New Chat and History icons in ChatWindow.tsx for mobile top-right, so this area might be empty or for other desktop actions */}
+    
       <div className="flex flex-row items-center space-x-4">
-        {/* Example: Edit icon previously for mobile, now back button is primary mobile-left action */}
-        {/* <Edit
-          size={17}
-          className="active:scale-95 transition duration-100 cursor-pointer lg:hidden" // This was the old mobile edit
-        /> */}
-        {/* <Share
-          size={17}
-          className="active:scale-95 transition duration-100 cursor-pointer"
-        /> */}
-        {/* <Trash
-          size={17}
-          className="text-red-400 active:scale-95 transition duration-100 cursor-pointer"
-        /> */}
+       
       </div>
     </div>
   );

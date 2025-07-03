@@ -35,26 +35,19 @@ const Chat = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // This part is correct and will scroll to the bottom when new messages arrive.
     messageEnd.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   return (
-    // This parent container is correctly set up with `relative` positioning,
-    // which is required for the `absolute` child to be positioned correctly.
-    <div className="flex flex-col h-full w-full relative">
+   
+    <div className="flex flex-col h-full w-full">
       
-      {/* Message List Area */}
-      {/* FIX: Changed `flex-grow` to `flex-1`.
-          This div now grows to fill the ENTIRE parent height.
-          The `overflow-y-auto` makes ONLY this section scrollable.
-          The `pb-32` is crucial to add space at the bottom so the last
-          message isn't hidden underneath the absolutely positioned input. */}
+     
       <div 
         ref={containerRef}
-        className="flex-1 overflow-y-auto pb-32"
+        className="flex-1 overflow-y-auto "
       >
-        <div className="px-4">
+        <div className="px-4 pt-4">
           {messages.map((msg, i) => (
             <Fragment key={msg.messageId}>
               <MessageBox
@@ -78,12 +71,9 @@ const Chat = ({
         </div>
       </div>
 
-      {/* Fixed Message Input at the bottom */}
-      {/* FIX: Replaced `sticky` with `absolute`. This takes the input out of
-          the document flow and pins it to the bottom of the nearest `relative`
-          parent, which is the main div of this component. */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-white via-white to-transparent dark:from-gray-900 dark:via-gray-900 dark:to-transparent pt-8">
-        <div className="w-full max-w-4xl mx-auto px-4 pb-4">
+      
+      <div className="absolute bottom-0 w-full py-2 md:py-4 z-10 bg-gradient-to-t from-white via-white to-transparent dark:from-gray-900 dark:via-gray-900 dark:to-transparent ">
+        <div className=" max-w-5xl mx-auto px-5  mb-5">
           <MessageInput
             loading={loading}
             sendMessage={sendMessage}

@@ -21,14 +21,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <Image
               src={LightThemeLogo}
               alt="ColomboAI Light Logo"
-              className="w-[160px] h-auto block dark:hidden"
+              className="w-[250px] h-auto block dark:hidden"
               priority
             />
             {/* Dark theme logo */}
             <Image
               src={DarkThemeLogo}
               alt="ColomboAI Dark Logo"
-              className="w-[160px] h-auto hidden dark:block"
+              className="w-[250px] h-auto hidden dark:block"
               priority
             />
           </div>
@@ -66,8 +66,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         </div>
       </header>
 
-     
-        {children}
+     <div className='h-full overflow-y-clip '>
+ {children}
+     </div>
+       
     </main>
   );
 };

@@ -7,7 +7,7 @@ interface CustomAudioWaveformIconProps {
   color?: string; // Color of the waveform lines, defaults to white
 }
 
-const CustomAudioWaveformIcon: React.FC<CustomAudioWaveformIconProps> = ({ size = 20, color = 'white' }) => {
+const CustomAudioWaveformIcon: React.FC<CustomAudioWaveformIconProps> = ({ size = 20, color = "currentColor" }) => {
   // Calculate bar heights and gaps based on overall size for some scalability
   // The user's CSS had specific heights (8, 16, 24px) and width (3px), gap (3px).
   // For simplicity with the animation, we'll stick to similar fixed-like proportions.

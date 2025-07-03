@@ -69,7 +69,7 @@ const LeftSidebar: FC<LeftSidebarProps> = ({ isOpen, onToggle, onNewChat }) => {
   }, [userDetails.profile_picture]);
 
   return (
-    <div className="flex flex-col h-full w-full p-3 border-r border-[#487ed5]">
+    <div className="flex flex-col  h-full w-full p-3 border-r border-[#487ed5]">
       {/* Profile Section */}
       <div className={cn('mb-10 h-12 flex items-center', isOpen ? 'self-start' : 'self-center')}>
         <Dropdown 
@@ -119,7 +119,6 @@ const LeftSidebar: FC<LeftSidebarProps> = ({ isOpen, onToggle, onNewChat }) => {
               New Chat
             </div>
           )}
-          {isOpen && <p className="text-sm font-medium whitespace-nowrap">New Chat</p>}
         </button>
         
         {/* Navigation Links */}
@@ -131,6 +130,24 @@ const LeftSidebar: FC<LeftSidebarProps> = ({ isOpen, onToggle, onNewChat }) => {
         <IconLink href="https://colomboai.com/favorites" Icon={StarIcon as IconComponent} label="Favorites" isOpen={isOpen} /> 
         <hr className="my-4 border-gray-200 dark:border-gray-600" />
         
+         {/* New Chat Button with Image */}
+        {/* <button
+          onClick={onNewChat}
+          className={cn('group relative flex items-center w-full p-3 py-4 rounded-lg gap-x-4 cursor-pointer transition-colors duration-200', 'text-gray-700 hover:bg-gray-100 hover:text-blue-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400', !isOpen && 'justify-center')}
+          aria-label="New Chat"
+        >
+          <div className="w-6 h-6 flex-shrink-0">
+                       <NewGenSearchIcon w={24} h={24} fill="currentColor" /> 
+
+          </div>
+          {!isOpen && (
+            <div className="absolute left-full ml-2 px-2 py-1 text-xs font-medium bg-black text-white rounded-md shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+              New Chat
+            </div>
+          )}
+        </button> */}
+
+
         {/* New Chat Button with Icon */}
         <button 
           onClick={onNewChat} 
@@ -143,9 +160,9 @@ const LeftSidebar: FC<LeftSidebarProps> = ({ isOpen, onToggle, onNewChat }) => {
           <div className="w-6 h-6 flex-shrink-0"> 
             <NewGenSearchIcon w={24} h={24} fill="currentColor" /> 
           </div>
-          {!isOpen && (
-            <div className="absolute left-full ml-2 px-2 py-1 text-xs font-medium bg-black text-white rounded-md shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50"> 
-              New Chat 
+                    {!isOpen && (
+            <div className="absolute left-full ml-2 px-2 py-1 text-xs font-medium bg-black text-white rounded-md shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+              New Chat
             </div>
           )}
           {isOpen && <p className="text-sm font-medium whitespace-nowrap">New Chat</p>}

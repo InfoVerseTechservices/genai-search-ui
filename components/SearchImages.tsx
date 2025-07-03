@@ -45,7 +45,7 @@ const SearchImagesSkeleton = () => (
             <div className="h-5 w-28 rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
         </div>
         <div className="grid grid-cols-2 gap-2">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(2)].map((_, i) => (
                 <div key={i} className="aspect-square w-full rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
             ))}
         </div>
@@ -108,49 +108,34 @@ const SearchImages = ({ query, chat_history, complete, visible }: { query: strin
 
     const slides = images.map(img => ({ src: img.img_src }));
 
-    return (
-        <div className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-3">
-            <div className="flex items-center space-x-2 mb-3">
-                <ImageIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-200">Related Images</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-                {images.slice(0, 3).map((image, i) => (
-                    <MediaCard key={i} imageUrl={image.img_src} link={image.url} onClick={() => openLightboxAtIndex(i)} />
-                ))}
-                
-                {images.length > 3 && (
-                    images.length === 4 ? (
-                        <MediaCard imageUrl={images[3].img_src} link={images[3].url} onClick={() => openLightboxAtIndex(3)} />
-                    ) : (
-                        <button
-                            onClick={() => openLightboxAtIndex(3)}
-                            className="group relative flex items-center justify-center aspect-square w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700/50"
-                        >
-                            <>
-                                <Image
-                                    src={images[3].img_src}
-                                    alt="View more images"
-                                    fill
-                                    className="object-cover transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:brightness-50"
-                                    style={{ objectFit: 'cover' }}
-                                    sizes="(max-width: 768px) 100vw, 50vw"
-                                    priority={false}
-                                />
-                                <span className="absolute text-white font-bold text-lg">+{images.length - 3}</span>
-                            </>
-                        </button>
-                    )
-                )}
-            </div>
-            <Lightbox
-                open={lightboxOpen}
-                close={() => setLightboxOpen(false)}
-                slides={slides}
-                index={lightboxIndex}
-            />
-        </div>
-    );
+   return (
+  <div className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-3">
+    <div className="flex items-center space-x-2 mb-3">
+      <ImageIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+      <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-200">Related Images</h3>
+    </div>
+    <div className="grid grid-cols-2 gap-2">
+      {images.slice(0, 2).map((image, i) => (
+        <MediaCard
+          key={i}
+          imageUrl={image.img_src}
+          link={image.url}
+          onClick={() => openLightboxAtIndex(i)}
+        />
+      ))}
+    </div>
+    <Lightbox
+      open={lightboxOpen}
+      close={() => setLightboxOpen(false)}
+      slides={slides}
+      index={lightboxIndex}
+    />
+  </div>
+);
+
 };
+
+
+
 
 export default SearchImages;

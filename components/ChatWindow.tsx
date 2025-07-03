@@ -474,7 +474,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
 console.log(messages, "messages here?")
   // Once loaded, render the appropriate view in the main column
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full ">
       {notFound ? (
         <Error statusCode={404} />
       ) : messages.length > 0 ? (

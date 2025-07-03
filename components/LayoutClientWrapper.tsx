@@ -1,18 +1,32 @@
+
 'use client';
 
 import { useState, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import LeftSidebar from '@/components/LeftSidebar';
-
 import { useLayout } from '@/app/context/LayoutContext';
+import MainNavBar from './MainNavBar'; 
+import Layout from './MainNavBar';
 import RelatedImages from './GetOneImage';
 import SearchImages from './SearchImages';
 import SearchVideos from './SearchVideos';
-import SideTopAdComponent from './Ads/SideAdTop';
-import SideBottomAdComponent from './Ads/SideAdBottom';
-import MainNavBar from './MainNavBar'; 
-import Layout from './MainNavBar';
+
+
+
+const AdPlaceholder = ({ divid }: { divid: string }) => (
+  <div 
+    id={divid} 
+    className="flex h-28 w-full items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 flex-shrink-0"
+  >
+    <span className="text-gray-400 dark:text-gray-500 text-sm font-medium">Advertisement</span>
+  </div>
+);
+
+const SideTopAdComponent = ({ divid }: { divid: string }) => <AdPlaceholder divid={divid} />;
+const SideBottomAdComponent = ({ divid }: { divid:string }) => <AdPlaceholder divid={divid} />;
+
+
 
 const RightSidebar = () => {
   const { rightSidebarContent } = useLayout();
@@ -26,13 +40,21 @@ const RightSidebar = () => {
   const { query, history } = rightSidebarContent;
 
   return (
-    <aside className="hidden xl:block w-[300px] flex-shrink-0">
-      <div className="sticky top-6 flex flex-col space-y-4">
-        <RelatedImages chat_history={history} query={query} />
-        {isImageSearchVisible && <SearchImages query={query} chat_history={history} complete={handleImageSearchCompletion} visible={true} />}
-        {isVideoSearchVisible && <SearchVideos query={query} chat_history={history} complete={handleVideoSearchCompletion} visible={true} />}
-        <SideTopAdComponent divid={`top-ad-sidebar`} />
-        <SideBottomAdComponent divid={`bottom-ad-sidebar`} />
+    <aside className="hidden xl:block w-[320px] flex-shrink-0 h-screen px-2 py-20">
+      <div className="sticky top-10 h-[calc(100vh-5rem)] ">
+        
+        <div className="h-full overflow-y-auto space-y-4 ">
+          
+          <RelatedImages chat_history={history} query={query} />
+          
+          {isImageSearchVisible && <SearchImages query={query} chat_history={history} complete={handleImageSearchCompletion} visible={true} />}
+          
+          {isVideoSearchVisible && <SearchVideos query={query} chat_history={history} complete={handleVideoSearchCompletion} visible={true} />}
+          
+          <SideTopAdComponent divid={`top-ad-sidebar`} />
+          <SideBottomAdComponent divid={`bottom-ad-sidebar`} />
+          
+        </div>
       </div>
     </aside>
   );
@@ -61,25 +83,24 @@ export default function LayoutClientWrapper({ children }: { children: ReactNode 
         <LeftSidebar onNewChat={handleNewChat} isOpen={isSidebarOpen} onToggle={toggleSidebar} />
       </aside>
 
-      
       <div className={cn('flex-1 flex flex-col transition-all duration-300 ease-in-out', isSidebarOpen ? 'md:ml-64' : 'md:ml-20')}>
-          
-          <Layout >
-
-          
-
-          <div className="relative flex-1 w-full max-w-screen-xl mx-auto overflow-y-auto p-4 md:p-6">
-              <div className="flex w-full gap-x-12">
-                  <main key={pathname} className="flex-1 flex flex-col min-w-0 relative ">
-                      {children}
-                  </main>
-
-                  <RightSidebar />
-              </div>
-          </div>
-</Layout>
+          <Layout>
+            <div className=" flex-1 w-full max-w-screen-xl mx-auto overflow-y-auto p-4 md:p-6 ">
+                <div className="flex w-full gap-x-12 h-screen ">
+                    <main key={pathname} className="flex-1 flex flex-col min-w-0 relative h-full">
+                        {children}
+                    </main>
+                    <RightSidebar />
+                </div>
+            </div>
+          </Layout>
       </div>
-
     </div>
   );
 }
+
+
+
+
+
+

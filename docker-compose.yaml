@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    ports:
+      - "32768:8080"
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:32768/
+    restart: unless-stopped
+
+  colomboai:
+    build:
+      context: .
+      dockerfile: app.dockerfile
+    depends_on:
+      - searxng
+    ports:
+      - "3000:3000"
+    volumes:
+      - ${PWD}:/home/colomboai/
+      - /home/colomboai/node_modules
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    environment:
+      - SEARXNG_API_URL=http://searxng:8080

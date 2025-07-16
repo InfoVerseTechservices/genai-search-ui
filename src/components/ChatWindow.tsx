@@ -767,6 +767,7 @@ const ChatWindow = ({ id }: { id?: string }) => {
               focusMode={focusMode}
               setFocusMode={setFocusMode}
             />
+            
           </>
         ) : (
           <EmptyChat

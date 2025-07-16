@@ -20,6 +20,7 @@ import {
 import React, { useEffect, useRef, useState, ChangeEvent, FunctionComponent as FC } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { toast } from 'sonner';
+import crypto from 'crypto';
 import { File } from './ChatWindow';
 import AttachSmall from './MessageInputActions/AttachSmall';
 
@@ -156,7 +157,13 @@ const MessageInput = ({
     const selectedFile = e.target.files?.[0] || null;
     if (selectedFile) {
       resetAllModes();
-      setFile(selectedFile);
+      // Convert browser File to custom File interface
+      const customFile: File = {
+        fileName: selectedFile.name,
+        fileExtension: selectedFile.name.split('.').pop() || '',
+        fileId: crypto.randomBytes(7).toString('hex')
+      };
+      setFile(customFile);
     }
   };
 
@@ -208,7 +215,7 @@ const MessageInput = ({
   const isSubmitDisabled = loading || isSubmitting || (!message.trim() && !file);
 
   const placeholderText = 
-    file ? `Attached: ${file.name}. Add a message...` :
+    file ? `Attached: ${file.fileName}. Add a message...` :
     ['imageGeneration', 'videoGeneration', 'audioGeneration'].includes(focusMode) ? "Describe what you want to generate..." :
     "Ask a follow-up...";
 
@@ -280,6 +287,12 @@ const MessageInput = ({
             <button type="button" className={`${modalButtonsStyle}`}><GooglePhotosIcon size={18} /><span>Google Photos</span></button>
         </div>
       </AddMoreModal>
+      
+      <div className="text-center py-2 px-4">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          ColomboAI MC1 can make mistakes. Check important info.
+        </p>
+      </div>
     </div>
   );
 };

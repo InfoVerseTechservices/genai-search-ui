@@ -26,24 +26,22 @@ class VideoGenerationAgent implements VideoGenerationAgentType {
     systemInstructions: string,
   ) {
     const emitter = new eventEmitter();
-    const messageId = require('crypto').randomBytes(7).toString('hex');
     
-    // Emit sources immediately
-    emitter.emit('data', JSON.stringify({ 
-      type: 'sources', 
-      data: [],
-      messageId 
-    }));
+    setTimeout(() => {
+      emitter.emit('data', JSON.stringify({ 
+        type: 'sources', 
+        data: []
+      }));
+    }, 50);
     
-    // Show loading message
-    emitter.emit('data', JSON.stringify({ 
-      type: 'message', 
-      data: '🎬 Generating your video, please wait...',
-      messageId 
-    }));
+    setTimeout(() => {
+      emitter.emit('data', JSON.stringify({ 
+        type: 'response', 
+        data: '🎬 Generating your video, please wait...'
+      }));
+    }, 100);
 
     try {
-      // Call the working API directly
       const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/generate-video`, {
         method: 'POST',
         headers: {
@@ -63,33 +61,32 @@ class VideoGenerationAgent implements VideoGenerationAgentType {
         const videoData = `data:video/mp4;base64,${data.data[0].b64_json}`;
         console.log('Video generated successfully');
         
-        // Replace the loading message with video
-        emitter.emit('data', JSON.stringify({ 
-          type: 'message', 
-          data: `<video controls style="width: 100%; max-width: 600px; border-radius: 8px;"><source src="${videoData}" type="video/mp4">Your browser does not support the video tag.</video>\n\n*Video generated for: "${message}"*`,
-          messageId 
-        }));
+        setTimeout(() => {
+          emitter.emit('data', JSON.stringify({ 
+            type: 'response', 
+            data: `\n\n<video controls style="width: 100%; max-width: 600px; border-radius: 8px; margin: 10px 0;"><source src="${videoData}" type="video/mp4">Your browser does not support the video tag.</video>\n\n*Video generated for: "${message}"*`
+          }));
+          emitter.emit('end');
+        }, 200);
       } else {
-        emitter.emit('data', JSON.stringify({ 
-          type: 'message', 
-          data: 'Video generation failed: ' + (data.error || 'Unknown error'),
-          messageId 
-        }));
+        setTimeout(() => {
+          emitter.emit('data', JSON.stringify({ 
+            type: 'response', 
+            data: '\n\nVideo generation failed: ' + (data.error || 'Unknown error')
+          }));
+          emitter.emit('end');
+        }, 200);
       }
     } catch (error) {
       console.error('Video generation error:', error);
-      emitter.emit('data', JSON.stringify({ 
-        type: 'message', 
-        data: `Video generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        messageId 
-      }));
+      setTimeout(() => {
+        emitter.emit('data', JSON.stringify({ 
+          type: 'response', 
+          data: `\n\nVideo generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }));
+        emitter.emit('end');
+      }, 200);
     }
-
-    emitter.emit('data', JSON.stringify({ 
-      type: 'messageEnd',
-      messageId 
-    }));
-    emitter.emit('end');
     
     return emitter;
   }

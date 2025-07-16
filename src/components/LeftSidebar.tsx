@@ -148,7 +148,7 @@ const LeftSidebar: FC<LeftSidebarProps> = ({
   }, [userDetails, dataLoaded]);
 
   return (
-    <div className="flex flex-col h-full w-full p-3 sm:p-4 border-r border-[#487ed5] overflow-y-auto">
+    <div className="flex flex-col h-full w-full p-3 sm:p-4 border-r border-[#487ed5] overflow-y-auto overflow-x-hidden">
       {/* Mobile Header - Profile + Close Button */}
       {isMobile ? (
         <div className="flex justify-between items-center mb-4 sm:mb-6">

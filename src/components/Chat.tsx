@@ -67,7 +67,7 @@ const Chat = ({
   }, [messages]);
 
   return (
-    <div className="flex flex-col space-y-4 sm:space-y-6 pt-4 sm:pt-8 pb-32 sm:pb-44 lg:pb-32 px-2 sm:px-4 md:px-8 max-w-full overflow-hidden">
+    <div className="flex flex-col space-y-4 sm:space-y-6 pt-4 sm:pt-8 pb-40 sm:pb-48 lg:pb-40 px-2 sm:px-4 md:px-8 max-w-full overflow-hidden">
       {messages.map((msg, i) => {
         const isLast = i === messages.length - 1;
 
@@ -93,14 +93,14 @@ const Chat = ({
       })}
       {loading && !messageAppeared && (
         <div className="px-2 sm:px-0">
-          <MessageBoxLoading />
+          <MessageBoxLoading focusMode={focusMode} />
         </div>
       )}
       <div ref={messageEnd} className="h-0" />
       {dividerWidth > 0 && (
         <>
           <div
-            className="bottom-20 sm:bottom-24 lg:bottom-10 fixed z-40 left-2 right-2 sm:left-auto sm:right-auto"
+            className="bottom-0 fixed z-40 left-0 right-2 sm:left-auto sm:right-auto pb-safe-bottom"
             style={{ width: window.innerWidth <= 640 ? 'calc(100vw - 1rem)' : dividerWidth }}
           >
             <MessageInput

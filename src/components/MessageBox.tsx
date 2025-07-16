@@ -67,6 +67,22 @@ const MessageBox = ({
       }
     }
 
+    // Convert markdown images with base64 data to HTML for proper rendering
+    if (processedMessage.includes('data:image/')) {
+      processedMessage = processedMessage.replace(
+        /!\[([^\]]*)\]\(data:image\/([^)]+)\)/g,
+        '<img src="data:image/$2" alt="$1" style="max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0;" />'
+      );
+    }
+
+    // Convert markdown videos with base64 data to HTML for proper rendering
+    if (processedMessage.includes('data:video/')) {
+      processedMessage = processedMessage.replace(
+        /!\[([^\]]*)\]\(data:video\/([^)]+)\)/g,
+        '<video controls style="max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0;"><source src="data:video/$2" type="video/mp4" />$1</video>'
+      );
+    }
+
     if (
       message.role === 'assistant' &&
       message?.sources &&
@@ -174,11 +190,11 @@ const MessageBox = ({
                 </h3>
               </div>
 
-              {parsedMessage.includes('<video') ? (
+              {parsedMessage.includes('<video') || parsedMessage.includes('<img') || parsedMessage.includes('data:image/') || parsedMessage.includes('data:video/') ? (
                 <div 
                   className={cn(
                     'prose prose-sm sm:prose prose-h1:mb-3 prose-h2:mb-2 prose-h2:mt-4 sm:prose-h2:mt-6 prose-h2:font-[800] prose-h3:mt-3 sm:prose-h3:mt-4 prose-h3:mb-1.5 prose-h3:font-[600] dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 font-[400]',
-                    'max-w-none break-words text-black dark:text-white prose-img:max-w-full prose-img:h-auto prose-img:rounded-lg overflow-hidden'
+                    'max-w-none break-words text-black dark:text-white prose-img:max-w-full prose-img:h-auto prose-img:rounded-lg overflow-hidden pb-4'
                   )}
                   dangerouslySetInnerHTML={{ __html: parsedMessage }}
                 />
@@ -277,8 +293,8 @@ const MessageBox = ({
                 )}
             </div>
           </div>
-          {!parsedMessage.includes('data:image/') && !parsedMessage.includes('<video') && !loading && (
-            <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3 w-full lg:w-3/12 z-30 h-full pb-4 px-2 sm:px-0">
+          {!parsedMessage.includes('data:image/') && !parsedMessage.includes('<video') && (
+            <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3 w-full lg:w-3/12 z-30 h-full pb-40 sm:pb-48 lg:pb-40 px-2 sm:px-0">
               <SearchImages
                 query={history[messageIndex - 1].content}
                 chatHistory={history.slice(0, messageIndex - 1)}

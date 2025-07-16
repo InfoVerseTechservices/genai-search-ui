@@ -51,7 +51,7 @@ const Favourite: React.FC<FavouriteProps> = ({ messageId, chatId, message, userM
       title="Add to favourites"
     >
       <Heart size={18} fill={isFavourite ? 'currentColor' : 'none'} />
-      <span className="text-sm font-medium">Favourite</span>
+      <span className="text-sm font-medium hidden sm:inline">Favourite</span>
     </button>
   );
 };

@@ -172,7 +172,7 @@ const Share: React.FC<ShareProps> = ({ message, chatId, messageId }) => {
         title="Share the response"
       >
         <Share2 size={18} />
-        <span className="text-sm font-medium">Share</span>
+        <span className="text-sm font-medium hidden sm:inline">Share</span>
       </button>
     </>
   );

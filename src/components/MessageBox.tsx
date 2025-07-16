@@ -231,8 +231,6 @@ const MessageBox = ({
                       userMessage={history[messageIndex - 1]?.content}
                     />
                     <Rewrite rewrite={rewrite} messageId={message.messageId} />
-                  </div>
-                  <div className="flex flex-row items-center space-x-1 self-end sm:self-auto">
                     <button
                       onClick={() => {
                         if (speechStatus === 'started') {
@@ -249,6 +247,8 @@ const MessageBox = ({
                         <Volume2 size={18} />
                       )}
                     </button>
+                  </div>
+                  <div className="flex flex-row items-center space-x-1 self-end sm:self-auto">
                   </div>
                 </div>
               )}

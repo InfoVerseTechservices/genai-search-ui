@@ -48,7 +48,7 @@ const Feedback: React.FC<FeedbackProps> = ({ messageId, chatId }) => {
         title="Like this response"
       >
         <ThumbsUp size={18} fill={feedback === 'like' ? 'currentColor' : 'none'} />
-        <span className="text-sm font-medium">Like</span>
+        <span className="text-sm font-medium hidden sm:inline">Like</span>
       </button>
       
       <button
@@ -60,7 +60,7 @@ const Feedback: React.FC<FeedbackProps> = ({ messageId, chatId }) => {
         title="Dislike this response"
       >
         <ThumbsDown size={18} fill={feedback === 'dislike' ? 'currentColor' : 'none'} />
-        <span className="text-sm font-medium">Dislike</span>
+        <span className="text-sm font-medium hidden sm:inline">Dislike</span>
       </button>
     </div>
   );

@@ -250,24 +250,9 @@ const loadMessages = async (
       ...(typeof msg.metadata === 'string' ? JSON.parse(msg.metadata) : msg.metadata),
     };
     
-    // Clean duplicate content from loaded messages
+    // Only remove obvious artifacts
     if (messageData.role === 'assistant' && messageData.content) {
-      let content = messageData.content;
-      
-      // Remove artifacts
-      content = content.replace(/\[Generating response\.\.\.\]/g, '');
-      
-      // Split content in half and check if it's duplicated
-      const midPoint = Math.floor(content.length / 2);
-      const firstHalf = content.substring(0, midPoint).trim();
-      const secondHalf = content.substring(midPoint).trim();
-      
-      // If second half starts with first half, it's likely a duplicate
-      if (secondHalf.startsWith(firstHalf) && firstHalf.length > 50) {
-        content = firstHalf;
-      }
-      
-      messageData.content = content.trim();
+      messageData.content = messageData.content.replace(/\[Generating response\.\.\.\]/g, '').trim();
     }
     
     return messageData;
@@ -458,7 +443,6 @@ const ChatWindow = ({ id }: { id?: string }) => {
       }
 
       if (data.type === 'message' || data.type === 'response') {
-        console.log('Received:', data.type, 'Video:', data.data.includes('<video'));
         responseGenerated = true;
         
         // Add assistant message when response starts generating
@@ -476,39 +460,17 @@ const ChatWindow = ({ id }: { id?: string }) => {
           ]);
           added = true;
         } else {
-          // Prevent duplicate content with chunk tracking
-          let newText = data.data;
-          if (newText && newText.trim().length > 0) {
-            // Create a more robust unique identifier for this chunk
-            const chunkId = newText.trim();
-            
-            // Skip if we've already processed this exact chunk
-            if (processedChunks.has(chunkId) || chunkId.length === 0) {
-              return;
-            }
-            processedChunks.add(chunkId);
-            
-            // Fix common word boundary issues and preserve formatting
-            newText = newText.replace(/([a-z])([A-Z])/g, '$1 $2');
-            // Preserve line breaks and formatting
-            newText = newText.replace(/\\n/g, '\n');
-            
-            setMessages((prev) => {
-              return prev.map((msg) => {
-                if (msg.messageId === data.messageId && msg.role === 'assistant') {
-                  const updatedContent = msg.content + newText;
-                  const cleanContent = updatedContent.replace(/\s+/g, ' ');
-                  return { ...msg, content: cleanContent, isStreaming: true };
-                }
-                return msg;
-              });
+          // Simple append without complex duplicate checking
+          setMessages((prev) => {
+            return prev.map((msg) => {
+              if (msg.messageId === data.messageId && msg.role === 'assistant') {
+                return { ...msg, content: msg.content + data.data };
+              }
+              return msg;
             });
-          }
+          });
         }
-        // Only add to received message if it's not already included
-        if (data.data && !recievedMessage.includes(data.data)) {
-          recievedMessage += data.data;
-        }
+        recievedMessage += data.data;
         setMessageAppeared(true);
       }
 
@@ -639,7 +601,6 @@ const ChatWindow = ({ id }: { id?: string }) => {
     const decoder = new TextDecoder('utf-8');
 
     let partialChunk = '';
-    let fullResponse = '';
 
     while (true) {
       const { value, done } = await reader.read();
@@ -678,17 +639,14 @@ const ChatWindow = ({ id }: { id?: string }) => {
             
             if (jsonData.output_text_delta?.text) {
               const text = jsonData.output_text_delta.text;
-              // Filter artifacts and duplicates
+              // Filter artifacts but allow proper content
               if (!text.includes('[Generating response...]') && 
                   !text.includes('<tool>') && 
                   !text.includes('</tool>') &&
                   !text.includes('{"query":') &&
                   !text.includes('"num_results"') &&
                   !text.includes('arch{') &&
-                  !text.includes('Hello! How can I assist you') &&
-                  !fullResponse.includes(text) &&
                   text.trim().length > 0) {
-                fullResponse += text;
                 messageHandler({
                   type: 'message',
                   data: text,
@@ -696,15 +654,6 @@ const ChatWindow = ({ id }: { id?: string }) => {
                 });
               }
             } else if (jsonData.status === 'completed' || jsonData.finish_reason) {
-              // Complete streaming and apply final formatting
-              setMessages((prev) => 
-                prev.map((msg) => {
-                  if (msg.messageId === messageId && msg.role === 'assistant') {
-                    return { ...msg, content: msg.content, isStreaming: false };
-                  }
-                  return msg;
-                })
-              );
               messageHandler({
                 type: 'messageEnd',
                 messageId: messageId

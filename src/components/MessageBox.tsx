@@ -174,18 +174,13 @@ const MessageBox = ({
                 </h3>
               </div>
 
-              {(() => {
-                const hasVideo = parsedMessage.includes('<video');
-                console.log('MessageBox - Has video:', hasVideo, 'Message length:', parsedMessage.length);
-                return hasVideo;
-              })() ? (
+              {parsedMessage.includes('<video') ? (
                 <div 
                   className={cn(
                     'prose prose-sm sm:prose prose-h1:mb-3 prose-h2:mb-2 prose-h2:mt-4 sm:prose-h2:mt-6 prose-h2:font-[800] prose-h3:mt-3 sm:prose-h3:mt-4 prose-h3:mb-1.5 prose-h3:font-[600] dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 font-[400]',
                     'max-w-none break-words text-black dark:text-white prose-img:max-w-full prose-img:h-auto prose-img:rounded-lg overflow-hidden'
                   )}
                   dangerouslySetInnerHTML={{ __html: parsedMessage }}
-                  ref={() => console.log('Video div rendered')}
                 />
               ) : isEnhancedSearch ? (
                 <RichTextRenderer content={parsedMessage} />
@@ -282,7 +277,7 @@ const MessageBox = ({
                 )}
             </div>
           </div>
-          {!parsedMessage.includes('data:image/') && !parsedMessage.includes('<video') && (
+          {!parsedMessage.includes('data:image/') && !parsedMessage.includes('<video') && !loading && (
             <div className="lg:sticky lg:top-20 flex flex-col items-center space-y-3 w-full lg:w-3/12 z-30 h-full pb-4 px-2 sm:px-0">
               <SearchImages
                 query={history[messageIndex - 1].content}
